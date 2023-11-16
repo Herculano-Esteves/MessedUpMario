@@ -10,8 +10,20 @@ module Tarefa1 where
 
 import LI12324
 
+mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
+    [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+    ,[Plataforma, Plataforma, Vazio, Vazio, Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
+    ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
+    ]
+
 colisoesParede :: Mapa -> Personagem -> Bool
 colisoesParede = undefined
+
+
 
 colisoesPersonagens :: Personagem -> Personagem -> Bool
 colisoesPersonagens = undefined
