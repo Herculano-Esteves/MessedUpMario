@@ -22,27 +22,35 @@ mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ]
 
+per = Personagem {
+    posicao = (20,20),
+    tamanho = (10,10)
+}
+
+
+per1 = Personagem {
+    posicao = (35,20),
+    tamanho = (10,10)
+}
+
 colisoesParede :: Mapa -> Personagem -> Bool
 colisoesParede = undefined
 
 
 
 colisoesPersonagens :: Personagem -> Personagem -> Bool
-colisoesPersonagens = undefined
+colisoesPersonagens p1 p2 = sobreposicao (genHitbox p1) (genHitbox p2)
 
 
-{-
-type Hitbox = (Posicao, Posicao)
-
--- | Vetor velocidade.
-type Velocidade = (Double, Double)
-
--- | Posicao no 'Mapa'.
-type Posicao = (Double, Double)
--}
+genHitbox :: Personagem -> Hitbox
+genHitbox p = (p1,p2)
+    where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          p2 = (xp + fst (tamanho p)/2, yp + snd (tamanho p)/2)
+          xp = fst (posicao p)
+          yp = snd (posicao p)
 
 sobreposicao :: Hitbox -> Hitbox -> Bool
-sobreposicao p1 p2= sobreposicaoAux p1 p2 || sobreposicaoAux p2 p1
+sobreposicao h1 h2= sobreposicaoAux h1 h2 || sobreposicaoAux h2 h1
 
 -- fazer função que faz: sobreposicao h1 h2 || sobreposicao h2 h1 (funciona para se as hitboxes tiverem tamanhos diferentes)
 sobreposicaoAux :: Hitbox -> Hitbox -> Bool
