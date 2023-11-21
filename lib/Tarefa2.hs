@@ -18,7 +18,7 @@ valida :: Jogo -> Bool
 valida = undefined
 
 validaChao :: Mapa -> Bool
-validaChao (Mapa _ _ mapMat) = elem Plataforma (last mapMat)
+validaChao (Mapa _ _ mapMat) = all (== Plataforma) (last mapMat)
 
 -- | Verifica se o ressalto do jogador é falso e se o ressalto de todos os enimigos é verdadeiro
 validaRessalta :: Personagem -> [Personagem] -> Bool
