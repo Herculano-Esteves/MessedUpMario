@@ -5,12 +5,14 @@ Copyright   : Nuno Miguel Paiva Fernandes <a107317@alunos.uminho.pt>
               Pedro Herculano Soares Oliveira do Lago Esteves <a106839@alunos.uminho.pt>
 
 Módulo para a realização da Tarefa 1 de LI1 em 2023/24.
+
+IMPORTANTE -> Tudo com IMPORTANTE tem dimensoes do bloco do mapa, possivel alteraçoes
 -}
 module Tarefa1 where
 
 import LI12324
 import Graphics.Gloss.Data.Point (pointInBox)
-import GHC.Float (double2Float)
+import GHC.Float (double2Float, double2Int)
 
 mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
@@ -23,8 +25,8 @@ mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     ]
 
 per = Personagem {
-    posicao = (20,20),
-    tamanho = (10,10)
+    posicao = (5,15),
+    tamanho = (7,7)
 }
 
 
@@ -33,8 +35,30 @@ per1 = Personagem {
     tamanho = (10,10)
 }
 
+-- | caso a personagem esteja fora do mapa a personagem esta a colidir com as paredes externas
+
 colisoesParede :: Mapa -> Personagem -> Bool
-colisoesParede = undefined
+colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes mapa)) || foldl (\valor lista -> if valor == True then True else if valor == lista then False else True) False (map (sobreposicao (genHitbox perso)) (getMapColisions (5,5) mapa))
+
+-- | dimensoes do mapa IMPORTANTE a assumir que a dimensao de cada bloco é 10x10
+getMapaDimensoes :: Mapa -> Hitbox
+getMapaDimensoes (Mapa _ _ (h:t)) = ((0,0),(fromIntegral(length (h:t))*10,fromIntegral(length h)*10))
+
+-- |IMPORTANDE depende de dimensoes do bloco
+getMapColisions :: Posicao -> Mapa -> [Hitbox]
+getMapColisions _ (Mapa _ _ []) = []
+getMapColisions (a,b) (Mapa c d (h:t)) = mapablocoshitbox (a,b) h ++ getMapColisions (a,b+10) (Mapa c d t)
+
+--IMPORTANTE depende da dimensao do bloco 10x10
+mapablocoshitbox :: Posicao -> [Bloco] -> [Hitbox]
+mapablocoshitbox _ [] = []
+mapablocoshitbox (a,b) (h:t)    | h == Plataforma = mapablocoshitbox (a+10,b) t ++ [gethitboxbloco (a,b)]
+                                | otherwise = mapablocoshitbox (a+10,b) t
+
+
+--assumindo que a IMPORTANTE dimensao do bloco é 10x10
+gethitboxbloco :: Posicao -> Hitbox
+gethitboxbloco (a,b) = ((a+5,b-5),(a-5,b+5))
 
 
 

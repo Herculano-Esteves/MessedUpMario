@@ -11,7 +11,9 @@ module Tarefa2 where
 import LI12324
 
 -- Test data
+enmLs :: [Personagem]
 enmLs = [Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,7.5)}]
+jog :: Personagem
 jog = Personagem {ressalta = False, posicao = (1.5,2.5)}
 
 valida :: Jogo -> Bool
