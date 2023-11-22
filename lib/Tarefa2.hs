@@ -24,5 +24,12 @@ validaChao (Mapa _ _ mapMat) = elem Plataforma (last mapMat)
 validaRessalta :: Personagem -> [Personagem] -> Bool
 validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta inimigosList
 
+-- | Verfica que a pos inicial de um jogador não coincide com a pos inicial dos inimigos
 validaPosJogInim :: Personagem -> [Personagem] -> Bool
 validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador) inimigosList
+
+
+-- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
+validaNumIniAndVidaFan :: [Personagem] -> Bool
+validaNumIniAndVidaFan inis = (length inis == 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
+
