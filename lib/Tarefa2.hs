@@ -10,11 +10,14 @@ module Tarefa2 where
 
 import LI12324
 
--- Test data
+-- Test data START
 enmLs :: [Personagem]
 enmLs = [Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,7.5)}]
 jog :: Personagem
 jog = Personagem {ressalta = False, posicao = (1.5,2.5)}
+-- Test data END
+
+
 
 valida :: Jogo -> Bool
 valida = undefined
@@ -22,7 +25,7 @@ valida = undefined
 validaChao :: Mapa -> Bool
 validaChao (Mapa _ _ mapMat) = all (== Plataforma) (last mapMat)
 
--- | Verifica se o ressalto do jogador é falso e se o ressalto de todos os enimigos é verdadeiro
+-- | Verifica se o ressalto do jogador é falso e se o ressalto de todos os inimigos é verdadeiro
 validaRessalta :: Personagem -> [Personagem] -> Bool
 validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta inimigosList
 
