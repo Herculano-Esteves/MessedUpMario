@@ -15,13 +15,49 @@ import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
 
 -- Test data START
-enmLs :: [Personagem]
-enmLs = [Personagem {ressalta = True, posicao = (1.5,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,7.5), tamanho = (7,7)}]
+inm :: [Personagem]
+inm = [Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (1.5,2.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste},
+        Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (1.5,2.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste},
+        Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (1.5,2.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste}]
 jog :: Personagem
-jog = Personagem {ressalta = False, posicao = (1.5,2.5), tamanho = (7,7)}
+jog = Personagem {  velocidade = (0,0),
+                    tipo = Jogador,
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = False, 
+                    posicao = (10,10), 
+                    tamanho = (7,7), 
+                    aplicaDano = (True, 10), 
+                    direcao = Este}
 -- Test data END
-
-
 
 valida :: Jogo -> Bool
 valida = undefined
