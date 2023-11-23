@@ -19,7 +19,7 @@ movimenta = undefined
 
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
-hitboxDanoJogador x y   | fst (aplicaDano x) && snd (aplicaDano x) >= 0 = hitboxDanoJogadoraux x y
+hitboxDanoJogador x y   | fst (aplicaDano x) && snd (aplicaDano x) > 0 = hitboxDanoJogadoraux x y
                         | otherwise = y
 
 
