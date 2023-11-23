@@ -33,15 +33,10 @@ validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta ini
 
 -- | Verifica a posiçao inicial se sobrepoem ou nao com os inimigos
 validaPosJogInim :: Personagem -> [Personagem] -> Bool
-validaPosJogInim jogador inimigosList = all (==False) (map (\i -> sobreposicao (genHitbox i) (genHitbox jogador)) inimigosList)
+validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador) inimigosList
 
--- | Verifica o numero minimo de inimigos
-validaInimigmin :: [Personagem] -> Bool
-validaInimigmin x = length x >= 2
 
--- | Verifica a vida de fantasmas
-validaVidaghost :: [Personagem] -> Bool
-validaVidaghost [] = True
-validaVidaghost (h:t)   | tipo h == Fantasma && vida h == 1 = True
-                        | otherwise = validaInimigmin t
+-- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
+validaNumIniAndVidaFan :: [Personagem] -> Bool
+validaNumIniAndVidaFan inis = (length inis == 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
 
