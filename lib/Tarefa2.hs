@@ -9,12 +9,13 @@ Módulo para a realização da Tarefa 2 de LI1 em 2023/24.
 module Tarefa2 where
 
 import LI12324
+import Tarefa1 (sobreposicao, genHitbox)
 
 -- Test data START
 enmLs :: [Personagem]
-enmLs = [Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,1.5)},Personagem {ressalta = True, posicao = (1.5,7.5)}]
+enmLs = [Personagem {ressalta = True, posicao = (20,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,7.5), tamanho = (7,7)}]
 jog :: Personagem
-jog = Personagem {ressalta = False, posicao = (1.5,2.5)}
+jog = Personagem {ressalta = False, posicao = (1.5,2.5), tamanho = (7,7)}
 -- Test data END
 
 
@@ -30,4 +31,4 @@ validaRessalta :: Personagem -> [Personagem] -> Bool
 validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta inimigosList
 
 validaPosJogInim :: Personagem -> [Personagem] -> Bool
-validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador) inimigosList
+validaPosJogInim jogador inimigosList = all (==False) (map (\i -> sobreposicao (genHitbox i) (genHitbox jogador)) inimigosList)
