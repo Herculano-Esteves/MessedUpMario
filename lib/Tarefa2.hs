@@ -12,10 +12,12 @@ import LI12324
 import Tarefa1 (sobreposicao, genHitbox)
 
 -- Test data START
-enmLs :: [Personagem]
-enmLs = [Personagem {ressalta = True, posicao = (1.5,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,1.5), tamanho = (7,7)},Personagem {ressalta = True, posicao = (20,7.5), tamanho = (7,7)}]
+inm :: [Personagem]
+inm = [Personagem {vida = 1, ressalta = True, posicao = (1.5,1.5), tamanho = (7,7)},
+        Personagem {vida = 1, ressalta = True, posicao = (20,1.5), tamanho = (7,7)},
+        Personagem {vida = 1, ressalta = True, posicao = (20,7.5), tamanho = (7,7)}]
 jog :: Personagem
-jog = Personagem {ressalta = False, posicao = (1.5,2.5), tamanho = (7,7)}
+jog = Personagem {ressalta = False, posicao = (1.5,2.5), tamanho = (7,7), aplicaDano = (True, 10), direcao = Oeste}
 -- Test data END
 
 
