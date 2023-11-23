@@ -10,6 +10,9 @@ module Tarefa2 where
 
 import LI12324
 import Tarefa1 (sobreposicao, genHitbox)
+import Data.List (elemIndex, elemIndices)
+import Data.Maybe (fromMaybe)
+import GHC.Float (double2Int)
 
 -- Test data START
 enmLs :: [Personagem]
@@ -39,4 +42,13 @@ validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador)
 -- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
 validaNumIniAndVidaFan :: [Personagem] -> Bool
 validaNumIniAndVidaFan inis = (length inis == 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
+
+-- TODO: Check if this should check for the platform blocks arround the end/start of the platform
+-- | Verfica se as escadas são continuas e terminam e começam com plataforma
+validaEscadas :: Mapa -> Bool
+validaEscadas (Mapa _ _ mat) = all (\(x,y) -> ((x,y-1) `elem` getPosOfBlock Plataforma mat || (x,y-1) `elem` getPosOfBlock Escada mat) && ((x,y+1) `elem` getPosOfBlock Plataforma mat || (x,y+1) `elem` getPosOfBlock Escada mat)) (getPosOfBlock Escada mat)
+
+-- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
+getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]
+getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! double2Int y !! double2Int x == bloco]
 
