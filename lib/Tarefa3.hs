@@ -39,4 +39,20 @@ hitboxDanoJogadoraux player (h:t)   | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam
                                         aux x   | x == Este = -1
                                                 | x == Oeste = 1
                                                 | otherwise = 1
-                                        
+
+
+inimigoMorto :: [Personagem] -> [Personagem]
+inimigoMorto l = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) [] l
+
+
+
+gravidadeQueda :: Mapa -> [Personagem] -> [Personagem]
+gravidadeQueda mapa l = foldl (\x y -> gravidadeQuedaaux mapa y 0 : x) [] l
+
+
+
+
+
+gravidadeQuedaaux :: Mapa -> Personagem -> Int -> Personagem
+gravidadeQuedaaux mapa x | snd (velocidade x) > 0 = 
+
