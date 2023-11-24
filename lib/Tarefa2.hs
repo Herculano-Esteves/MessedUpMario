@@ -66,30 +66,31 @@ jogoSamp = Jogo mapaTeste inm colec jog
 -- Test data END
 
 valida :: Jogo -> Bool
-valida = undefined
+valida jogo = validaChao (mapa jogo) &&
+    validaRessalta (jogador jogo) (inimigos jogo) &&
+    validaPosJogInim (jogador jogo) (inimigos jogo) &&
+    validaNumIniAndVidaFan (inimigos jogo) &&
+    validaEscadas (mapa jogo) &&
+    validaAlcapoes (mapa jogo) &&
+    validaPosPersColecs jogo
 
--- * Add to valida
 -- | Verifica o chao do mapa
 validaChao :: Mapa -> Bool
 validaChao (Mapa _ _ mapMat) = all (== Plataforma) (last mapMat)
 
--- * Add to valida
 -- | Verifica se o ressalto do jogador é falso e se o ressalto de todos os inimigos é verdadeiro
 validaRessalta :: Personagem -> [Personagem] -> Bool
 validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta inimigosList
 
--- * Add to valida
 -- | Verifica a posiçao inicial se sobrepoem ou nao com os inimigos
 validaPosJogInim :: Personagem -> [Personagem] -> Bool
 validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador) inimigosList
 
 
--- * Add to valida
 -- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
 validaNumIniAndVidaFan :: [Personagem] -> Bool
-validaNumIniAndVidaFan inis = (length inis == 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
+validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
 
--- * Add to valida
 -- TODO: Check if this should check for the platform blocks arround the end/start of the platform
 -- | Verfica se as escadas são continuas e terminam e começam com plataforma
 validaEscadas :: Mapa -> Bool
@@ -105,10 +106,12 @@ getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)],
 getPosOfBlock' :: Bloco -> Mapa -> [Posicao]
 getPosOfBlock' bloco (Mapa _ _ mat) = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! double2Int y !! double2Int x == bloco]
 
-
 -- TODO: Discuss the size of blocks and player, needed for the 7th step
+-- | Verifica se os alçapões se encontram pelo menos em grupos de 2
+validaAlcapoes :: Mapa -> Bool
+validaAlcapoes (Mapa _ _ mat) = all (\(x,y) -> (x+1,y) `elem` matEsc || (x-1,y) `elem` matEsc) matEsc
+    where matEsc = getPosOfBlock Alcapao mat
 
--- * Add to valida
 -- | Verifica se os colecionaveis se encontram em espaços vazios no mapa e se as personagens se encontram em espaços vazios do mapa
 validaPosPersColecs :: Jogo -> Bool
 validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jogo) && validaColecs (colecionaveis jogo) (mapa jogo) 
