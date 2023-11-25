@@ -10,7 +10,7 @@ module Tarefa2 where
 
 import LI12324
 import Tarefa1 (sobreposicao, genHitbox, mapaTeste)
-import Data.List (elemIndex, elemIndices)
+import Data.List (elemIndex, elemIndices, groupBy, sortOn)
 import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
 
@@ -93,9 +93,32 @@ validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ f
 
 -- TODO: Check if this should check for the platform blocks arround the end/start of the platform
 -- | Verfica se as escadas são continuas e terminam e começam com plataforma
+-- | 
 validaEscadas :: Mapa -> Bool
-validaEscadas (Mapa _ _ mat) = all (\(x,y) -> ((x,y-1) `elem` getPosOfBlock Plataforma mat || (x,y-1) `elem` getPosOfBlock Escada mat) && ((x,y+1) `elem` getPosOfBlock Plataforma mat || (x,y+1) `elem` getPosOfBlock Escada mat)) (getPosOfBlock Escada mat)
+validaEscadas (Mapa _ _ mat) = all validateEachOne (agrupaEscadas (getPosOfBlock Escada mat))
+    where validateEachOne :: [Posicao] -> Bool
+          validateEachOne ls = ((x1,y1-1) `elem` getPosOfBlock Plataforma mat &&
+                                (x2,y2-1) `elem` getPosOfBlock Escada mat) ||
+                                ((x2,y2+1) `elem` getPosOfBlock Plataforma mat &&
+                                (x1,y1+1) `elem` getPosOfBlock Escada mat)
+            where (x1,y1) = head ls
+                  (x2,y2) = last ls
 
+
+-- TODO: I only want the head and last of each stair list
+agrupaEscadas :: [Posicao] -> [[Posicao]]
+agrupaEscadas pos = map (\p-> [head p] ++ [last p]) $ agrupaEscadasAux (groupEscadasAux pos)
+
+agrupaEscadasAux :: [Posicao] -> [[Posicao]]
+agrupaEscadasAux [] = []
+agrupaEscadasAux [x] = [[x]]
+agrupaEscadasAux ((x,y):t)
+    | elem (x,y+1) (head r) = ((x,y) : (head r)) : tail r
+    | otherwise = [(x,y)] : r
+    where r = agrupaEscadasAux t
+
+groupEscadasAux :: [Posicao] -> [Posicao]
+groupEscadasAux pos = sortOn fst pos
 
 -- ? Maybe this should return the pos of a block as (0.5,0.5) instead of (0,0), however we would have to refactor the code
 -- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
