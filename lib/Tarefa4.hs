@@ -13,15 +13,22 @@ import Data.Maybe
 import LI12324
 
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
-atualiza = undefined
+atualiza actions action jogo
+    | length actions == length (inimigos jogo) = jogo {
+        jogador = atualizaPersonagem action (jogador jogo),
+        inimigos = atualizaInimigos actions (inimigos jogo)
+        }
+    | otherwise = jogo
+
+
 
 atualizaInimigos :: [Maybe Acao] -> [Personagem] -> [Personagem]
-atualizaInimigos actions inms = zipWith (\a b -> b) actions inms
+atualizaInimigos actions inms = zipWith atualizaPersonagem actions inms
 
 -- * Change the velocity
 -- TODO: Define how each character is going to jump
-atualizaInimigo :: Maybe Acao -> Personagem -> Personagem
-atualizaInimigo action inm = case action of
+atualizaPersonagem :: Maybe Acao -> Personagem -> Personagem
+atualizaPersonagem action inm = case action of
         Just Subir -> inm {velocidade = (0,-10)}
         Just Descer -> inm {velocidade = (0,10)}
         Just AndarEsquerda -> inm {velocidade = (-10,0), direcao = Oeste}
