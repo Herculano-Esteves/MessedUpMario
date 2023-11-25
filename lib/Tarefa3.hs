@@ -51,7 +51,7 @@ gravidadeQueda mapa l = foldl (\x y -> x ++ [changeVelocidade mapa y]) [] l
 
 -- | Muda individualmete a gravidade
 changeVelocidade :: Mapa -> Personagem -> Personagem
-changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {velocidade = (fst(velocidade perso),snd gravidade) }
+changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {velocidade = (fst (velocidade perso),snd gravidade) }
                                 | otherwise = perso
 
 -- | Deteta se a gravidade presisa de estar on ou off
@@ -68,12 +68,15 @@ perdeVidaJogador jog inm        | all (==False) (foldl (\x y -> colisoesPersonag
 
 -- JOGADOR E OBJETOS START
 coletarObjetos :: Jogo -> Jogo
-coletarObjetos jogo = jogo {colecionaveis = coletarObjetosaux (jogador jogo) (colecionaveis jogo)}
-
-coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [(Colecionavel,Posicao)]
+coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos = pontos (jogador jogo) + p3,aplicaDano = (if (p4 == False && (snd (aplicaDano (jogador jogo)) > 0)) || p4 then True else False,if p4 && (snd (aplicaDano (jogador jogo)) == 0) then 10 else snd (aplicaDano (jogador jogo)))}}
+                        where   p1 = map fst (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
+                                p2 = map snd (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
+                                p3 = sum (map fst p2)
+                                p4 = not (all (==False) (map snd p2))
+coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
 coletarObjetosaux _ [] = []
-coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = (x,(-5,-5)) : coletarObjetosaux jog t
-                                | otherwise = (x,y) : coletarObjetosaux jog t
+coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-5,-5)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
+                                | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
 estaTocarObjeto jog pos = sobreposicao (genHitbox jog) (pos,pos)
