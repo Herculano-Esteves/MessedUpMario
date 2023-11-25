@@ -44,15 +44,37 @@ hitboxDanoJogadoraux player (h:t)   | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam
 inimigoMorto :: [Personagem] -> [Personagem]
 inimigoMorto l = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) [] l
 
-
-
+-- GRAVIDADE START
+-- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Mapa -> [Personagem] -> [Personagem]
-gravidadeQueda mapa l = foldl (\x y -> gravidadeQuedaaux mapa y 0 : x) [] l
+gravidadeQueda mapa l = foldl (\x y -> x ++ [changeVelocidade mapa y]) [] l
+
+-- | Muda individualmete a gravidade
+changeVelocidade :: Mapa -> Personagem -> Personagem
+changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {velocidade = (fst(velocidade perso),snd gravidade) }
+                                | otherwise = perso
+
+-- | Deteta se a gravidade presisa de estar on ou off
+gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
+gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 10 [Plataforma] (5,5) mapa))
+-- GRAVIDADE END
 
 
+-- JOGADOR LIFE START
+perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
+perdeVidaJogador jog inm        | all (==False) (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
+                                | otherwise = jog {vida = vida jog - 1}
+-- JOGADOR LIFE END
 
+-- JOGADOR E OBJETOS START
+coletarObjetos :: Jogo -> Jogo
+coletarObjetos jogo = jogo {colecionaveis = coletarObjetosaux (jogador jogo) (colecionaveis jogo)}
 
+coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [(Colecionavel,Posicao)]
+coletarObjetosaux _ [] = []
+coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = (x,(-5,-5)) : coletarObjetosaux jog t
+                                | otherwise = (x,y) : coletarObjetosaux jog t
 
-gravidadeQuedaaux :: Mapa -> Personagem -> Int -> Personagem
-gravidadeQuedaaux mapa x | snd (velocidade x) > 0 = 
-
+estaTocarObjeto :: Personagem -> Posicao -> Bool
+estaTocarObjeto jog pos = sobreposicao (genHitbox jog) (pos,pos)
+-- JOGADOR E OBJETOS END
