@@ -91,7 +91,6 @@ validaPosJogInim jogador inimigosList = all (\i -> posicao i /= posicao jogador)
 validaNumIniAndVidaFan :: [Personagem] -> Bool
 validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
 
--- TODO: Check if this should check for the platform blocks arround the end/start of the platform
 -- | Verfica se as escadas são continuas e terminam e começam com plataforma
 -- | 
 validaEscadas :: Mapa -> Bool
@@ -105,7 +104,6 @@ validaEscadas (Mapa _ _ mat) = all validateEachOne (agrupaEscadas (getPosOfBlock
                   (x2,y2) = last ls
 
 
--- TODO: I only want the head and last of each stair list
 agrupaEscadas :: [Posicao] -> [[Posicao]]
 agrupaEscadas pos = map (\p-> [head p] ++ [last p]) $ agrupaEscadasAux (groupEscadasAux pos)
 
