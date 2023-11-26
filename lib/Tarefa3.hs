@@ -17,7 +17,9 @@ movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta = undefined
 
 
-
+--Dano Jogador START
+hitboxDanoJogadorFinal :: Jogo -> Jogo
+hitboxDanoJogadorFinal jogo = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogador x y   | fst (aplicaDano x) && snd (aplicaDano x) > 0 = hitboxDanoJogadoraux x y
@@ -40,12 +42,23 @@ hitboxDanoJogadoraux player (h:t)   | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam
                                         aux x   | x == Este = -1
                                                 | x == Oeste = 1
                                                 | otherwise = 1
+--Dano Jogador END
 
+
+--Inimigo morto START
+inimigoMortoEnd :: Jogo -> Jogo
+inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
 inimigoMorto l = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) [] l
+--Inimigo morto END
+
 
 -- GRAVIDADE START
+gravidadeQuedaEnd :: Jogo -> Jogo
+gravidadeQuedaEnd jogo = jogo {inimigos = gravidadeQueda (mapa jogo) (inimigos jogo), jogador = changeVelocidade (mapa jogo) (jogador jogo)}
+
+
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Mapa -> [Personagem] -> [Personagem]
 gravidadeQueda mapa l = foldl (\x y -> x ++ [changeVelocidade mapa y]) [] l
@@ -57,11 +70,14 @@ changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {veloci
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 10 [Plataforma] (5,5) mapa))
+gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 -- GRAVIDADE END
 
 
 -- JOGADOR LIFE START
+perdeVidaJogadorEnd :: Jogo -> Jogo
+perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
+
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm        | all (==False) (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
                                 | otherwise = jog {vida = vida jog - 1}
@@ -76,7 +92,7 @@ coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos 
                                 p4 = not (all (==False) (map snd p2))
 coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
 coletarObjetosaux _ [] = []
-coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-5,-5)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
+coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-50,-50)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
                                 | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
@@ -86,11 +102,11 @@ estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((snd pos+1,fst pos+1),po
 
 --JOGADOR E ALCAPAO START
 acionarAlcapao :: Jogo -> Jogo
-acionarAlcapao jogo = undefined
+acionarAlcapao jogo =  jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
 
 
 acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
-acionarAlcapaoaux mapa jog = undefined
+acionarAlcapaoaux (Mapa a b c) jog = Mapa a b (alcapaoMapa (dimensaobloco*0.5) c jog)
 
 --funcao que atualiza o mapa double é metade da dimensao do bloco
 alcapaoMapa :: Double -> [[Bloco]] -> Personagem -> [[Bloco]]
@@ -117,8 +133,6 @@ alcapaolinhaAux :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
 alcapaolinhaAux _ _ [] _ = []
 alcapaolinhaAux y z (h:t) jog        | h == Alcapao = if sobreposicao (genHitbox jog) (gethitboxbloco dimensaobloco (y,z)) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
                                 | otherwise = h : alcapaolinhaAux y (z+dimensaobloco) t jog
+--JOGADOR E ALCAPAO END
 
 
-
-
--- gethitboxbloco :: Double -> Posicao -> Hitbox
