@@ -45,16 +45,17 @@ per1 = Personagem {
 
 -- | caso a personagem esteja fora do mapa a personagem esta a colidir com as paredes externas, || personagens a colidir com as platafromas do mapa
 
---dimensao de cada bloco é 10x10 por                                             aqui e                                                                                 aqui
+--dimensao de cada bloco é 10x10 por
 colisoesParede :: Mapa -> Personagem -> Bool
 colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes 10 mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 10 [Plataforma] (5,5) mapa)))
 
 
 
--- | Colisoes START - o x em todas as funçoes é o lado do tamanho de um bloco
+
+-- Colisoes START - o x em todas as funçoes é o lado do tamanho de um bloco
 -- | dimensoes do mapa x e y IMPORTANTE a assumir que a dimensao de cada bloco é 10x10
 getMapaDimensoes :: Double -> Mapa -> Hitbox
-getMapaDimensoes x (Mapa _ _ (h:t)) = ((0,0),(fromIntegral(length (h:t))*x,fromIntegral(length h)*x))
+getMapaDimensoes x (Mapa _ _ (h:t)) = ((0,0),(fromIntegral (length (h:t))*x,fromIntegral (length h)*x))
 
 -- |funçao que dá todas as hitbox de Plataformas - IMPORTANDE depende de dimensoes do bloco
 getMapColisions :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
@@ -69,7 +70,7 @@ mapablocoshitbox x l (a,b) (h:t)    | h `elem` l = mapablocoshitbox x l (a+x,b) 
 -- faz a hitbox de casa bloco a partir de uma posiçao - assumindo que a IMPORTANTE dimensao do bloco é 10x10
 gethitboxbloco :: Double -> Posicao -> Hitbox
 gethitboxbloco x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a-(x*0.5),b+(x*0.5)))
--- | Colisoes END
+-- Colisoes END
 
 
 -- | Colisoes personagem com personagem
@@ -103,4 +104,3 @@ sobreposicaoAux ((x1,y1), (x2,y2)) ((x3,y3),(x4,y4)) = pointInBox (double2Float 
 
 
 
-                                                
