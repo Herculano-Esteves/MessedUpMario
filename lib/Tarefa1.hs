@@ -14,6 +14,7 @@ import LI12324
 import Graphics.Gloss.Data.Point (pointInBox)
 import GHC.Float (double2Float, double2Int)
 
+
 dimensaobloco :: Double
 dimensaobloco = 50
 mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
@@ -25,7 +26,7 @@ mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
-    ,[Plataforma, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
+    ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ]
 
 -- Test data START
@@ -104,5 +105,5 @@ sobreposicaoAux ((x1,y1), (x2,y2)) ((x3,y3),(x4,y4)) = pointInBox (double2Float 
                                                     || pointInBox (double2Float x4,double2Float y3) (double2Float x1,double2Float y1) (double2Float x2,double2Float y2)
 -- Colisoes personagem END                                                
 
-
-
+getcenterofhitbox :: [Hitbox] -> [Posicao]
+getcenterofhitbox l = foldl (\x y -> (fst(fst y)-(dimensaobloco*0.5),snd(fst y)+(dimensaobloco*0.5)):x) [] l
