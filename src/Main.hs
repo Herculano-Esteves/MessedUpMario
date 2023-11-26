@@ -16,7 +16,8 @@ window = InWindow
     (100,100)
 
 eventHandler :: Event -> Jogo -> IO Jogo
-eventHandler event jogo = return jogo
+eventHandler (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarDireita) jogo
+eventHandler e jogo = return jogo
 
 timeHandler :: Float -> Jogo -> IO Jogo
 timeHandler time jogo = return jogo
