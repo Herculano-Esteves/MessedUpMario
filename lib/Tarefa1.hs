@@ -25,15 +25,15 @@ mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
-    ,[Plataforma, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
+    ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ]
 
 -- Test data START
-{- per = Personagem {
+per = Personagem {
     posicao = (5,5),
     tamanho = (10,10),
     aplicaDano = (True, 10)
-} -}
+}
 
 
 per1 = Personagem {
@@ -73,6 +73,10 @@ mapablocoshitbox x l (a,b) (h:t)    | h `elem` l = mapablocoshitbox x l (a+x,b) 
 gethitboxbloco :: Double -> Posicao -> Hitbox
 gethitboxbloco x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a-(x*0.5),b+(x*0.5)))
 -- Colisoes END
+
+
+
+
 
 
 -- | Colisoes personagem com personagem
