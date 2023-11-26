@@ -29,8 +29,8 @@ atualizaInimigos actions inms = zipWith atualizaPersonagem actions inms
 -- TODO: Define how each character is going to jump
 atualizaPersonagem :: Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem action inm = case action of
-        Just Subir -> inm {velocidade = (0,-10)}
-        Just Descer -> inm {velocidade = (0,10)}
+        Just Subir -> inm {velocidade = (0,-10), direcao = Norte}
+        Just Descer -> inm {velocidade = (0,10), direcao = Sul}
         Just AndarEsquerda -> inm {velocidade = (-10,0), direcao = Oeste}
         Just AndarDireita -> inm {velocidade = (10,0), direcao = Este}
         Just Parar -> inm {velocidade = (0,0)}
