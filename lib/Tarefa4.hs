@@ -11,6 +11,7 @@ module Tarefa4 where
 import Data.Maybe
 
 import LI12324
+import Tarefa1 (dimensaobloco)
 
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
 atualiza actions action jogo
@@ -31,8 +32,8 @@ atualizaPersonagem :: Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem action inm = case action of
         Just Subir -> inm {velocidade = (0,-10), direcao = Norte}
         Just Descer -> inm {velocidade = (0,10), direcao = Sul}
-        Just AndarEsquerda -> inm {velocidade = (-10,0), direcao = Oeste}
+        Just AndarEsquerda -> inm {velocidade = (-0.5/dimensaobloco,0), direcao = Oeste}
         -- ! Remove add position
-        Just AndarDireita -> inm {posicao = ((fst $ (posicao inm)) + 10,snd $ (posicao inm)),velocidade = (10,0), direcao = Este}
+        Just AndarDireita -> inm {posicao = ((fst $ (posicao inm)),snd $ (posicao inm)),velocidade = (0.5/dimensaobloco,0), direcao = Este}
         Just Parar -> inm {velocidade = (0,0)}
         Nothing -> inm

@@ -15,7 +15,7 @@ import Graphics.Gloss.Data.Point (pointInBox)
 import GHC.Float (double2Float, double2Int)
 
 dimensaobloco :: Double
-dimensaobloco = 10
+dimensaobloco = 50
 mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ,[Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
@@ -25,15 +25,15 @@ mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
-    ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
+    ,[Plataforma, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ]
 
 -- Test data START
-per = Personagem {
+{- per = Personagem {
     posicao = (5,5),
     tamanho = (10,10),
     aplicaDano = (True, 10)
-}
+} -}
 
 
 per1 = Personagem {

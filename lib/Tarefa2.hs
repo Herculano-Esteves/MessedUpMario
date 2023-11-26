@@ -55,7 +55,7 @@ jog = Personagem {  velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = False, 
-                    posicao = (75,85), 
+                    posicao = (1.5,1.5), 
                     tamanho = (10,10), 
                     aplicaDano = (True, 10), 
                     direcao = Este}

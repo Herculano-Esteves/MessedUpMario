@@ -12,19 +12,23 @@ import Tarefa2 (jogoSamp)
 window :: Display
 window = InWindow
     "Donkeykong"
-    (700,700)
+    sizeWin --(700,700)
     (100,100)
+
+sizeWin :: (Int, Int)
+sizeWin = (floor $ fst $ (snd (getMapaDimensoes dimensaobloco mapaTeste)), floor $ snd $ (snd (getMapaDimensoes dimensaobloco mapaTeste)))
 
 eventHandler :: Event -> Jogo -> IO Jogo
 eventHandler (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarDireita) jogo
+eventHandler (EventKey (SpecialKey KeyLeft) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarEsquerda) jogo
 eventHandler e jogo = return jogo
 
 timeHandler :: Float -> Jogo -> IO Jogo
-timeHandler time jogo = return jogo
+timeHandler time jogo = return $ movimenta 1 (float2Double time) jogo
 
 -- ? Set a scale for drawng according to the size of the window
 drawPlayer :: Personagem -> Picture
-drawPlayer jog = Color white $ Translate (double2Float $ fst $ posicao jog) (double2Float $ snd $ posicao jog) $ rectangleSolid (double2Float $ fst $ tamanho jog) (double2Float $ snd $ tamanho jog)
+drawPlayer jog = Color white $ Translate (((double2Float $ fst $ posicao jog) * double2Float dimensaobloco) - fromIntegral (fst sizeWin)/2) (((double2Float $ snd $ posicao jog) * double2Float dimensaobloco) - fromIntegral (snd sizeWin)/2) $ rectangleSolid (double2Float $ fst $ tamanho jog) (double2Float $ snd $ tamanho jog)
 
 draw :: Jogo -> IO Picture
 draw jogo = return $ Pictures [drawPlayer (jogador jogo)]
