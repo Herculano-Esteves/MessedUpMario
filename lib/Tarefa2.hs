@@ -14,6 +14,8 @@ import Data.List (elemIndex, elemIndices)
 import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
 
+
+
 -- Test data START
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
@@ -53,7 +55,7 @@ jog = Personagem {  velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = False, 
-                    posicao = (5,5), 
+                    posicao = (75,85), 
                     tamanho = (10,10), 
                     aplicaDano = (True, 10), 
                     direcao = Este}

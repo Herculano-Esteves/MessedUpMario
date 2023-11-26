@@ -12,6 +12,7 @@ import LI12324
 import Tarefa1
 import Tarefa2
 
+
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta = undefined
 
@@ -79,5 +80,45 @@ coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-5,-5)),if x == M
                                 | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
-estaTocarObjeto jog pos = sobreposicao (genHitbox jog) (pos,pos)
+estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((snd pos+1,fst pos+1),pos)
 -- JOGADOR E OBJETOS END
+
+
+--JOGADOR E ALCAPAO START
+acionarAlcapao :: Jogo -> Jogo
+acionarAlcapao jogo = undefined
+
+
+acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
+acionarAlcapaoaux mapa jog = undefined
+
+--funcao que atualiza o mapa double é metade da dimensao do bloco
+alcapaoMapa :: Double -> [[Bloco]] -> Personagem -> [[Bloco]]
+alcapaoMapa _ [] _ = []
+alcapaoMapa x (h:t) jog = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa (x+dimensaobloco) t jog
+
+
+--funcao que verifica se existem alcapoes perto para desaparecerem tambem
+alcapaoDifere :: [Bloco] -> [Bloco] -> [Bloco]
+alcapaoDifere b1 b2     | b1 == b2 = b2
+                        | otherwise = reverse (alcapaoAux False (reverse b1) (reverse (alcapaoAux False b1 b2)))
+                                
+alcapaoAux :: Bool -> [Bloco] -> [Bloco] -> [Bloco]
+alcapaoAux _ [] [] = []
+alcapaoAux b (h:t) (h2:t2)      | b == False = if h == h2 then h2 : alcapaoAux False t t2 else Vazio : alcapaoAux True t t2
+                                | b && h2 == Alcapao = Vazio : alcapaoAux True t t2
+                                | b && not (h==h2) = h2 : alcapaoAux True t t2
+                                | otherwise = h2 : alcapaoAux False t t2
+
+
+
+--funcao que calcula se o jogador toca ou nao numa hitbox de alcapao
+alcapaolinhaAux :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
+alcapaolinhaAux _ _ [] _ = []
+alcapaolinhaAux y z (h:t) jog        | h == Alcapao = if sobreposicao (genHitbox jog) (gethitboxbloco dimensaobloco (y,z)) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
+                                | otherwise = h : alcapaolinhaAux y (z+dimensaobloco) t jog
+
+
+
+
+-- gethitboxbloco :: Double -> Posicao -> Hitbox

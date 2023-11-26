@@ -14,6 +14,8 @@ import LI12324
 import Graphics.Gloss.Data.Point (pointInBox)
 import GHC.Float (double2Float, double2Int)
 
+dimensaobloco :: Double
+dimensaobloco = 10
 mapaTeste = Mapa ((0.5, 5.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
@@ -45,7 +47,7 @@ per1 = Personagem {
 
 --dimensao de cada bloco é 10x10 por
 colisoesParede :: Mapa -> Personagem -> Bool
-colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes 10 mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 10 [Plataforma] (5,5) mapa)))
+colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes dimensaobloco mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
 
 
 
