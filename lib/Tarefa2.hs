@@ -14,6 +14,8 @@ import Data.List (elemIndex, elemIndices, groupBy, sortOn)
 import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
 
+
+
 -- Test data START
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
@@ -22,7 +24,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (1.5,2.5), 
+                    posicao = (-5,-5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste},
@@ -53,13 +55,15 @@ jog = Personagem {  velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = False, 
-                    posicao = (1.5,5.5), 
-                    tamanho = (7,7), 
+                    posicao = (75,85), 
+                    tamanho = (10,10), 
                     aplicaDano = (True, 10), 
                     direcao = Este}
+-- TESTE DATA END
+
 
 colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(0,5)),(Martelo,(7,5))]
+colec = [(Moeda,(0,0)),(Martelo,(0,0))]
 
 jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog

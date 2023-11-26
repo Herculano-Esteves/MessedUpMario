@@ -12,6 +12,7 @@ import LI12324
 import Tarefa1
 import Tarefa2
 
+
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta = undefined
 
@@ -44,15 +45,80 @@ hitboxDanoJogadoraux player (h:t)   | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam
 inimigoMorto :: [Personagem] -> [Personagem]
 inimigoMorto l = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) [] l
 
-
-
+-- GRAVIDADE START
+-- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Mapa -> [Personagem] -> [Personagem]
-gravidadeQueda mapa l = foldl (\x y -> gravidadeQuedaaux mapa y 0 : x) [] l
+gravidadeQueda mapa l = foldl (\x y -> x ++ [changeVelocidade mapa y]) [] l
+
+-- | Muda individualmete a gravidade
+changeVelocidade :: Mapa -> Personagem -> Personagem
+changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {velocidade = (fst (velocidade perso),snd gravidade) }
+                                | otherwise = perso
+
+-- | Deteta se a gravidade presisa de estar on ou off
+gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
+gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 10 [Plataforma] (5,5) mapa))
+-- GRAVIDADE END
+
+
+-- JOGADOR LIFE START
+perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
+perdeVidaJogador jog inm        | all (==False) (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
+                                | otherwise = jog {vida = vida jog - 1}
+-- JOGADOR LIFE END
+
+-- JOGADOR E OBJETOS START
+coletarObjetos :: Jogo -> Jogo
+coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos = pontos (jogador jogo) + p3,aplicaDano = (if (p4 == False && (snd (aplicaDano (jogador jogo)) > 0)) || p4 then True else False,if p4 && (snd (aplicaDano (jogador jogo)) == 0) then 10 else snd (aplicaDano (jogador jogo)))}}
+                        where   p1 = map fst (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
+                                p2 = map snd (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
+                                p3 = sum (map fst p2)
+                                p4 = not (all (==False) (map snd p2))
+coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
+coletarObjetosaux _ [] = []
+coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-5,-5)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
+                                | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
+
+estaTocarObjeto :: Personagem -> Posicao -> Bool
+estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((snd pos+1,fst pos+1),pos)
+-- JOGADOR E OBJETOS END
+
+
+--JOGADOR E ALCAPAO START
+acionarAlcapao :: Jogo -> Jogo
+acionarAlcapao jogo = undefined
+
+
+acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
+acionarAlcapaoaux mapa jog = undefined
+
+--funcao que atualiza o mapa double é metade da dimensao do bloco
+alcapaoMapa :: Double -> [[Bloco]] -> Personagem -> [[Bloco]]
+alcapaoMapa _ [] _ = []
+alcapaoMapa x (h:t) jog = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa (x+dimensaobloco) t jog
+
+
+--funcao que verifica se existem alcapoes perto para desaparecerem tambem
+alcapaoDifere :: [Bloco] -> [Bloco] -> [Bloco]
+alcapaoDifere b1 b2     | b1 == b2 = b2
+                        | otherwise = reverse (alcapaoAux False (reverse b1) (reverse (alcapaoAux False b1 b2)))
+                                
+alcapaoAux :: Bool -> [Bloco] -> [Bloco] -> [Bloco]
+alcapaoAux _ [] [] = []
+alcapaoAux b (h:t) (h2:t2)      | b == False = if h == h2 then h2 : alcapaoAux False t t2 else Vazio : alcapaoAux True t t2
+                                | b && h2 == Alcapao = Vazio : alcapaoAux True t t2
+                                | b && not (h==h2) = h2 : alcapaoAux True t t2
+                                | otherwise = h2 : alcapaoAux False t t2
+
+
+
+--funcao que calcula se o jogador toca ou nao numa hitbox de alcapao
+alcapaolinhaAux :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
+alcapaolinhaAux _ _ [] _ = []
+alcapaolinhaAux y z (h:t) jog        | h == Alcapao = if sobreposicao (genHitbox jog) (gethitboxbloco dimensaobloco (y,z)) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
+                                | otherwise = h : alcapaolinhaAux y (z+dimensaobloco) t jog
 
 
 
 
-
-gravidadeQuedaaux :: Mapa -> Personagem -> Int -> Personagem
-gravidadeQuedaaux mapa x | snd (velocidade x) > 0 = 
-
+-- gethitboxbloco :: Double -> Posicao -> Hitbox
