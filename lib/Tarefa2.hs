@@ -139,7 +139,7 @@ validaAlcapoes (Mapa _ _ mat) = all (\(x,y) -> (x+1,y) `elem` matEsc || (x-1,y) 
 
 -- | Verifica se os colecionaveis se encontram em espaços vazios no mapa e se as personagens se encontram em espaços vazios do mapa
 validaPosPersColecs :: Jogo -> Bool
-validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jogo) && validaColecs (colecionaveis jogo) (mapa jogo) 
+validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jogo) && validaColecs (colecionaveis jogo) (mapa jogo)
 
 -- | Verifica se os colecionávei se encontram em espaços vazios do mapa
 validaColecs :: [(Colecionavel,Posicao)] -> Mapa -> Bool

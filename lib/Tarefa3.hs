@@ -14,7 +14,7 @@ import Tarefa2
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd jog))))))
+movimenta seed dtime jog = (acionarAlcapao (podeFimDireita (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd jog)))))))
 
 
 --Dano Jogador START
@@ -102,7 +102,7 @@ estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0
 
 --JOGADOR E ALCAPAO START
 acionarAlcapao :: Jogo -> Jogo
-acionarAlcapao jogo =  jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
+acionarAlcapao jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
 
 
 acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
@@ -142,6 +142,24 @@ mapaEmovimentos jogo = undefined
 
 
 
+
+--Colisoes com parede da direita START
+podeFimDireita :: Jogo -> Jogo
+podeFimDireita jogo = podeAndarParaADireita jogo (mapa jogo) (jogador jogo)
+
+podeAndarParaADireita :: Jogo -> Mapa -> Personagem -> Jogo
+podeAndarParaADireita jogo  mapa ent  | not (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2+0.3),(p3,p4-0.3))
+                                 = if fst (velocidade ent) < 0 then  jogo {jogador  = (jogador jogo) {velocidade = (1,snd (velocidade ent))}} else jogo {jogador  = (jogador jogo) {velocidade = (0,snd (velocidade ent))}}
+                                | otherwise = jogo
+                                where   ((p1,p2),(p3,p4)) = (genEntleftside ent)
+                                        ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
+
+--(getMapaDimensoes dimensaobloco mapa)
+
+
+getMaprightsideEnd :: [Bloco] -> Mapa -> [Hitbox]
+getMaprightsideEnd a b = getMaprightside dimensaobloco a (dimensaobloco*0.5,dimensaobloco*0.5) b
+
 getMaprightside :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
 getMaprightside x l _ (Mapa _ _ []) = []
 getMaprightside x l (a,b) (Mapa c d (h:t)) = mapablocosrightside x l (a,b) h ++ getMaprightside x l (a,b+x) (Mapa c d t)
@@ -157,10 +175,10 @@ gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
 genEntleftside :: Personagem -> Hitbox
 genEntleftside p = (p1,p2)
     where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
-          p2 = (xp + fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          p2 = (xp - fst (tamanho p)/2, yp + snd (tamanho p)/2)
           xp = fst (posicao p)
           yp = snd (posicao p)
-
+--Colisoes com parede da direita END
 
 
 
