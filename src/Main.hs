@@ -54,6 +54,7 @@ draw jogo = do
     putStrLn ("Posicao jog: " ++ (show (posicao $ jogador jogo)))
     putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
     putStrLn (show (gravidadeQuedaonoff (mapa jogo) (jogador jogo)))
+    putStrLn ("Velocidade jogador Y: " ++ (show (snd $ velocidade $ jogador jogo)))
     --putStrLn (show (mapa jogo))
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"

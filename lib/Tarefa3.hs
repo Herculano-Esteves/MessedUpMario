@@ -66,11 +66,17 @@ gravidadeQuedaEnd dtime jogo = jogo {inimigos = gravidadeQueda dtime (mapa jogo)
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
 gravidadeQueda dtime mapa l = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) [] l
 
--- | Muda individualmete a gravidade
+-- | Aplica a velocidade à personagem e aplca a gravidade quando não está no chão
 changeVelocidade :: Double -> Mapa -> Personagem -> Personagem
 changeVelocidade dtime mapa perso
-    | gravidadeQuedaonoff mapa perso = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))/escalaGloss, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime ), velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime) }
-    | otherwise = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))*dtime, (snd $ (posicao perso)) + if ((gravidadeQuedaonoff mapa perso)) then (snd $ (velocidade perso))*dtime else 0), velocidade = (fst (velocidade perso), 0)}
+    | gravidadeQuedaonoff mapa perso = perso {
+        posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))/escalaGloss, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime ),
+        velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime)
+        }
+    | otherwise = perso {
+        posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))*dtime, (snd $ (posicao perso)) + if (snd (velocidade perso) <= 0) then (snd $ (velocidade perso))*dtime else 0), -- this if prevents the player from entering the floor after falling
+        velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
+        }
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
