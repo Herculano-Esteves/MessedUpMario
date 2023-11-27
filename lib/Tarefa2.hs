@@ -56,7 +56,7 @@ jog = Personagem {  velocidade = (0,0),
                     pontos = 0, 
                     ressalta = False, 
                     posicao = (1.0,2.5), 
-                    tamanho = (0.9,1.2), 
+                    tamanho = (0.9,1.1), 
                     aplicaDano = (True, 10), 
                     direcao = Este}
 -- TESTE DATA END

@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao (podeFimDireita (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog = (acionarAlcapao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
 
 
 --Dano Jogador START
@@ -70,13 +70,18 @@ gravidadeQueda dtime mapa l = foldl (\x y -> x ++ [changeVelocidade dtime mapa y
 changeVelocidade :: Double -> Mapa -> Personagem -> Personagem
 changeVelocidade dtime mapa perso
     | gravidadeQuedaonoff mapa perso = perso {
-        posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))/escalaGloss, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime ),
+        posicao = (xPos, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime ),
         velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime)
         }
     | otherwise = perso {
-        posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))*dtime, (snd $ (posicao perso)) + if (snd (velocidade perso) <= 0) then (snd $ (velocidade perso))*dtime else 0), -- this if prevents the player from entering the floor after falling
+        posicao = (xPos, (snd $ (posicao perso)) + if (snd (velocidade perso) > 0 && podeAndarParaDireitaBool mapa perso) then 0 else (snd $ (velocidade perso))*dtime), -- this if prevents the player from entering the floor after falling
         velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
         }
+    -- returns the X pos according to certain coditions
+    where xPos = if not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0 then
+                (fst $ (posicao perso)) -- get player out of wall (??)
+            else
+                (fst $ (posicao perso)) + (fst (velocidade perso))*dtime
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
@@ -173,6 +178,10 @@ podeAndarParaADireita jogo  mapa ent
 
 --(getMapaDimensoes dimensaobloco mapa)
 
+podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
+podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2+0.3),(p3,p4-0.3))
+    where ((p1,p2),(p3,p4)) = (genEntleftside ent)
+          ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
 
 getMaprightsideEnd :: [Bloco] -> Mapa -> [Hitbox]
 getMaprightsideEnd a b = getMaprightside dimensaobloco a (dimensaobloco*0.5,dimensaobloco*0.5) b
@@ -192,7 +201,7 @@ gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
 
 genEntleftside :: Personagem -> Hitbox
 genEntleftside p = (p1,p2)
-    where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
+    where p1 = (xp - fst (tamanho p)/1.7, yp - snd (tamanho p)/2) -- the x value of tamanho can´t be divided by 2 or else it's going to be stuck on the side of the wall
           p2 = (xp - fst (tamanho p)/2, yp + snd (tamanho p)/2)
           xp = fst (posicao p)
           yp = snd (posicao p)
