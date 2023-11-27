@@ -63,7 +63,7 @@ jog = Personagem {  velocidade = (0,0),
 
 
 colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(0,0)),(Martelo,(0,0))]
+colec = [(Moeda,(3.5,11.5)),(Martelo,(7.5,7.5))]
 
 jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog
