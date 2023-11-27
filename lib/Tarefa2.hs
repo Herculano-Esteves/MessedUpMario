@@ -24,7 +24,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (-5,-5), 
+                    posicao = (1.5,2.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste},
@@ -75,8 +75,8 @@ valida jogo = validaChao (mapa jogo) &&
     validaPosJogInim (mapa jogo) (inimigos jogo) &&
     validaNumIniAndVidaFan (inimigos jogo) &&
     validaEscadas (mapa jogo) &&
-    validaAlcapoes (mapa jogo) -- &&
-    --validaPosPersColecs jogo
+    validaAlcapoes (mapa jogo) &&
+    validaPosPersColecs jogo
 
 -- | Verifica o chao do mapa
 validaChao :: Mapa -> Bool
@@ -145,7 +145,6 @@ validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jo
 validaColecs :: [(Colecionavel,Posicao)] -> Mapa -> Bool
 validaColecs colecs (Mapa _ _ mat) = all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Vazio mat) colecs
 
--- TODO: This is returning false idk why
 -- | Verifica se as personagens (jogador e inimigos) se encontram em espaços vazios do mapa
 validaPosPers :: Personagem -> [Personagem] -> Mapa -> Bool
 validaPosPers player inms (Mapa _ _ mat) = floorPos (posicao player) `elem` getPosOfBlock Vazio mat && all (\inm -> floorPos (posicao inm) `elem` getPosOfBlock Vazio mat) inms

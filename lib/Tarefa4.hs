@@ -33,7 +33,7 @@ atualizaPersonagem action inm = case action of
         Just Subir -> inm {velocidade = (0,-10), direcao = Norte}
         Just Descer -> inm {velocidade = (0,10), direcao = Sul}
         Just AndarEsquerda -> inm {velocidade = (-4,0), direcao = Oeste}
-        -- ! Remove add position
-        Just AndarDireita -> inm {posicao = ((fst $ (posicao inm)),snd $ (posicao inm)),velocidade = (4,0), direcao = Este}
+        Just Saltar -> inm {velocidade = (fst $ (velocidade inm),-30)}
+        Just AndarDireita -> inm {velocidade = (4,0), direcao = Este}
         Just Parar -> inm {velocidade = (0,0)}
         Nothing -> inm
