@@ -65,8 +65,8 @@ gravidadeQueda mapa l = foldl (\x y -> x ++ [changeVelocidade mapa y]) [] l
 
 -- | Muda individualmete a gravidade
 changeVelocidade :: Mapa -> Personagem -> Personagem
-changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso)), (snd $ (posicao perso)) + (snd gravidade)/dimensaobloco), velocidade = (fst (velocidade perso),snd (velocidade perso)) }
-                                | otherwise = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso)), (snd $ (posicao perso)) + (snd $ (velocidade perso))), velocidade = (fst (velocidade perso), 0)}
+changeVelocidade mapa perso     | gravidadeQuedaonoff mapa perso = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))/escalaGloss, (snd $ (posicao perso)) + (snd gravidade)/escalaGloss), velocidade = (fst (velocidade perso),snd (velocidade perso)) }
+                                | otherwise = perso {posicao = ((fst $ (posicao perso)) + (fst $ (velocidade perso))/escalaGloss, (snd $ (posicao perso)) + (snd $ (velocidade perso))/escalaGloss), velocidade = (fst (velocidade perso), 0)}
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
