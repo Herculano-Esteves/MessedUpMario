@@ -139,6 +139,33 @@ alcapaolinhaAux y z (h:t) jog        | h == Alcapao = if sobreposicao (genHitbox
 mapaEmovimentos :: Jogo -> Jogo
 mapaEmovimentos jogo = undefined
 
+
+
+
+getMaprightside :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
+getMaprightside x l _ (Mapa _ _ []) = []
+getMaprightside x l (a,b) (Mapa c d (h:t)) = mapablocosrightside x l (a,b) h ++ getMaprightside x l (a,b+x) (Mapa c d t)
+
+mapablocosrightside :: Double -> [Bloco] -> Posicao -> [Bloco] -> [Hitbox]
+mapablocosrightside x l _ [] = []
+mapablocosrightside x l (a,b) (h:t) | h `elem` l = mapablocosrightside x l (a+x,b) t ++ [gethitboxrightside x (a,b)]
+                                    | otherwise = mapablocosrightside x l (a+x,b) t
+
+gethitboxrightside :: Double -> Posicao -> Hitbox
+gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
+
+genEntleftside :: Personagem -> Hitbox
+genEntleftside p = (p1,p2)
+    where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          p2 = (xp + fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          xp = fst (posicao p)
+          yp = snd (posicao p)
+
+
+
+
+
+{--
 chaoPlataformas :: Mapa -> Personagem -> Personagem
 chaoPlataformas mapa ent | snd (velocidade ent) > 0 = ent
                          | snd (velocidade ent) == 0 && not (all (==False) (foldl (\x y -> sobreposicao (genEntFloor ent) y : x) [] (getMapFloorEnd [Plataforma,Alcapao] mapaTeste))) = undefined
@@ -147,7 +174,7 @@ chaoPlataformas mapa ent | snd (velocidade ent) > 0 = ent
 
 
 
---Esta Funcao gera as hitbox só do chao
+Esta Funcao gera as hitbox só do chao
 getMapFloorEnd :: [Bloco] -> Mapa -> [Hitbox]
 getMapFloorEnd bloc map = getMapFloor dimensaobloco bloc (dimensaobloco*0.5,dimensaobloco*0.5) map
 
@@ -169,3 +196,4 @@ genEntFloor p = (p1,p2)
           p2 = (xp + fst (tamanho p)/2, yp - snd (tamanho p)/2)
           xp = fst (posicao p)
           yp = snd (posicao p)
+--}
