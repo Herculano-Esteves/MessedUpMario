@@ -69,6 +69,8 @@ getMapColisions :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
 getMapColisions x l _ (Mapa _ _ []) = []
 getMapColisions x l (a,b) (Mapa c d (h:t)) = mapablocoshitbox x l (a,b) h ++ getMapColisions x l (a,b+x) (Mapa c d t)
 
+
+
 -- | a partir de uma sting de blocos retorna uma lista das suas hitbox - IMPORTANTE depende da dimensao do bloco 10x10
 mapablocoshitbox :: Double -> [Bloco] -> Posicao -> [Bloco] -> [Hitbox]
 mapablocoshitbox x l _ [] = []
@@ -78,10 +80,6 @@ mapablocoshitbox x l (a,b) (h:t)    | h `elem` l = mapablocoshitbox x l (a+x,b) 
 gethitboxbloco :: Double -> Posicao -> Hitbox
 gethitboxbloco x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a-(x*0.5),b+(x*0.5)))
 -- Colisoes END
-
-
-
-
 
 
 -- | Colisoes personagem com personagem

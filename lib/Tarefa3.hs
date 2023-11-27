@@ -14,9 +14,7 @@ import Tarefa2
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = jog {
-        jogador = changeVelocidade (mapa jog) (jogador jog)
-        }
+movimenta seed dtime jog = (acionarAlcapao (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd jog))))))
 
 
 --Dano Jogador START
@@ -94,11 +92,11 @@ coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos 
                                 p4 = not (all (==False) (map snd p2))
 coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
 coletarObjetosaux _ [] = []
-coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-50,-50)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
+coletarObjetosaux jog ((x,y):t) | estaTocarObjeto jog y = ((x,(-500,-500)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
                                 | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
-estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((snd pos+1,fst pos+1),pos)
+estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0.5,snd pos+dimensaobloco*0.5),(fst pos+dimensaobloco*0.5,snd pos-dimensaobloco*0.5))
 -- JOGADOR E OBJETOS END
 
 
@@ -120,7 +118,7 @@ alcapaoMapa x (h:t) jog = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5)
 alcapaoDifere :: [Bloco] -> [Bloco] -> [Bloco]
 alcapaoDifere b1 b2     | b1 == b2 = b2
                         | otherwise = reverse (alcapaoAux False (reverse b1) (reverse (alcapaoAux False b1 b2)))
-                                
+
 alcapaoAux :: Bool -> [Bloco] -> [Bloco] -> [Bloco]
 alcapaoAux _ [] [] = []
 alcapaoAux b (h:t) (h2:t2)      | b == False = if h == h2 then h2 : alcapaoAux False t t2 else Vazio : alcapaoAux True t t2
@@ -138,3 +136,36 @@ alcapaolinhaAux y z (h:t) jog        | h == Alcapao = if sobreposicao (genHitbox
 --JOGADOR E ALCAPAO END
 
 
+mapaEmovimentos :: Jogo -> Jogo
+mapaEmovimentos jogo = undefined
+
+chaoPlataformas :: Mapa -> Personagem -> Personagem
+chaoPlataformas mapa ent | snd (velocidade ent) > 0 = ent
+                         | snd (velocidade ent) == 0 && not (all (==False) (foldl (\x y -> sobreposicao (genEntFloor ent) y : x) [] (getMapFloorEnd [Plataforma,Alcapao] mapaTeste))) = undefined
+                         | otherwise = ent
+
+
+
+
+--Esta Funcao gera as hitbox só do chao
+getMapFloorEnd :: [Bloco] -> Mapa -> [Hitbox]
+getMapFloorEnd bloc map = getMapFloor dimensaobloco bloc (dimensaobloco*0.5,dimensaobloco*0.5) map
+
+getMapFloor :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
+getMapFloor x l _ (Mapa _ _ []) = []
+getMapFloor x l (a,b) (Mapa c d (h:t)) = mapablocosFloor x l (a,b) h ++ getMapFloor x l (a,b+x) (Mapa c d t)
+
+mapablocosFloor :: Double -> [Bloco] -> Posicao -> [Bloco] -> [Hitbox]
+mapablocosFloor x l _ [] = []
+mapablocosFloor x l (a,b) (h:t)    | h `elem` l = mapablocosFloor x l (a+x,b) t ++ [gethitboxFloor x (a,b)]
+                                    | otherwise = mapablocosFloor x l (a+x,b) t
+
+gethitboxFloor :: Double -> Posicao -> Hitbox
+gethitboxFloor x (a,b) = ((a-(x*0.5),b-(x*0.5)),(a+(x*0.5),b-(x*0.5)))
+
+genEntFloor :: Personagem -> Hitbox
+genEntFloor p = (p1,p2)
+    where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          p2 = (xp + fst (tamanho p)/2, yp - snd (tamanho p)/2)
+          xp = fst (posicao p)
+          yp = snd (posicao p)
