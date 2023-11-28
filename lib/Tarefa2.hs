@@ -148,5 +148,6 @@ validaColecs colecs (Mapa _ _ mat) = all (\(c,(x,y)) -> (fromIntegral $ floor x,
 -- | Verifica se as personagens (jogador e inimigos) se encontram em espaços vazios do mapa
 validaPosPers :: Personagem -> [Personagem] -> Mapa -> Bool
 validaPosPers player inms (Mapa _ _ mat) = floorPos (posicao player) `elem` getPosOfBlock Vazio mat && all (\inm -> floorPos (posicao inm) `elem` getPosOfBlock Vazio mat) inms
-    where floorPos :: Posicao -> Posicao
-          floorPos (x,y) = (fromIntegral $ floor x, fromIntegral $ floor y)
+
+floorPos :: Posicao -> Posicao
+floorPos (x,y) = (fromIntegral $ floor x, fromIntegral $ floor y)

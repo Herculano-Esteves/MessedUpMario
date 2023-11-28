@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog = checkEscadas $ acionarAlcapao $ coletarObjetos $ perdeVidaJogadorEnd $ hitboxDanoJogadorFinal $ inimigoMortoEnd $ gravidadeQuedaEnd dtime jog
 
 
 --Dano Jogador START
@@ -74,8 +74,8 @@ changeVelocidade dtime mapa perso
         velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime)
         }
     | otherwise = perso {
-        posicao = (xPos, (snd $ (posicao perso)) + if (snd (velocidade perso) > 0 && podeAndarParaDireitaBool mapa perso) then 0 else (snd $ (velocidade perso))*dtime), -- this if prevents the player from entering the floor after falling
-        velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
+        posicao = (xPos, (snd $ (posicao perso)) + if (snd (velocidade perso) > 0 && podeAndarParaDireitaBool mapa perso && not (emEscada perso)) then 0 else (snd $ (velocidade perso))*dtime), -- this if prevents the player from entering the floor after falling
+        velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0 && not (emEscada perso)) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
     where xPos = if not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0 then
@@ -85,7 +85,8 @@ changeVelocidade dtime mapa perso
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) mapa))
+gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) mapa) ++
+    map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
 
 
@@ -234,3 +235,16 @@ genEntFloor p = (p1,p2)
 movimentoInimigos :: Semente -> Jogo -> Jogo
 movimentoInimigos sem jogo = undefined
 
+-- Ladder logic started
+checkEscadas :: Jogo -> Jogo
+checkEscadas jogo = jogo {
+    inimigos = checkEscadaList (mapa jogo) (inimigos jogo),
+    jogador = checkEscadaAux (mapa jogo) (jogador jogo)
+}
+    where Mapa _ _ mat = mapa jogo
+
+checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
+checkEscadaList mapa persos = map (checkEscadaAux mapa) persos
+
+checkEscadaAux :: Mapa -> Personagem -> Personagem
+checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso) `elem` getPosOfBlock Escada mat}

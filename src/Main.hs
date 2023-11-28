@@ -8,6 +8,7 @@ import Tarefa3
 import Tarefa4
 import GHC.Float (float2Double, double2Float)
 import Tarefa2 (jogoSamp)
+import System.Exit (exitSuccess)
 
 window :: Display
 window = InWindow
@@ -29,8 +30,13 @@ eventHandler (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza 
 eventHandler (EventKey (SpecialKey KeyRight) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
 eventHandler (EventKey (SpecialKey KeyLeft) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarEsquerda) jogo
 eventHandler (EventKey (SpecialKey KeyLeft) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
+eventHandler (EventKey (SpecialKey KeyUp) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Subir) jogo
+eventHandler (EventKey (SpecialKey KeyUp) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
+eventHandler (EventKey (SpecialKey KeyDown) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Descer) jogo
+eventHandler (EventKey (SpecialKey KeyDown) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
 eventHandler (EventKey (SpecialKey KeySpace) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Saltar) jogo
 --eventHandler (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
+eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) jogo = exitSuccess
 eventHandler e jogo = return jogo
 
 timeHandler :: Float -> Jogo -> IO Jogo
@@ -59,6 +65,7 @@ draw jogo = do
     putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa jogo) (jogador jogo)))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador jogo)))
+    putStrLn ("Em escada: " ++ (show (emEscada $ jogador jogo)))
     --putStrLn (show (mapa jogo))
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
