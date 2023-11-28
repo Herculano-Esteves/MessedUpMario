@@ -45,9 +45,13 @@ drawColecs jogo = map (\(colec,pos) -> (Translate (fst $ (posMapToGloss pos)) (s
 
 drawLs :: Jogo -> Picture -> [Picture]
 drawLs jogo img = map (\(x,y) -> Color white $ Translate ((double2Float x)-(fromIntegral $
-    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Plataforma] (50*0.5,50*0.5) (mapa jogo))) ++
+    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Plataforma] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo))) ++
     map (\(x,y) -> Color white $ Translate ((double2Float x)-(fromIntegral $
     (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ Color blue $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Alcapao] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
+
+drawLadder :: Jogo -> Picture -> Picture
+drawLadder jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fromIntegral $
+    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Escada] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 
 draw :: Jogo -> IO Picture
 draw jogo = do
@@ -58,7 +62,8 @@ draw jogo = do
     --putStrLn (show (mapa jogo))
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
-    return $ Pictures ([drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo)
+    escadas <- loadBMP "assets/ladder.bmp"
+    return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo)
 
 bgColor :: Color
 bgColor = black

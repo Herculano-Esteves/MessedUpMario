@@ -32,8 +32,8 @@ atualizaPersonagem :: Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem action inm = case action of
         Just Subir -> inm {velocidade = (0,-10), direcao = Norte}
         Just Descer -> inm {velocidade = (0,10), direcao = Sul}
-        Just AndarEsquerda -> inm {velocidade = (-4,0), direcao = Oeste}
-        Just Saltar -> if (snd (velocidade inm) >= 0 ) then inm {velocidade = (fst $ (velocidade inm),-3)} else inm
-        Just AndarDireita -> inm {velocidade = (4,0), direcao = Este}
-        Just Parar -> inm {velocidade = (0,0)}
+        Just AndarEsquerda -> if (snd (velocidade inm) >0) then inm else inm {velocidade = (-4,0), direcao = Oeste}
+        Just Saltar -> if (snd (velocidade inm) == 0 ) then inm {velocidade = (fst $ (velocidade inm),-5)} else inm
+        Just AndarDireita -> if (snd (velocidade inm) >0) then inm else inm {velocidade = (4,0), direcao = Este}
+        Just Parar -> inm {velocidade = (0,snd (velocidade inm))}
         Nothing -> inm
