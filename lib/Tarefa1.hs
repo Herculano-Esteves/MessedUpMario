@@ -45,7 +45,7 @@ per = Personagem {
 
 
 per1 = Personagem {
-    posicao = (35,20),
+    posicao = (5,5),
     tamanho = (10,10)
 }
 -- Test data END
@@ -63,7 +63,7 @@ colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoe
 
 
 -- Colisoes START - o x em todas as funçoes é o lado do tamanho de um bloco
--- | dimensoes do mapa x e y IMPORTANTE a assumir que a dimensao de cada bloco é 10x10
+-- | dimensoes do mapa x e y 
 getMapaDimensoes :: Double -> Mapa -> Hitbox
 getMapaDimensoes x (Mapa _ _ (h:t)) = ((0,0),(fromIntegral (length (h:t))*x,fromIntegral (length h)*x))
 

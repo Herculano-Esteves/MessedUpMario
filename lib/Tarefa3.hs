@@ -164,6 +164,8 @@ mapaEmovimentos jogo = undefined
 
 
 
+
+
 --Colisoes com parede da direita START
 podeFimDireita :: Jogo -> Jogo
 podeFimDireita jogo = podeAndarParaADireita jogo (mapa jogo) (jogador jogo)
@@ -179,7 +181,7 @@ podeAndarParaADireita jogo  mapa ent
 --(getMapaDimensoes dimensaobloco mapa)
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2+0.3),(p3,p4-0.3))
+podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = (genEntleftside ent)
           ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
 
@@ -201,7 +203,7 @@ gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
 
 genEntleftside :: Personagem -> Hitbox
 genEntleftside p = (p1,p2)
-    where p1 = (xp - fst (tamanho p)/1.7, yp - snd (tamanho p)/2) -- the x value of tamanho can´t be divided by 2 or else it's going to be stuck on the side of the wall
+    where p1 = (xp - fst (tamanho p)/1.9, yp - snd (tamanho p)/2) -- the x value of tamanho can´t be divided by 2 or else it's going to be stuck on the side of the wall
           p2 = (xp - fst (tamanho p)/2, yp + snd (tamanho p)/2)
           xp = fst (posicao p)
           yp = snd (posicao p)
@@ -242,3 +244,10 @@ genEntFloor p = (p1,p2)
           xp = fst (posicao p)
           yp = snd (posicao p)
 --}
+
+
+
+--INICIO DE AI
+movimentoInimigos :: Semente -> Jogo -> Jogo
+movimentoInimigos jogo = undefined
+
