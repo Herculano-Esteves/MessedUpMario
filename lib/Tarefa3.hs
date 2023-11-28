@@ -163,23 +163,6 @@ mapaEmovimentos jogo = undefined
 
 
 
-
-
-
---Colisoes com parede da direita START
-podeFimDireita :: Jogo -> Jogo
-podeFimDireita jogo = podeAndarParaADireita jogo (mapa jogo) (jogador jogo)
-
-podeAndarParaADireita :: Jogo -> Mapa -> Personagem -> Jogo
-podeAndarParaADireita jogo  mapa ent  
-    | not (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2+0.3),(p3,p4-0.3))
-        = if fst (velocidade ent) < 0 then  jogo {jogador  = (jogador jogo) {velocidade = (1,snd (velocidade ent))}} else jogo {jogador  = (jogador jogo) {velocidade = (0,snd (velocidade ent))}}
-    | otherwise = jogo
-    where ((p1,p2),(p3,p4)) = (genEntleftside ent)
-          ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
-
---(getMapaDimensoes dimensaobloco mapa)
-
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
 podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = (genEntleftside ent)
@@ -249,5 +232,5 @@ genEntFloor p = (p1,p2)
 
 --INICIO DE AI
 movimentoInimigos :: Semente -> Jogo -> Jogo
-movimentoInimigos jogo = undefined
+movimentoInimigos sem jogo = undefined
 
