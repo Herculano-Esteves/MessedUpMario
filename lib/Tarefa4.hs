@@ -24,8 +24,6 @@ atualiza actions action jogo
     | length actions == length (inimigos jogo) = jogo {
         jogador = atualizaPersonagem jogo action (jogador jogo),
         inimigos = atualizaInimigos jogo actions (inimigos jogo)
-        jogador = atualizaPersonagem jogo action (jogador jogo),
-        inimigos = atualizaInimigos jogo actions (inimigos jogo)
         }
     | otherwise = jogo
 
