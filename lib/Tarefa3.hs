@@ -78,7 +78,7 @@ changeVelocidade dtime mapa perso
         velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0 && not (emEscada perso)) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
-    where xPos = if not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0 then
+    where xPos = if ((not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0)) || ((not (podeAndarParaEsquerdaBool mapa perso) && (fst $ (velocidade perso)) > 0)) then
                 (fst $ (posicao perso)) -- get player out of wall (??)
             else
                 (fst $ (posicao perso)) + (fst (velocidade perso))*dtime
@@ -158,15 +158,22 @@ alcapaolinhaAux y z (h:t) jog
 --JOGADOR E ALCAPAO END
 
 
+
 mapaEmovimentos :: Jogo -> Jogo
 mapaEmovimentos jogo = undefined
 
 
 
 
+podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
+podeAndarParaEsquerdaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p7+1,p6),(p7,p8)) ((p1,p2),(p3,p4)))
+    where ((p1,p2),(p3,p4)) = (genHitbox ent)
+          ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
+
+
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p3,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2),(p3,p4)))
-    where ((p1,p2),(p3,p4)) = (genEntleftside ent)
+podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p1,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2),(p3,p4)))
+    where ((p1,p2),(p3,p4)) = (genHitbox ent)
           ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
 
 getMaprightsideEnd :: [Bloco] -> Mapa -> [Hitbox]
@@ -184,51 +191,15 @@ mapablocosrightside x l (a,b) (h:t)
 
 gethitboxrightside :: Double -> Posicao -> Hitbox
 gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
-
-genEntleftside :: Personagem -> Hitbox
-genEntleftside p = (p1,p2)
-    where p1 = (xp - fst (tamanho p)/1.9, yp - snd (tamanho p)/2) -- the x value of tamanho can´t be divided by 2 or else it's going to be stuck on the side of the wall
-          p2 = (xp - fst (tamanho p)/2, yp + snd (tamanho p)/2)
-          xp = fst (posicao p)
-          yp = snd (posicao p)
 --Colisoes com parede da direita END
 
 
+isOnFloor :: Jogo -> Bool
+isOnFloor jogo = isOnFlooraux  (jogador jogo) (mapa jogo)
 
-
-{--
-chaoPlataformas :: Mapa -> Personagem -> Personagem
-chaoPlataformas mapa ent | snd (velocidade ent) > 0 = ent
-                         | snd (velocidade ent) == 0 && not (all (==False) (foldl (\x y -> sobreposicao (genEntFloor ent) y : x) [] (getMapFloorEnd [Plataforma,Alcapao] mapaTeste))) = undefined
-                         | otherwise = ent
-
-
-
-
-Esta Funcao gera as hitbox só do chao
-getMapFloorEnd :: [Bloco] -> Mapa -> [Hitbox]
-getMapFloorEnd bloc map = getMapFloor dimensaobloco bloc (dimensaobloco*0.5,dimensaobloco*0.5) map
-
-getMapFloor :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
-getMapFloor x l _ (Mapa _ _ []) = []
-getMapFloor x l (a,b) (Mapa c d (h:t)) = mapablocosFloor x l (a,b) h ++ getMapFloor x l (a,b+x) (Mapa c d t)
-
-mapablocosFloor :: Double -> [Bloco] -> Posicao -> [Bloco] -> [Hitbox]
-mapablocosFloor x l _ [] = []
-mapablocosFloor x l (a,b) (h:t)    | h `elem` l = mapablocosFloor x l (a+x,b) t ++ [gethitboxFloor x (a,b)]
-                                    | otherwise = mapablocosFloor x l (a+x,b) t
-
-gethitboxFloor :: Double -> Posicao -> Hitbox
-gethitboxFloor x (a,b) = ((a-(x*0.5),b-(x*0.5)),(a+(x*0.5),b-(x*0.5)))
-
-genEntFloor :: Personagem -> Hitbox
-genEntFloor p = (p1,p2)
-    where p1 = (xp - fst (tamanho p)/2, yp - snd (tamanho p)/2)
-          p2 = (xp + fst (tamanho p)/2, yp - snd (tamanho p)/2)
-          xp = fst (posicao p)
-          yp = snd (posicao p)
---}
-
+isOnFlooraux :: Personagem -> Mapa -> Bool
+isOnFlooraux jog mapa = not (all (==False) (map (sobreposicao ((p3,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+                        where ((p1,p2),(p3,p4)) = genHitbox jog
 
 
 --INICIO DE AI

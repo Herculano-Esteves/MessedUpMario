@@ -16,10 +16,14 @@ import LI12324
       Personagem(velocidade, emEscada, direcao),
       Direcao(Este, Norte, Sul, Oeste) )
 import Tarefa1 (dimensaobloco)
+import Tarefa3
+
 
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
 atualiza actions action jogo
     | length actions == length (inimigos jogo) = jogo {
+        jogador = atualizaPersonagem jogo action (jogador jogo),
+        inimigos = atualizaInimigos jogo actions (inimigos jogo)
         jogador = atualizaPersonagem jogo action (jogador jogo),
         inimigos = atualizaInimigos jogo actions (inimigos jogo)
         }
@@ -27,6 +31,8 @@ atualiza actions action jogo
 
 
 
+atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
+atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
 atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
 atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
 
