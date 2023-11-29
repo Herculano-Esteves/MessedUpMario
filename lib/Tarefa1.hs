@@ -32,21 +32,21 @@ mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
-    ,[Plataforma, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
+    ,[Plataforma, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Plataforma]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ]
 
 -- Test data START
 per = Personagem {
-    posicao = (250,150),
-    tamanho = (10,10),
+    posicao = (0.5,0.5),
+    tamanho = (0.9,0.9),
     aplicaDano = (True, 10)
 }
 
 
 per1 = Personagem {
-    posicao = (5,5),
-    tamanho = (10,10)
+    posicao = (0.5,0.5),
+    tamanho = (1,1)
 }
 -- Test data END
 

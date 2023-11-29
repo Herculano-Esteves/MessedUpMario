@@ -12,28 +12,30 @@ import Data.Maybe
 
 import LI12324
 import Tarefa1 (dimensaobloco)
+import Tarefa3
+
 
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
 atualiza actions action jogo
     | length actions == length (inimigos jogo) = jogo {
-        jogador = atualizaPersonagem action (jogador jogo),
-        inimigos = atualizaInimigos actions (inimigos jogo)
+        jogador = atualizaPersonagem jogo action (jogador jogo),
+        inimigos = atualizaInimigos jogo actions (inimigos jogo)
         }
     | otherwise = jogo
 
 
 
-atualizaInimigos :: [Maybe Acao] -> [Personagem] -> [Personagem]
-atualizaInimigos actions inms = zipWith atualizaPersonagem actions inms
+atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
+atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
 
 -- * Change the velocity
 -- TODO: Define how each character is going to jump
-atualizaPersonagem :: Maybe Acao -> Personagem -> Personagem
-atualizaPersonagem action inm = case action of
+atualizaPersonagem :: Jogo -> Maybe Acao -> Personagem -> Personagem
+atualizaPersonagem jogo action inm = case action of
         Just Subir -> inm {velocidade = (0,-10), direcao = Norte}
         Just Descer -> inm {velocidade = (0,10), direcao = Sul}
-        Just AndarEsquerda -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
+        Just AndarEsquerda -> if snd (velocidade inm) /= 0 then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
         Just Saltar -> if (snd (velocidade inm) == 0 ) then inm {velocidade = (fst $ (velocidade inm),-5)} else inm
-        Just AndarDireita -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
+        Just AndarDireita -> if snd (velocidade inm) /= 0 then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
         Just Parar -> inm {velocidade = (0,snd (velocidade inm))}
-        Nothing -> inm
+        Nothing -> inm {velocidade = (0,0)}
