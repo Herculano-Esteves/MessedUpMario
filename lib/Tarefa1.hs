@@ -38,7 +38,7 @@ mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
 
 -- Test data START
 per = Personagem {
-    posicao = (0.5,0.5),
+    posicao = (0.5,1.0),
     tamanho = (0.9,0.9),
     aplicaDano = (True, 10)
 }

@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = removerjogChao (acionarAlcapao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog = removerjogChao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (acionarAlcapao (gravidadeQuedaEnd dtime jog)))))))
 
 
 --Dano Jogador START
@@ -85,7 +85,7 @@ changeVelocidade dtime mapa perso
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) mapa) ++
+gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao] (1*0.5,1*0.5) mapa) ++
     map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
 
@@ -94,7 +94,7 @@ removerjogChao :: Jogo -> Jogo
 removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
 
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (all (==False) (map (sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) =
+seDentroSai mapa ent | not (all (==False) (map (sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) =
                     ent {posicao = ((fst (posicao ent)),fromIntegral(floor p4)-snd (tamanho ent)*0.5)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
@@ -133,16 +133,29 @@ estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0
 
 --JOGADOR E ALCAPAO START
 acionarAlcapao :: Jogo -> Jogo
-acionarAlcapao jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
+acionarAlcapao jogo = jogo {mapa = acionarUmAlcapao (mapa jogo) (jogador jogo)}
+
+
+acionarUmAlcapao :: Mapa -> Personagem -> Mapa
+acionarUmAlcapao (Mapa a b c) per = Mapa a b (alcapaoMapa Alcapao (dimensaobloco*0.5) c jog)
+
+
+
+
+
+acionarVidro :: Jogo -> Jogo
+acionarVidro jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
 
 
 acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
-acionarAlcapaoaux (Mapa a b c) jog = Mapa a b (alcapaoMapa (dimensaobloco*0.5) c jog)
+acionarAlcapaoaux (Mapa a b c) jog = Mapa a b (alcapaoMapa Vidro (dimensaobloco*0.5) c jog)
 
 --funcao que atualiza o mapa double é metade da dimensao do bloco
-alcapaoMapa :: Double -> [[Bloco]] -> Personagem -> [[Bloco]]
-alcapaoMapa _ [] _ = []
-alcapaoMapa x (h:t) jog = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa (x+dimensaobloco) t jog
+alcapaoMapa :: Bloco -> Double -> [[Bloco]] -> Personagem -> [[Bloco]]
+alcapaoMapa b _ [] _ = []
+alcapaoMapa b x (h:t) jog   | b == Vidro = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa b (x+dimensaobloco) t jog
+                            | b == Alcapao = (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa b (x+dimensaobloco) t jog
+                            | otherwise = (h:t)
 
 
 --funcao que verifica se existem alcapoes perto para desaparecerem tambem
@@ -155,7 +168,7 @@ alcapaoAux :: Bool -> [Bloco] -> [Bloco] -> [Bloco]
 alcapaoAux _ [] [] = []
 alcapaoAux b (h:t) (h2:t2)
     | b == False = if h == h2 then h2 : alcapaoAux False t t2 else Vazio : alcapaoAux True t t2
-    | b && h2 == Alcapao = Vazio : alcapaoAux True t t2
+    | b && h2 == Vidro = Vazio : alcapaoAux True t t2
     | b && not (h==h2) = h2 : alcapaoAux True t t2
     | otherwise = h2 : alcapaoAux False t t2
 
@@ -165,8 +178,9 @@ alcapaoAux b (h:t) (h2:t2)
 alcapaolinhaAux :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
 alcapaolinhaAux _ _ [] _ = []
 alcapaolinhaAux y z (h:t) jog
-    | h == Alcapao = if sobreposicao (genHitbox jog) (gethitboxbloco dimensaobloco (y,z)) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
+    | h == Alcapao = if (sobreposicao ((p1,p2),(p3,p4+0.2)) (gethitboxbloco dimensaobloco (y,z))) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
     | otherwise = h : alcapaolinhaAux y (z+dimensaobloco) t jog
+        where ((p1,p2),(p3,p4)) = (genHitbox jog)
 --JOGADOR E ALCAPAO END
 
 

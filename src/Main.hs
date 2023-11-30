@@ -42,6 +42,7 @@ draw jogo = do
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa jogo) (jogador jogo)))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador jogo)))
     putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa jogo) (jogador jogo)) )
+
     --putStrLn (show (mapa jogo))
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
