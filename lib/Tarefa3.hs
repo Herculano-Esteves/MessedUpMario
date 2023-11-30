@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog = removerjogChao (acionarAlcapao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (gravidadeQuedaEnd dtime jog)))))))
 
 
 --Dano Jogador START
@@ -23,14 +23,14 @@ hitboxDanoJogadorFinal :: Jogo -> Jogo
 hitboxDanoJogadorFinal jogo = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
-hitboxDanoJogador x y   
+hitboxDanoJogador x y
     | fst (aplicaDano x) && snd (aplicaDano x) > 0 = hitboxDanoJogadoraux x y
     | otherwise = y
 
 
 hitboxDanoJogadoraux :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogadoraux _ [] = []
-hitboxDanoJogadoraux player (h:t)   
+hitboxDanoJogadoraux player (h:t)
     | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam2*aux dir,p3)) (genHitbox h) = h {vida = vida h -1 }: hitboxDanoJogadoraux player t
     | otherwise = h: hitboxDanoJogadoraux player t
     where p1 = snd (fst (genHitbox player))
@@ -74,7 +74,7 @@ changeVelocidade dtime mapa perso
         velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime)
         }
     | otherwise = perso {
-        posicao = (xPos, (snd $ (posicao perso)) + if (snd (velocidade perso) > 0 && podeAndarParaDireitaBool mapa perso) then 0 else (snd $ (velocidade perso))*dtime), -- this if prevents the player from entering the floor after falling
+        posicao = (xPos, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime),
         velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
@@ -87,6 +87,18 @@ changeVelocidade dtime mapa perso
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
 gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
+
+
+removerjogChao :: Jogo -> Jogo
+removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
+
+seDentroSai :: Mapa -> Personagem -> Personagem
+seDentroSai mapa ent | not (all (==False) (map (sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) =
+                    ent {posicao = ((fst (posicao ent)),fromIntegral(floor p4)-snd (tamanho ent)*0.5)}
+                     | otherwise = ent
+                    where ((p1,p2),(p3,p4)) = genHitbox ent
+                     
+
 
 
 -- JOGADOR LIFE START
@@ -165,13 +177,13 @@ mapaEmovimentos jogo = undefined
 
 
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p7+1,p6),(p7,p8)) ((p1,p2),(p3,p4)))
+podeAndarParaEsquerdaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = (genHitbox ent)
           ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
 
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p1,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) || (sobreposicao ((p5,p6),(-p7,p8)) ((p1,p2),(p3,p4)))
+podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = (genHitbox ent)
           ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
 
