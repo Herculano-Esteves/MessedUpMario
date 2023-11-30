@@ -213,6 +213,7 @@ checkEscadas jogo = jogo {
     jogador = checkEscadaAux (mapa jogo) (jogador jogo)
 }
     where Mapa _ _ mat = mapa jogo
+          startEndEscadas = agrupaEscadas (getPosOfBlock Escada mat)
 
 checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
 checkEscadaList mapa persos = map (checkEscadaAux mapa) persos

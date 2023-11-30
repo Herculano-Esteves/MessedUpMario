@@ -11,11 +11,14 @@ module Tarefa4 where
 import Data.Maybe
 
 import LI12324
-    ( Jogo(inimigos, jogador),
+    ( Jogo(..),
       Acao(..),
-      Personagem(velocidade, emEscada, direcao),
-      Direcao(Este, Norte, Sul, Oeste) )
-import Tarefa1 (dimensaobloco)
+      Personagem(..),
+      Direcao(Este, Norte, Sul, Oeste),
+      Mapa(..),
+      Bloco(..) )
+import Tarefa1
+import Tarefa2
 import Tarefa3
 
 
@@ -31,8 +34,7 @@ atualiza actions action jogo
 
 atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
 atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
-atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
-atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
+
 
 -- * Change the velocity
 -- TODO: Define how each character is going to jump
@@ -46,3 +48,6 @@ atualizaPersonagem jogo action inm = case action of
         -- Just Parar -> inm {velocidade = (0,if (emEscada inm) then 0 else snd (velocidade inm))} -- TODO: Make the player stop after releasing key when on ladder
         Just Parar -> inm {velocidade = (0, snd (velocidade inm))}
         Nothing -> inm
+    {-where onTopLadder :: Personagem -> Bool
+          onTopLadder perso = floorPos (posicao perso) == head (agrupaEscadas (getPosOfBlock Escada mat))
+          (Mapa _ _ mat) = mapa jogo-}

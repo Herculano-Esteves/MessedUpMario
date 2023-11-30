@@ -50,6 +50,7 @@ library
         Tarefa2
         Tarefa3
         Tarefa4
+        Mapas
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -106,4 +107,4 @@ test-suite primate-kong-test
     main-is:          Spec.hs
 
     -- Test dependencies.
-    build-depends:    base ^>=4.16.4.0, random ^>=1.2.1.1, HUnit
+    build-depends:    base ^>=4.16.4.0, random ^>=1.2.1.1, HUnit, gloss ^>=1.13.2.2
