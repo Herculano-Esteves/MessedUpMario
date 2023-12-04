@@ -7,6 +7,7 @@ import Tarefa2
 import Tarefa3
 import Tarefa4
 import Graphics.Gloss
+import Graphics.Gloss.Interface.IO.Game
 
 import GHC.Float (float2Double, double2Float)
 
