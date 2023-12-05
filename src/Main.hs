@@ -49,6 +49,7 @@ eventHandler :: Event -> Jogo -> IO Jogo
 -- eventHandler (EventKey (Char 'm') Down _ _) jogo = return $ jogo {mapa = emptyMap}
 eventHandler event jogo
     | (mapa jogo) /= emptyMap = eventHandlerInGame event jogo
+    | otherwise = return jogo
 
 timeHandler :: Float -> Jogo -> IO Jogo
 timeHandler time jogo = return $ movimenta 1 (float2Double time) jogo
@@ -66,7 +67,7 @@ draw jogo = do
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escadas <- loadBMP "assets/ladder.bmp"
     if (mapa jogo /= emptyMap) then return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo)
-    else return $ Pictures [drawTitle]
+    else return $ Pictures [drawMenu]
 
 bgColor :: Color
 bgColor = black
