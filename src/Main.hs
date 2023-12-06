@@ -41,7 +41,7 @@ draw state = do
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escadas <- loadBMP "assets/ladder.bmp"
-    if (inGame state) then return $ Pictures ([drawLadder (jogo state) escadas, drawPlayer  mario (jogador (jogo state))] ++ (drawLs (jogo state) plataforma) ++ drawColecs (jogo state))
+    if (inGame state) then return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo ++ [drawAlcapao jogo alcapao))
     else return $ Pictures [drawMenu state]
 
 bgColor :: Color
