@@ -19,22 +19,9 @@ window = InWindow
     sizeWin --(700,700)
     (700,200)
 
-eventHandlerInGame :: Event -> Jogo -> IO Jogo
-eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarDireita) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyRight) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyLeft) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarEsquerda) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyLeft) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyUp) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Subir) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyUp) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyDown) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Descer) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyDown) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Saltar) jogo
---eventHandlInGameer (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyEsc) Down _ _) jogo = exitSuccess
-eventHandlerInGame (EventKey (Char 'm') Down _ _) jogo = return $ jogo {mapa = emptyMap}
-eventHandlerInGame e jogo = return jogo
 
-eventHandler :: Event -> Jogo -> IO Jogo
+
+eventHandler :: Event -> State -> IO State
 -- eventHandler (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarDireita) jogo
 -- eventHandler (EventKey (SpecialKey KeyRight) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
 -- eventHandler (EventKey (SpecialKey KeyLeft) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarEsquerda) jogo
@@ -47,27 +34,29 @@ eventHandler :: Event -> Jogo -> IO Jogo
 -- --eventHandler (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
 -- eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) jogo = exitSuccess
 -- eventHandler (EventKey (Char 'm') Down _ _) jogo = return $ jogo {mapa = emptyMap}
-eventHandler event jogo
-    | (mapa jogo) /= emptyMap = eventHandlerInGame event jogo
-    | otherwise = return jogo
+eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {inMenu = not (inMenu state)}
+eventHandler event state
+    | inMenu state = return state {jogo = eventHandlerInGame event (jogo state)}
+    | otherwise = eventHandlerInMenu event state
 
-timeHandler :: Float -> Jogo -> IO Jogo
-timeHandler time jogo = return $ movimenta 1 (float2Double time) jogo
+timeHandler :: Float -> State -> IO State
+timeHandler time state = return $ state {jogo = movimenta 1 (float2Double time) (jogo state)}
 
 
-draw :: Jogo -> IO Picture
-draw jogo = do
-    putStrLn ("Posicao jog: " ++ (show (posicao $ jogador jogo)))
-    putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
-    putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa jogo) (jogador jogo)))
-    putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador jogo)))
-    putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa jogo) (jogador jogo)) )
+draw :: State -> IO Picture
+draw state = do
+    putStrLn ("Posicao jog: " ++ (show (posicao $ jogador (jogo state))))
+    putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador (jogo state)) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador (jogo state)) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
+    putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo state)) (jogador (jogo state))))
+    putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
+    putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
     --putStrLn (show (mapa jogo))
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escadas <- loadBMP "assets/ladder.bmp"
-    if (mapa jogo /= emptyMap) then return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo)
-    else return $ Pictures [drawMenu]
+    if (inMenu state) then return $ Pictures ([drawLadder (jogo state) escadas, drawPlayer  mario (jogador (jogo state))] ++ (drawLs (jogo state) plataforma) ++ drawColecs (jogo state))
+    else return $ Pictures [drawMenu state]
 
 bgColor :: Color
 bgColor = black
@@ -78,4 +67,4 @@ fr = 60
 main :: IO ()
 main = do
     putStrLn (show (fst sizeWin, snd sizeWin))
-    playIO window bgColor fr jogoSamp draw eventHandler timeHandler
+    playIO window bgColor fr initialState draw eventHandler timeHandler
