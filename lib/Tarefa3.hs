@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = removerjogChao ( (coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (acionarAlcapao (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog = acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd  (gravidadeQuedaEnd dtime jog))))))
 
 
 --Dano Jogador START
@@ -53,7 +53,7 @@ inimigoMortoEnd :: Jogo -> Jogo
 inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
-inimigoMorto l = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) [] l
+inimigoMorto = foldl (\x h-> if (vida h == 0) then h {posicao = (-10,-10)} : x else h : x ) []
 --Inimigo morto END
 
 
@@ -64,28 +64,28 @@ gravidadeQuedaEnd dtime jogo = jogo {inimigos = gravidadeQueda dtime (mapa jogo)
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
-gravidadeQueda dtime mapa l = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) [] l
+gravidadeQueda dtime mapa = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) []
 
 -- | Aplica a velocidade à personagem e aplca a gravidade quando não está no chão
 changeVelocidade :: Double -> Mapa -> Personagem -> Personagem
 changeVelocidade dtime mapa perso
     | gravidadeQuedaonoff mapa perso = perso {
-        posicao = (xPos, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime ),
-        velocidade = (fst (velocidade perso),snd (velocidade perso)+(snd gravidade)*dtime)
+        posicao = (xPos, (snd (posicao perso)) + (snd (velocidade perso))*dtime ),
+        velocidade = (fst (velocidade perso),snd (velocidade perso)+snd gravidade*dtime)
         }
     | otherwise = perso {
-        posicao = (xPos, (snd $ (posicao perso)) + (snd $ (velocidade perso))*dtime),
-        velocidade = (fst (velocidade perso), if (snd (velocidade perso) >0) then 0 else snd (velocidade perso)) -- this if resets the Y speed after falling
+        posicao = (xPos, (snd (posicao perso)) + (snd (velocidade perso))*dtime),
+        velocidade = (fst (velocidade perso), min (snd (velocidade perso)) 0) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
-    where xPos = if ((not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0)) || ((not (podeAndarParaEsquerdaBool mapa perso) && (fst $ (velocidade perso)) > 0)) then
-                (fst $ (posicao perso)) -- get player out of wall (??)
+    where xPos = if (not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0) || (not (podeAndarParaEsquerdaBool mapa perso) && (fst $ (velocidade perso)) > 0) then
+                fst $ (posicao perso) -- get player out of wall (??)
             else
-                (fst $ (posicao perso)) + (fst (velocidade perso))*dtime
+                (fst (posicao perso)) + fst (velocidade perso)*dtime
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao] (1*0.5,1*0.5) mapa) ++
+gravidadeQuedaonoff mapa perso = all not (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao] (1*0.5,1*0.5) mapa) ++
     map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
 
@@ -94,11 +94,11 @@ removerjogChao :: Jogo -> Jogo
 removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
 
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (all (==False) (map (sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) =
-                    ent {posicao = ((fst (posicao ent)),fromIntegral(floor p4)-snd (tamanho ent)*0.5)}
+seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) =
+                    ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
-                     
+
 
 
 
@@ -108,17 +108,17 @@ perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inim
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
-    | all (==False) (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
     | otherwise = jog {vida = vida jog - 1}
 -- JOGADOR LIFE END
 
 -- JOGADOR E OBJETOS START
 coletarObjetos :: Jogo -> Jogo
-coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos = pontos (jogador jogo) + p3,aplicaDano = (if (p4 == False && (snd (aplicaDano (jogador jogo)) > 0)) || p4 then True else False,if p4 && (snd (aplicaDano (jogador jogo)) == 0) then 10 else snd (aplicaDano (jogador jogo)))}}
+coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos = pontos (jogador jogo) + p3,aplicaDano = ((p4 == False && (snd (aplicaDano (jogador jogo)) > 0)) || p4,if p4 && snd (aplicaDano (jogador jogo)) == 0 then 10 else snd (aplicaDano (jogador jogo)))}}
     where p1 = map fst (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
           p2 = map snd (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
           p3 = sum (map fst p2)
-          p4 = not (all (==False) (map snd p2))
+          p4 = not (all ((==False) . snd) p2)
 
 coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
 coletarObjetosaux _ [] = []
@@ -133,77 +133,46 @@ estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0
 
 --JOGADOR E ALCAPAO START
 acionarAlcapao :: Jogo -> Jogo
-acionarAlcapao jogo = jogo {mapa = acionarUmAlcapao (mapa jogo) (jogador jogo)}
-
-
-acionarUmAlcapao :: Mapa -> Personagem -> Mapa
-acionarUmAlcapao (Mapa a b c) per = Mapa a b (alcapaoMapa Alcapao (dimensaobloco*0.5) c jog)
-
-
-
-
-
-acionarVidro :: Jogo -> Jogo
-acionarVidro jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
-
+acionarAlcapao jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
 
 acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
-acionarAlcapaoaux (Mapa a b c) jog = Mapa a b (alcapaoMapa Vidro (dimensaobloco*0.5) c jog)
-
---funcao que atualiza o mapa double é metade da dimensao do bloco
-alcapaoMapa :: Bloco -> Double -> [[Bloco]] -> Personagem -> [[Bloco]]
-alcapaoMapa b _ [] _ = []
-alcapaoMapa b x (h:t) jog   | b == Vidro = alcapaoDifere h (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa b (x+dimensaobloco) t jog
-                            | b == Alcapao = (alcapaolinhaAux x (dimensaobloco*0.5) h jog) : alcapaoMapa b (x+dimensaobloco) t jog
-                            | otherwise = (h:t)
+acionarAlcapaoaux (Mapa a b c) jog = (Mapa a b (removerChao (Mapa a b c) jog))
 
 
---funcao que verifica se existem alcapoes perto para desaparecerem tambem
-alcapaoDifere :: [Bloco] -> [Bloco] -> [Bloco]
-alcapaoDifere b1 b2
-    | b1 == b2 = b2
-    | otherwise = reverse (alcapaoAux False (reverse b1) (reverse (alcapaoAux False b1 b2)))
+removerChao :: Mapa -> Personagem -> [[Bloco]]
+removerChao (Mapa a b c) jog    | (all (==False) (map (sobreposicao (genHitbox jog)) (getMapColisions dimensaobloco [Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) (Mapa a b c)))) = c
+                                | otherwise = removerAlcapao (dimensaobloco*0.5) c jog
 
-alcapaoAux :: Bool -> [Bloco] -> [Bloco] -> [Bloco]
-alcapaoAux _ [] [] = []
-alcapaoAux b (h:t) (h2:t2)
-    | b == False = if h == h2 then h2 : alcapaoAux False t t2 else Vazio : alcapaoAux True t t2
-    | b && h2 == Vidro = Vazio : alcapaoAux True t t2
-    | b && not (h==h2) = h2 : alcapaoAux True t t2
-    | otherwise = h2 : alcapaoAux False t t2
+removerAlcapao :: Double -> [[Bloco]] -> Personagem -> [[Bloco]]
+removerAlcapao _ [] _ = []
+removerAlcapao x l jog  | Alcapao `elem` head l = removerUmAlcapao x (dimensaobloco*0.5) (head l) jog : removerAlcapao (x+dimensaobloco) (tail l) jog
+                        | otherwise = head l : removerAlcapao (x+dimensaobloco) (tail l) jog
 
-
-
---funcao que calcula se o jogador toca ou nao numa hitbox de alcapao
-alcapaolinhaAux :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
-alcapaolinhaAux _ _ [] _ = []
-alcapaolinhaAux y z (h:t) jog
-    | h == Alcapao = if (sobreposicao ((p1,p2),(p3,p4+0.2)) (gethitboxbloco dimensaobloco (y,z))) then Vazio : alcapaolinhaAux y (z+dimensaobloco) t jog else h : alcapaolinhaAux y (z+dimensaobloco) t jog
-    | otherwise = h : alcapaolinhaAux y (z+dimensaobloco) t jog
-        where ((p1,p2),(p3,p4)) = (genHitbox jog)
---JOGADOR E ALCAPAO END
-
-
-
-mapaEmovimentos :: Jogo -> Jogo
-mapaEmovimentos jogo = undefined
-
+removerUmAlcapao :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
+removerUmAlcapao _ _ [] _ = []
+removerUmAlcapao y x l jog  | sobreposicao ((px+0.1,p4),(px,p4)) ((px2+0.1,p6),(px2,p6)) && head l == Alcapao = Vazio : removerUmAlcapao y (x+dimensaobloco) (tail l) jog
+                            | otherwise = head l : removerUmAlcapao y (x+dimensaobloco) (tail l) jog
+                            where   ((p1,p2),(p3,p4)) = (genHitbox jog)
+                                    ((p5,p6),(p7,p8)) = (gethitboxbloco dimensaobloco (x,y))
+                                    px = (p1+p3)*0.5
+                                    px2 = (p5+p7)*0.5
+--ALcapao END
 
 
 
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
-    where ((p1,p2),(p3,p4)) = (genHitbox ent)
-          ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
+podeAndarParaEsquerdaBool mapa ent = all (==False) (foldl (\x y -> (sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
+    where ((p1,p2),(p3,p4)) = genHitbox ent
+          ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = (all (==False) (foldl (\x y -> (sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
-    where ((p1,p2),(p3,p4)) = (genHitbox ent)
-          ((p5,p6),(p7,p8)) = (getMapaDimensoes dimensaobloco mapa)
+podeAndarParaDireitaBool mapa ent = all (==False) (foldl (\x y -> (sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
+    where ((p1,p2),(p3,p4)) = genHitbox ent
+          ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
 getMaprightsideEnd :: [Bloco] -> Mapa -> [Hitbox]
-getMaprightsideEnd a b = getMaprightside dimensaobloco a (dimensaobloco*0.5,dimensaobloco*0.5) b
+getMaprightsideEnd a = getMaprightside dimensaobloco a (dimensaobloco*0.5,dimensaobloco*0.5)
 
 getMaprightside :: Double -> [Bloco] -> Posicao -> Mapa -> [Hitbox]
 getMaprightside x l _ (Mapa _ _ []) = []
@@ -216,7 +185,7 @@ mapablocosrightside x l (a,b) (h:t)
     | otherwise = mapablocosrightside x l (a+x,b) t
 
 gethitboxrightside :: Double -> Posicao -> Hitbox
-gethitboxrightside x (a,b) = ((a+(x*0.5),b-(x*0.5)),(a+(x*0.5),b+(x*0.5)))
+gethitboxrightside x (a,b) = ((a+x*0.5,b-x*0.5),(a+x*0.5,b+x*0.5))
 --Colisoes com parede da direita END
 
 
@@ -224,7 +193,7 @@ isOnFloor :: Jogo -> Bool
 isOnFloor jogo = isOnFlooraux  (jogador jogo) (mapa jogo)
 
 isOnFlooraux :: Personagem -> Mapa -> Bool
-isOnFlooraux jog mapa = not (all (==False) (map (sobreposicao ((p3,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+isOnFlooraux jog mapa = not (all ((==False) . sobreposicao ((p3,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
                         where ((p1,p2),(p3,p4)) = genHitbox jog
 
 
@@ -242,7 +211,7 @@ checkEscadas jogo = jogo {
           startEndEscadas = agrupaEscadas (getPosOfBlock Escada mat)
 
 checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
-checkEscadaList mapa persos = map (checkEscadaAux mapa) persos
+checkEscadaList mapa = map (checkEscadaAux mapa)
 
 checkEscadaAux :: Mapa -> Personagem -> Personagem
 checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso) `elem` getPosOfBlock Escada mat}
