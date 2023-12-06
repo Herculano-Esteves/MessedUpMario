@@ -47,7 +47,8 @@ draw jogo = do
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escadas <- loadBMP "assets/ladder.bmp"
-    return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo)
+    alcapao <- loadBMP "assets/Alcapao.bmp"
+    return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo ++ [drawAlcapao jogo alcapao])
 
 bgColor :: Color
 bgColor = black

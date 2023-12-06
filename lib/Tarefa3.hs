@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd  (gravidadeQuedaEnd dtime jog))))))
+movimenta seed dtime jog = (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd  (gravidadeQuedaEnd dtime jog)))))))
 
 
 --Dano Jogador START
@@ -85,7 +85,7 @@ changeVelocidade dtime mapa perso
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all not (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao] (1*0.5,1*0.5) mapa) ++
+gravidadeQuedaonoff mapa perso = all not (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao,Escada] (1*0.5,1*0.5) mapa) ++
     map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
 
@@ -94,14 +94,18 @@ removerjogChao :: Jogo -> Jogo
 removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
 
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) =
-                    ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5)}
+seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) =
+                    ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = ((fst (velocidade ent)),0)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
-
-
-
-
+{-
+saltoComInercia :: Jogo -> Jogo
+saltoComInercia jogo    | gravidadeQuedaonoff (mapa jogo) (jogador jogo) = jogo {jogador = jog {velocidade = (if direcao jog == Este then 4.1 else (-4.1),vely)}}
+                        | otherwise = jogo {jogador = jog {velocidade = (if direcao jog == Este && vely == 0 && then 4 else (-4),vely)}}
+                        where   jog = (jogador jogo)
+                                velx = fst(velocidade jog)
+                                vely = snd(velocidade jog)
+-}
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo
 perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
@@ -150,7 +154,7 @@ removerAlcapao x l jog  | Alcapao `elem` head l = removerUmAlcapao x (dimensaobl
 
 removerUmAlcapao :: Double -> Double -> [Bloco] -> Personagem -> [Bloco]
 removerUmAlcapao _ _ [] _ = []
-removerUmAlcapao y x l jog  | sobreposicao ((px+0.1,p4),(px,p4)) ((px2+0.1,p6),(px2,p6)) && head l == Alcapao = Vazio : removerUmAlcapao y (x+dimensaobloco) (tail l) jog
+removerUmAlcapao y x l jog  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0.07,p6),(px2,p6)) || (sobreposicao ((p1,p2),(p3,p4))  ((p5,p6),(p7,p8)) && fst (velocidade jog) == 0)) && head l == Alcapao = Vazio : removerUmAlcapao y (x+dimensaobloco) (tail l) jog
                             | otherwise = head l : removerUmAlcapao y (x+dimensaobloco) (tail l) jog
                             where   ((p1,p2),(p3,p4)) = (genHitbox jog)
                                     ((p5,p6),(p7,p8)) = (gethitboxbloco dimensaobloco (x,y))
