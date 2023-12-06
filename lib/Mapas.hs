@@ -7,7 +7,7 @@ import Graphics.Gloss
 emptyMap :: Mapa
 emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
 
-data Images = Images [(String,Picture)]
+type Images = [(String,Picture)]
 
 data State = State {
     jogo :: Jogo,
@@ -22,5 +22,6 @@ initialState = State {
     jogo = jogoSamp,
     inGame = False,
     selectedButton = 0,
-    exitGame = False
+    exitGame = False,
+    images = []
 }

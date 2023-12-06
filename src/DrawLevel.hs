@@ -1,4 +1,4 @@
-module DrawMap where
+module DrawLevel where
 
 
 import LI12324
@@ -10,6 +10,9 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
 
 import GHC.Float (float2Double, double2Float)
+import Mapas
+import LI12324
+import Data.Maybe (fromJust)
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
 sizeWin :: (Int, Int)
@@ -17,12 +20,17 @@ sizeWin = (round $ snd $ (snd (getMapaDimensoes escalaGloss mapaTeste)), (round 
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
 posMapToGloss :: Posicao -> (Float,Float)
-posMapToGloss (x,y) = (((double2Float x)*d2f escalaGloss)-(fromIntegral $(fst sizeWin))/2, ((fromIntegral $ (snd sizeWin))/2 - (double2Float y) * d2f escalaGloss))
+posMapToGloss (x,y) = ((d2f x*d2f escalaGloss)-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
 
 d2f = double2Float
 f2d = float2Double
 
--- drawMap :: Jogo
+drawLevel :: State -> Picture
+drawLevel state = Pictures ([drawLadder (jogo state) texEscada, drawPlayer  texMario (jogador (jogo state))] ++ (drawMap (jogo state) texPlataforma) ++ drawColecs (jogo state) ++ [drawAlcapao (jogo state) texAlcapao])
+    where texEscada = fromJust(lookup "escada" (images state))
+          texMario = fromJust(lookup "mario" (images state))
+          texPlataforma = fromJust(lookup "plataforma" (images state))
+          texAlcapao = fromJust(lookup "alcapao" (images state))
 
 -- ? Set a scale for drawng according to the size of the window
 drawPlayer :: Picture -> Personagem -> Picture
@@ -31,11 +39,10 @@ drawPlayer pic jog = Color red $ Translate (((double2Float $ fst $ posicao jog) 
 drawColecs :: Jogo -> [Picture]
 drawColecs jogo = map (\(colec,pos) -> (Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) ) $ (Color red) $ (rectangleSolid 25 25)) (colecionaveis jogo)
 
-drawLs :: Jogo -> Picture -> [Picture]
-drawLs jogo img = map (\(x,y) -> Color white $ Translate ((double2Float x)-(fromIntegral $
-    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Plataforma] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo))) ++
-    map (\(x,y) -> Color white $ Translate ((double2Float x)-(fromIntegral $
-    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
+-- TODO: Maybe we should make the get center of hitbox not receive a scale to avoid having to set it to 1
+drawMap :: Jogo -> Picture -> [Picture]
+drawMap jogo img = map (\pos -> Color white $ Translate (fst $ posMapToGloss pos) (snd $ posMapToGloss pos) $ img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) ++
+    map (\pos -> Color white $ Translate (fst $ posMapToGloss pos) (snd $ posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 
 drawLadder :: Jogo -> Picture -> Picture
 drawLadder jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fromIntegral $

@@ -7,7 +7,7 @@ import Tarefa1
 import Tarefa3
 import Tarefa4
 import Mapas
-import DrawMap
+import DrawLevel
 import DrawMenu
 import GHC.Float (float2Double, double2Float)
 import Tarefa2 (jogoSamp)
@@ -38,11 +38,8 @@ draw state = do
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
     putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
     --putStrLn (show (mapa jogo))
-    mario <- loadBMP "assets/mario.bmp"
-    plataforma <- loadBMP "assets/Plataforma.bmp"
-    escadas <- loadBMP "assets/ladder.bmp"
-    if (inGame state) then return $ Pictures ([drawLadder jogo escadas, drawPlayer  mario (jogador jogo)] ++ (drawLs jogo plataforma) ++ drawColecs jogo ++ [drawAlcapao jogo alcapao))
-    else return $ Pictures [drawMenu state]
+    if (inGame state) then return (drawLevel state)
+    else return (drawMenu state)
 
 bgColor :: Color
 bgColor = black
@@ -53,8 +50,16 @@ fr = 60
 loadImages :: State -> IO State
 loadImages state = do
     mario <- loadBMP "assets/mario.bmp"
+    plataforma <- loadBMP "assets/Plataforma.bmp"
+    escada <- loadBMP "assets/ladder.bmp"
+    alcapao <- loadBMP "assets/Alcapao.bmp"
     return  state {
-        images = Images [("mario", mario)]
+        images = [
+            ("mario", mario),
+            ("escada", escada),
+            ("plataforma", plataforma),
+            ("alcapao", alcapao)
+            ]
         }
 
 main :: IO ()
