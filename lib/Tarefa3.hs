@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd  (gravidadeQuedaEnd dtime jog))))))
+movimenta seed dtime jog = checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd  (gravidadeQuedaEnd dtime jog)))))))
 
 
 --Dano Jogador START
@@ -195,7 +195,6 @@ isOnFloor jogo = isOnFlooraux  (jogador jogo) (mapa jogo)
 isOnFlooraux :: Personagem -> Mapa -> Bool
 isOnFlooraux jog mapa = not (all ((==False) . sobreposicao ((p3,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
                         where ((p1,p2),(p3,p4)) = genHitbox jog
-
 
 --INICIO DE AI
 movimentoInimigos :: Semente -> Jogo -> Jogo

@@ -11,14 +11,18 @@ import Graphics.Gloss.Interface.IO.Game
 
 import GHC.Float (float2Double, double2Float)
 
+-- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
 sizeWin :: (Int, Int)
 sizeWin = (round $ snd $ (snd (getMapaDimensoes escalaGloss mapaTeste)), (round $ fst $ (snd (getMapaDimensoes escalaGloss mapaTeste))))
 
+-- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
 posMapToGloss :: Posicao -> (Float,Float)
 posMapToGloss (x,y) = (((double2Float x)*d2f escalaGloss)-(fromIntegral $(fst sizeWin))/2, ((fromIntegral $ (snd sizeWin))/2 - (double2Float y) * d2f escalaGloss))
 
 d2f = double2Float
 f2d = float2Double
+
+-- drawMap :: Jogo
 
 -- ? Set a scale for drawng according to the size of the window
 drawPlayer :: Picture -> Personagem -> Picture

@@ -19,30 +19,16 @@ window = InWindow
     sizeWin --(700,700)
     (700,200)
 
-
-
 eventHandler :: Event -> State -> IO State
--- eventHandler (EventKey (SpecialKey KeyRight) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarDireita) jogo
--- eventHandler (EventKey (SpecialKey KeyRight) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
--- eventHandler (EventKey (SpecialKey KeyLeft) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just AndarEsquerda) jogo
--- eventHandler (EventKey (SpecialKey KeyLeft) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
--- eventHandler (EventKey (SpecialKey KeyUp) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Subir) jogo
--- eventHandler (EventKey (SpecialKey KeyUp) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
--- eventHandler (EventKey (SpecialKey KeyDown) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Descer) jogo
--- eventHandler (EventKey (SpecialKey KeyDown) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Parar) jogo
--- eventHandler (EventKey (SpecialKey KeySpace) Down _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Just Saltar) jogo
--- --eventHandler (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
--- eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) jogo = exitSuccess
--- eventHandler (EventKey (Char 'm') Down _ _) jogo = return $ jogo {mapa = emptyMap}
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
-eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {inMenu = not (inMenu state)}
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {inGame = not (inGame state)}
 eventHandler event state
-    | inMenu state = return state {jogo = eventHandlerInGame event (jogo state)}
+    | inGame state = return state {jogo = eventHandlerInGame event (jogo state)}
     | otherwise = eventHandlerInMenu event state
 
 timeHandler :: Float -> State -> IO State
+timeHandler time (State {exitGame = True}) = exitSuccess
 timeHandler time state = return $ state {jogo = movimenta 1 (float2Double time) (jogo state)}
-
 
 draw :: State -> IO Picture
 draw state = do
@@ -55,7 +41,7 @@ draw state = do
     mario <- loadBMP "assets/mario.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escadas <- loadBMP "assets/ladder.bmp"
-    if (inMenu state) then return $ Pictures ([drawLadder (jogo state) escadas, drawPlayer  mario (jogador (jogo state))] ++ (drawLs (jogo state) plataforma) ++ drawColecs (jogo state))
+    if (inGame state) then return $ Pictures ([drawLadder (jogo state) escadas, drawPlayer  mario (jogador (jogo state))] ++ (drawLs (jogo state) plataforma) ++ drawColecs (jogo state))
     else return $ Pictures [drawMenu state]
 
 bgColor :: Color
@@ -64,7 +50,15 @@ bgColor = black
 fr :: Int
 fr = 60
 
+loadImages :: State -> IO State
+loadImages state = do
+    mario <- loadBMP "assets/mario.bmp"
+    return  state {
+        images = Images [("mario", mario)]
+        }
+
 main :: IO ()
 main = do
     putStrLn (show (fst sizeWin, snd sizeWin))
-    playIO window bgColor fr initialState draw eventHandler timeHandler
+    initState <- loadImages initialState
+    playIO window bgColor fr initState draw eventHandler timeHandler

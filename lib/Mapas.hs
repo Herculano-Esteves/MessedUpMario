@@ -2,19 +2,25 @@ module Mapas where
 
 import LI12324
 import Tarefa2 (jogoSamp)
+import Graphics.Gloss
 
 emptyMap :: Mapa
 emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
 
+data Images = Images [(String,Picture)]
+
 data State = State {
     jogo :: Jogo,
-    inMenu :: Bool,
-    selectedButton :: Int 
+    inGame :: Bool,
+    selectedButton :: Int,
+    exitGame :: Bool,
+    images :: Images
 }
 
 initialState :: State
 initialState = State {
     jogo = jogoSamp,
-    inMenu = True,
-    selectedButton = 0
+    inGame = False,
+    selectedButton = 0,
+    exitGame = False
 }
