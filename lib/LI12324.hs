@@ -28,6 +28,7 @@ data Bloco
   | Plataforma   -- ^ Bloco sólido que pode ser utilizado como superfície
   | Alcapao      -- ^ Bloco que desaparece após ser atravessado pelo jogador
   | Vazio        -- ^ Espaço
+  | Vidro      
   deriving (Ord, Eq, Read, Show)
 
 -- | Mapa de um 'Jogo', composto por uma posição e direção inicial, posição final e uma matriz de blocos.

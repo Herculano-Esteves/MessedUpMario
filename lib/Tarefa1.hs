@@ -22,9 +22,9 @@ dimensaobloco = 1
 
 mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
-    ,[Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
-    ,[Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
-    ,[Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
+    ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Alcapao, Alcapao, Alcapao, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
@@ -38,7 +38,7 @@ mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
 
 -- Test data START
 per = Personagem {
-    posicao = (0.5,0.5),
+    posicao = (2.0,2.5),
     tamanho = (0.9,0.9),
     aplicaDano = (True, 10)
 }
