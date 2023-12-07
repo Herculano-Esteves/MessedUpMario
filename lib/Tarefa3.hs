@@ -214,12 +214,12 @@ checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso)
 
 
 --INICIO DE AI
-movimentoInimigos :: Semente -> Jogo -> Jogo
-movimentoInimigos sem jogo = undefined
+movimentoInimigosaux :: Semente -> Jogo -> Jogo
+movimentoInimigosaux sem jogo = undefined
 
 
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
 inimigoAndar start mapa enm | all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p1+0.1,p2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (4,0)}
                             | all (==False) (foldl (\x y -> (sobreposicao ((p3,p4),(p3-0.1,p4)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (4,0)}
-                            
+                            | otherwise = undefined
                             where ((p1,p2),(p3,p4)) = genHitbox enm
