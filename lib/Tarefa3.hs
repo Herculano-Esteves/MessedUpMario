@@ -98,14 +98,7 @@ seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (ge
                     ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = ((fst (velocidade ent)),0)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
-{-
-saltoComInercia :: Jogo -> Jogo
-saltoComInercia jogo    | gravidadeQuedaonoff (mapa jogo) (jogador jogo) = jogo {jogador = jog {velocidade = (if direcao jog == Este then 4.1 else (-4.1),vely)}}
-                        | otherwise = jogo {jogador = jog {velocidade = (if direcao jog == Este && vely == 0 && then 4 else (-4),vely)}}
-                        where   jog = (jogador jogo)
-                                velx = fst(velocidade jog)
-                                vely = snd(velocidade jog)
--}
+
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo
 perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
@@ -201,9 +194,6 @@ isOnFlooraux jog mapa = not (all ((==False) . sobreposicao ((p3,p2),(p3,p4))) (g
                         where ((p1,p2),(p3,p4)) = genHitbox jog
 
 
---INICIO DE AI
-movimentoInimigos :: Semente -> Jogo -> Jogo
-movimentoInimigos sem jogo = undefined
 
 -- Ladder logic started
 checkEscadas :: Jogo -> Jogo
@@ -219,3 +209,15 @@ checkEscadaList mapa = map (checkEscadaAux mapa)
 
 checkEscadaAux :: Mapa -> Personagem -> Personagem
 checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso) `elem` getPosOfBlock Escada mat}
+
+
+--INICIO DE AI
+movimentoInimigos :: Semente -> Jogo -> Jogo
+movimentoInimigos sem jogo = undefined
+
+
+inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
+inimigoAndar start mapa enm | all (==False) (foldl (\x y -> (sobreposicao ((p1,p2),(p1+0.1,p2)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (4,0)}
+                            | all (==False) (foldl (\x y -> (sobreposicao ((p3,p4),(p3-0.1,p4)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (4,0)}
+                            
+                            where ((p1,p2),(p3,p4)) = genHitbox enm
