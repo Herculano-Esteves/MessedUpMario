@@ -64,7 +64,8 @@ gravidadeQuedaEnd dtime jogo = jogo {inimigos = gravidadeQueda dtime (mapa jogo)
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
-gravidadeQueda dtime mapa = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) []
+gravidadeQueda dtime mapa inms = map (\inm -> changeVelocidade dtime mapa inm) inms
+-- gravidadeQueda dtime mapa = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) []
 
 -- | Aplica a velocidade à personagem e aplca a gravidade quando não está no chão
 changeVelocidade :: Double -> Mapa -> Personagem -> Personagem

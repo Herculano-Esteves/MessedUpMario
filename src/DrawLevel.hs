@@ -33,6 +33,7 @@ drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texAl
           texAlcapao = fromJust(lookup "alcapao" (images state))
 
 -- ? Set a scale for drawng according to the size of the window
+-- ! Discard this function and use the DrawEnemy to draw every entity
 drawPlayer :: Picture -> Personagem -> Picture
 drawPlayer pic jog = Color red $ Translate (((double2Float $ fst $ posicao jog) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2) ((-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2) $ pic --rectangleSolid ((double2Float $ fst $ tamanho jog)* (double2Float escalaGloss)) ((double2Float $ snd $ tamanho jog)*double2Float escalaGloss)
 
@@ -40,7 +41,12 @@ drawEnemies :: Picture -> Jogo -> Picture
 drawEnemies tex jogo = Pictures $ map (drawEnemy tex) (inimigos jogo)
 
 drawEnemy :: Picture -> Personagem -> Picture
-drawEnemy tex inim = Color yellow $ Translate (fst $ posMapToGloss (posicao inim)) (snd $ posMapToGloss (posicao inim)) $ circleSolid 25
+drawEnemy tex inim = Color yellow $
+    Translate (fst $ posMapToGloss (posicao inim)) (snd $ posMapToGloss (posicao inim)) $
+    case tipo inim of
+        MacacoMalvado -> Color yellow $ circleSolid 25
+        Fantasma -> Color white $ circleSolid 25
+        Jogador -> Color red $ circleSolid 25
 
 drawColecs :: Jogo -> [Picture]
 drawColecs jogo = map (\(colec,pos) -> (Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) ) $ (Color red) $ (rectangleSolid 25 25)) (colecionaveis jogo)

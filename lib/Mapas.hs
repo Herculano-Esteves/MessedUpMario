@@ -11,16 +11,18 @@ type Images = [(String,Picture)]
 
 data State = State {
     jogo :: Jogo,
-    inGame :: Bool,
+    currentMenu :: Menu,
     selectedButton :: Int,
     exitGame :: Bool,
     images :: Images
 }
 
+data Menu = InGame | MainMenu deriving (Eq)
+
 initialState :: State
 initialState = State {
     jogo = jogoSamp,
-    inGame = False,
+    currentMenu = MainMenu,
     selectedButton = 0,
     exitGame = False,
     images = []

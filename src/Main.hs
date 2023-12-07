@@ -21,9 +21,9 @@ window = InWindow
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
-eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {inGame = not (inGame state)}
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | inGame state = return state {jogo = eventHandlerInGame event (jogo state)}
+    | currentMenu state == InGame = return state {jogo = eventHandlerInGame event (jogo state)}
     | otherwise = eventHandlerInMenu event state
 
 timeHandler :: Float -> State -> IO State
@@ -38,7 +38,7 @@ draw state = do
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
     putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
     --putStrLn (show (mapa jogo))
-    if (inGame state) then return (drawLevel state)
+    if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
 
 bgColor :: Color

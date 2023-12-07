@@ -27,7 +27,7 @@ drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong
 -- | Executa a função correspondente quando um determinado botão é pressionado
 buttonPress :: State -> State
 buttonPress state
-    | selectedButton state == 0 = state { inGame = True}
+    | selectedButton state == 0 = state { currentMenu = InGame}
     | selectedButton state == 1 = state { exitGame = True}
     | otherwise = state
 
