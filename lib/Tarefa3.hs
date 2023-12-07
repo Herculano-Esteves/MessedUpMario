@@ -193,7 +193,9 @@ isOnFlooraux :: Personagem -> Mapa -> Bool
 isOnFlooraux jog mapa = not (all ((==False) . sobreposicao ((p3,p2),(p3,p4))) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
                         where ((p1,p2),(p3,p4)) = genHitbox jog
 
-
+--INICIO DE AI
+movimentoInimigos :: Semente -> Jogo -> Jogo
+movimentoInimigos sem jogo = undefined
 
 -- Ladder logic started
 checkEscadas :: Jogo -> Jogo
