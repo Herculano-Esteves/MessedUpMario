@@ -26,7 +26,7 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder (jogo state) texEscada, drawPlayer  texMario (jogador (jogo state))] ++ (drawMap (jogo state) texPlataforma) ++ drawColecs (jogo state) ++ [drawAlcapao (jogo state) texAlcapao])
+drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texAlcapao (jogo state), drawPlayer  texMario (jogador (jogo state))] ++ (drawMap (jogo state) texPlataforma) ++ drawColecs (jogo state) ++ [drawAlcapao (jogo state) texAlcapao])
     where texEscada = fromJust(lookup "escada" (images state))
           texMario = fromJust(lookup "mario" (images state))
           texPlataforma = fromJust(lookup "plataforma" (images state))
@@ -35,6 +35,12 @@ drawLevel state = Pictures ([drawLadder (jogo state) texEscada, drawPlayer  texM
 -- ? Set a scale for drawng according to the size of the window
 drawPlayer :: Picture -> Personagem -> Picture
 drawPlayer pic jog = Color red $ Translate (((double2Float $ fst $ posicao jog) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2) ((-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2) $ pic --rectangleSolid ((double2Float $ fst $ tamanho jog)* (double2Float escalaGloss)) ((double2Float $ snd $ tamanho jog)*double2Float escalaGloss)
+
+drawEnemies :: Picture -> Jogo -> Picture
+drawEnemies tex jogo = Pictures $ map (drawEnemy tex) (inimigos jogo)
+
+drawEnemy :: Picture -> Personagem -> Picture
+drawEnemy tex inim = Color yellow $ Translate (fst $ posMapToGloss (posicao inim)) (snd $ posMapToGloss (posicao inim)) $ circleSolid 25
 
 drawColecs :: Jogo -> [Picture]
 drawColecs jogo = map (\(colec,pos) -> (Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) ) $ (Color red) $ (rectangleSolid 25 25)) (colecionaveis jogo)

@@ -24,7 +24,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (1.5,2.5), 
+                    posicao = (2.5,2.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste},
@@ -44,7 +44,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (1.5,2.5), 
+                    posicao = (2.5,6.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste}]
@@ -57,7 +57,7 @@ jog = Personagem {  velocidade = (0,0),
                     ressalta = False, 
                     posicao = (1.0,3.5), 
                     tamanho = (0.9,1.1), 
-                    aplicaDano = (True, 10), 
+                    aplicaDano = (False, 0), 
                     direcao = Este}
 -- TESTE DATA END
 
@@ -90,13 +90,11 @@ validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta ini
 validaPosJogInim :: Mapa -> [Personagem] -> Bool
 validaPosJogInim (Mapa (posJogador,_) _ _) inimigosList = all (\i -> posicao i /= posJogador) inimigosList
 
-
 -- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
 validaNumIniAndVidaFan :: [Personagem] -> Bool
 validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
 
 -- | Verfica se as escadas são continuas e terminam e começam com plataforma
--- | 
 validaEscadas :: Mapa -> Bool
 validaEscadas (Mapa _ _ mat) = all validateEachOne (agrupaEscadas (getPosOfBlock Escada mat))
     where validateEachOne :: [Posicao] -> Bool
