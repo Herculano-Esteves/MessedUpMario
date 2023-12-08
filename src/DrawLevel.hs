@@ -26,19 +26,21 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state), drawPlayer  texMario (jogador (jogo state))] ++ (drawMap (jogo state) texPlataforma) ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel])
+drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state), drawPlayer  texMariocair texMariosaltar texMarioandar (jogador (jogo state))] ++ (drawMap (jogo state) texPlataforma) ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel])
     where texEscada = fromJust(lookup "escada" (images state))
-          texMario = fromJust(lookup "mario" (images state))
+          texMarioandar = fromJust(lookup "marioandar" (images state))
+          texMariosaltar = fromJust(lookup "mariosaltar" (images state))
           texPlataforma = fromJust(lookup "plataforma" (images state))
           texAlcapao = fromJust(lookup "alcapao" (images state))
           texTunel = fromJust(lookup "tunel" (images state))
           texInimigo = fromJust(lookup "inimigo" (images state))
           texMoeda = fromJust(lookup "moeda" (images state))
           texMartelo = fromJust(lookup "martelo" (images state))
+          texMariocair = fromJust(lookup "mariocair" (images state))
 
 -- ? Set a scale for drawng according to the size of the window
-drawPlayer :: Picture -> Personagem -> Picture
-drawPlayer pic jog = Color red $ Translate (((double2Float $ fst $ posicao jog) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2) ((-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2) $ (scale 1.25 1.25 pic) --rectangleSolid ((double2Float $ fst $ tamanho jog)* (double2Float escalaGloss)) ((double2Float $ snd $ tamanho jog)*double2Float escalaGloss)
+drawPlayer :: Picture -> Picture -> Picture -> Personagem -> Picture
+drawPlayer pixcair picsaltar picandar jog = Translate (((double2Float $ fst $ posicao jog) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2) ((-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2) $ (scale (if direcao jog == Este then 1 else -1) 1 (if snd(velocidade jog) == 0 then picandar else (if fst(velocidade jog) == 0 then pixcair else picsaltar))) --rectangleSolid ((double2Float $ fst $ tamanho jog)* (double2Float escalaGloss)) ((double2Float $ snd $ tamanho jog)*double2Float escalaGloss)
 
 drawEnemies :: Picture -> Jogo -> Picture
 drawEnemies tex jogo = Pictures $ map (drawEnemy tex) (inimigos jogo)

@@ -49,7 +49,8 @@ fr = 60
 
 loadImages :: State -> IO State
 loadImages state = do
-    mario <- loadBMP "assets/mario.bmp"
+    marioandar <- loadBMP "assets/Marioandar.bmp"
+    mariosaltar <- loadBMP "assets/Mariosaltar.bmp"
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escada <- loadBMP "assets/ladder.bmp"
     alcapao <- loadBMP "assets/Alcapao.bmp"
@@ -57,16 +58,19 @@ loadImages state = do
     inimigo <- loadBMP "assets/Inimigo.bmp"
     moeda <- loadBMP "assets/Moeda.bmp"
     martelo <- loadBMP "assets/Martelo.bmp"
+    mariocair <- loadBMP "assets/Mariocair.bmp"
     return  state {
         images = [
-            ("mario", mario),
+            ("marioandar", marioandar),
+            ("mariosaltar", mariosaltar),
             ("escada", escada),
             ("plataforma", plataforma),
             ("alcapao", alcapao),
             ("tunel", tunel),
             ("inimigo", inimigo),
             ("moeda", moeda),
-            ("martelo", martelo)
+            ("martelo", martelo),
+            ("mariocair", mariocair)
             ]
         }
 
