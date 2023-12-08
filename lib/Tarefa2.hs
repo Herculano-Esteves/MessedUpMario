@@ -34,7 +34,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (1.5,2.5), 
+                    posicao = (7.5,3.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste},
@@ -44,7 +44,7 @@ inm = [Personagem {velocidade = (0,0),
                     vida = 1, 
                     pontos = 0, 
                     ressalta = True, 
-                    posicao = (2.5,6.5), 
+                    posicao = (2.5,7.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste}]
@@ -63,7 +63,7 @@ jog = Personagem {  velocidade = (0,0),
 
 
 colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(3.5,11.5)),(Martelo,(7.5,7.5))]
+colec = [(Moeda,(2.5,11.5)),(Martelo,(7.5,7.5))]
 
 jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog

@@ -53,12 +53,20 @@ loadImages state = do
     plataforma <- loadBMP "assets/Plataforma.bmp"
     escada <- loadBMP "assets/ladder.bmp"
     alcapao <- loadBMP "assets/Alcapao.bmp"
+    tunel <- loadBMP "assets/Tunel.bmp"
+    inimigo <- loadBMP "assets/Inimigo.bmp"
+    moeda <- loadBMP "assets/Moeda.bmp"
+    martelo <- loadBMP "assets/Martelo.bmp"
     return  state {
         images = [
             ("mario", mario),
             ("escada", escada),
             ("plataforma", plataforma),
-            ("alcapao", alcapao)
+            ("alcapao", alcapao),
+            ("tunel", tunel),
+            ("inimigo", inimigo),
+            ("moeda", moeda),
+            ("martelo", martelo)
             ]
         }
 
