@@ -33,7 +33,7 @@ mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
-    ,[Plataforma, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Plataforma]
+    ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Tunel, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ]
 
@@ -58,7 +58,7 @@ per1 = Personagem {
 
 --dimensao de cada bloco é 10x10 por
 colisoesParede :: Mapa -> Personagem -> Bool
-colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes dimensaobloco mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes dimensaobloco mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
 
 
 
