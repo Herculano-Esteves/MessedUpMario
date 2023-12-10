@@ -12,6 +12,7 @@ import DrawMenu
 import GHC.Float (float2Double, double2Float)
 import Tarefa2 (jogoSamp)
 import System.Exit (exitSuccess)
+import System.Random
 
 window :: Display
 window = InWindow
@@ -28,7 +29,9 @@ eventHandler event state
 
 timeHandler :: Float -> State -> IO State
 timeHandler time (State {exitGame = True}) = exitSuccess
-timeHandler time state = return $ state {jogo = movimenta (head(geraAleatorios (round(fst(posicao (jogador (jogo state))))) 1)) (float2Double time) (jogo state)}
+timeHandler time state = do generateRandomNumber <- randomRIO (1, 100 :: Int)
+                            return $ state {jogo = movimenta generateRandomNumber (float2Double time) (jogo state)}
+
 
 draw :: State -> IO Picture
 draw state = do

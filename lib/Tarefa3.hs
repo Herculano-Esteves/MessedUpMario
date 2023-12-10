@@ -134,7 +134,7 @@ estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0
 --JOGADOR E ALCAPAO START
 acionarAlcapao :: Jogo -> Jogo
 acionarAlcapao jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo)}
-                              
+
 
 acionarAlcapaoaux :: Mapa -> Personagem -> Mapa
 acionarAlcapaoaux (Mapa a b c) jog = (Mapa a b (removerChao (Mapa a b c) jog))
@@ -224,14 +224,32 @@ movimentoInimigos sem jogo = jogo {inimigos = movimentoInimigoscontrolo (geraAle
 movimentoInimigoscontrolo ::[Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
 movimentoInimigoscontrolo _ _ [] _ = []
 movimentoInimigoscontrolo [] _ _ _ = []
-movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = (inimigoAndar h mapa a jogo) : movimentoInimigoscontrolo t mapa b jogo
+movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo
+
+inimigoMove :: Int -> Mapa -> Personagem -> Personagem
+inimigoMove start mapa enm  | ((read(take 2 (show start))) <= 11 && (read(take 2 (show start))) >= 10 && p) || inimigosubirdescerescadaBool mapa enm = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
+                            | otherwise = inimigoAndar start mapa enm
+                            where p = not (all (==False) (map (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
 
 
-inimigoAndar :: Int -> Mapa -> Personagem -> Jogo -> Personagem
-inimigoAndar start mapa enm jogo| not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-2,0)}
+
+inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
+inimigoAndar start mapa enm     | fst (velocidade enm) == 0 = if start > 0 then enm {velocidade = (2,0)} else enm {velocidade = (-2,0)}
+                                | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-2,0)}
                                 | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (2,0)}
-                                | all (==False) (foldl (\x y -> (sobreposicao ((p1,p4),(p1-0.1,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (2,0)}
-                                | all (==False) (foldl (\x y -> (sobreposicao ((p3,p4),(p3+0.1,p4-0.1)) y) : x) [] (getMapColisions dimensaobloco [Plataforma] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (-2,0)}
-                                | fst (velocidade enm) == 0 = if start > 0 then enm {velocidade = (2,0)} else enm {velocidade = (-2,0)}
+                                | all (==False) (foldl (\x y -> (sobreposicao ((p1,p4),(p1-0.1,p4-0.5)) y) : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (2,0)}
+                                | all (==False) (foldl (\x y -> (sobreposicao ((p3,p4),(p3+0.1,p4-0.5)) y) : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (-2,0)}
                                 | otherwise = enm {velocidade = (fst (velocidade enm),0)}
                                 where ((p1,p2),(p3,p4)) = genHitbox enm
+                                      p = not (all (==False) (map (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+
+inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
+inimigosubirdescerescada start mapa enm = if not (all (==False) (map (sobreposicao ((p1+(0.3),p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+                                            then enm {velocidade = (if start > 0 then 2 else -2,0), posicao = (fst(posicao enm),(fromInteger(floor(snd(posicao enm))))+0.5)}
+                                            else enm {velocidade = (0,-2)}
+                                        where ((p1,p2),(p3,p4)) = (genHitbox enm)
+
+inimigosubirdescerescadaBool :: Mapa -> Personagem -> Bool
+inimigosubirdescerescadaBool mapa enm = fst (velocidade enm) == 0 && snd (velocidade enm) /= 0
+
+

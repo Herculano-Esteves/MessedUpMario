@@ -50,7 +50,7 @@ drawEnemies :: Picture -> Jogo -> Picture
 drawEnemies tex jogo = Pictures $ map (drawEnemy tex) (inimigos jogo)
 
 drawEnemy :: Picture -> Personagem -> Picture
-drawEnemy tex inim = Color yellow $ Translate (fst $ posMapToGloss (posicao inim)) (snd $ posMapToGloss (posicao inim)) tex
+drawEnemy tex inim = Color yellow $ Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ Scale 0.85 0.85 tex
 
 drawColecs :: Picture -> Picture -> Jogo -> [Picture]
 drawColecs moeda martelo jogo = map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ (Color red) (Scale 0.6 0.6 moeda) else Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ (Color red) martelo) (colecionaveis jogo)
