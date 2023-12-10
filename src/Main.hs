@@ -17,7 +17,7 @@ window :: Display
 window = InWindow
     "Donkeykong"
     sizeWin --(700,700)
-    (700,200)
+    (300,200)
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
@@ -28,7 +28,7 @@ eventHandler event state
 
 timeHandler :: Float -> State -> IO State
 timeHandler time (State {exitGame = True}) = exitSuccess
-timeHandler time state = return $ state {jogo = movimenta 1 (float2Double time) (jogo state)}
+timeHandler time state = return $ state {jogo = movimenta (head(geraAleatorios (round(fst(posicao (jogador (jogo state))))) 1)) (float2Double time) (jogo state)}
 
 draw :: State -> IO Picture
 draw state = do
