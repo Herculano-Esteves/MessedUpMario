@@ -37,6 +37,8 @@ draw state = do
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo state)) (jogador (jogo state))))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
     putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
+    putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo state))
+    putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo state))
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
