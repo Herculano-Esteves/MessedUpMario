@@ -227,7 +227,7 @@ movimentoInimigoscontrolo [] _ _ _ = []
 movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo
 
 inimigoMove :: Int -> Mapa -> Personagem -> Personagem
-inimigoMove start mapa enm  | ((read(take 2 (show start))) <= 11 && (read(take 2 (show start))) >= 10 && p) || inimigosubirdescerescadaBool mapa enm = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
+inimigoMove start mapa enm  | ((read(take 3 (show start))) <= 305 && (read(take 3 (show start))) >= 300 && p) || inimigosubirdescerescadaBool mapa enm = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
                             | otherwise = inimigoAndar start mapa enm
                             where p = not (all (==False) (map (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
 
@@ -245,7 +245,7 @@ inimigoAndar start mapa enm     | fst (velocidade enm) == 0 = if start > 0 then 
 
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
 inimigosubirdescerescada start mapa enm = if not (all (==False) (map (sobreposicao ((p1+(0.3),p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
-                                            then enm {velocidade = (if start > 0 then 2 else -2,0), posicao = (fst(posicao enm),(fromInteger(floor(snd(posicao enm))))+0.5)}
+                                            then enm {velocidade = (if fst(velocidade enm) == 0 then 2 else fst(velocidade enm),0), posicao = (fst(posicao enm),(fromInteger(floor(snd(posicao enm))))+0.5)}
                                             else enm {velocidade = (0,-2)}
                                         where ((p1,p2),(p3,p4)) = (genHitbox enm)
 
