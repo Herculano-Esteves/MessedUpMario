@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog = checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
 
 
 --Dano Jogador START
@@ -76,7 +76,7 @@ changeVelocidade dtime mapa perso
         }
     | otherwise = perso {
         posicao = (xPos, (snd (posicao perso)) + (snd (velocidade perso))*dtime),
-        velocidade = (fst (velocidade perso), min (snd (velocidade perso)) 0) -- this if resets the Y speed after falling
+        velocidade = (fst (velocidade perso), snd (velocidade perso)) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
     where xPos = if (not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0) || (not (podeAndarParaEsquerdaBool mapa perso) && (fst $ (velocidade perso)) > 0) then

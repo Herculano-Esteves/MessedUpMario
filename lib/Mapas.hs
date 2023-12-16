@@ -17,7 +17,13 @@ data State = State {
     images :: Images
 }
 
-data Menu = InGame | MainMenu deriving (Eq)
+data Options = Options {
+    currentTheme :: Theme
+    
+}
+
+data Theme = Defaut | Minecraft deriving (Eq)
+data Menu = InGame | MainMenu | OptionsMenu deriving (Eq)
 
 initialState :: State
 initialState = State {
