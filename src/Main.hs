@@ -64,9 +64,11 @@ loadImages state = do
     moeda <- loadBMP "assets/Moeda.bmp"
     martelo <- loadBMP "assets/Martelo.bmp"
     mariocair <- loadBMP "assets/Mariocair.bmp"
+    relva <- loadBMP "assets/relva.bmp"
     return  state {
         images = [
-            ("marioandar", marioandar),
+            (Default,
+            [("marioandar", marioandar),
             ("mariosaltar", mariosaltar),
             ("escada", escada),
             ("plataforma", plataforma),
@@ -75,7 +77,18 @@ loadImages state = do
             ("inimigo", inimigo),
             ("moeda", moeda),
             ("martelo", martelo),
-            ("mariocair", mariocair)
+            ("mariocair", mariocair)]),
+            (Minecraft,
+            [("marioandar", marioandar),
+            ("mariosaltar", mariosaltar),
+            ("escada", escada),
+            ("plataforma", relva),
+            ("alcapao", alcapao),
+            ("tunel", tunel),
+            ("inimigo", inimigo),
+            ("moeda", moeda),
+            ("martelo", martelo),
+            ("mariocair", mariocair)])
             ]
         }
 

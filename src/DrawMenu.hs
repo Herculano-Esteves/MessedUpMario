@@ -22,7 +22,7 @@ drawMenu state
         drawButton (selectedButton state) 2 "Options"
         ]
     | currentMenu state == OptionsMenu = Pictures [
-        drawButton (selectedButton state) 13 "Change theme"
+        drawButton (selectedButton state) 0 "Change theme"
     ]
 
 drawTitle :: Picture
@@ -31,7 +31,8 @@ drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong
 -- | Executa a função correspondente quando um determinado botão é pressionado
 buttonPress :: State -> State
 buttonPress state
-    | selectedButton state == 0 = state { currentMenu = InGame}
+    | selectedButton state == 0 && currentMenu state == MainMenu = state { currentMenu = InGame}
+    | selectedButton state == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | selectedButton state == 1 = state { exitGame = True}
     | selectedButton state == 2 = state { currentMenu = OptionsMenu}
     | otherwise = state
