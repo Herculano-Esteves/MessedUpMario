@@ -54,17 +54,23 @@ fr = 60
 
 loadImages :: State -> IO State
 loadImages state = do
-    marioandar <- loadBMP "assets/Marioandar.bmp"
-    mariosaltar <- loadBMP "assets/Mariosaltar.bmp"
-    plataforma <- loadBMP "assets/Plataforma.bmp"
-    escada <- loadBMP "assets/ladder.bmp"
-    alcapao <- loadBMP "assets/Alcapao.bmp"
-    tunel <- loadBMP "assets/Tunel.bmp"
-    inimigo <- loadBMP "assets/Inimigo.bmp"
-    moeda <- loadBMP "assets/Moeda.bmp"
-    martelo <- loadBMP "assets/Martelo.bmp"
-    mariocair <- loadBMP "assets/Mariocair.bmp"
-    relva <- loadBMP "assets/relva.bmp"
+    marioandar <- loadBMP "assets/MarioTexture/Marioandar.bmp"
+    mariosaltar <- loadBMP "assets/MarioTexture/Mariosaltar.bmp"
+    plataforma <- loadBMP "assets/MarioTexture/Plataforma.bmp"
+    escada <- loadBMP "assets/MarioTexture/ladder.bmp"
+    alcapao <- loadBMP "assets/MarioTexture/Alcapao.bmp"
+    tunel <- loadBMP "assets/MarioTexture/Tunel.bmp"
+    inimigo <- loadBMP "assets/MarioTexture/Inimigo.bmp"
+    moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
+    martelo <- loadBMP "assets/MarioTexture/Martelo.bmp"
+    mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
+    relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
+    moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
+    steveandar <- loadBMP "assets/MinecraftTexture/Steveandar.bmp"
+    stevesaltar <- loadBMP "assets/MinecraftTexture/Stevesaltar.bmp"
+    stevecair <- loadBMP "assets/MinecraftTexture/Stevecair.bmp"
+    inimigominecraft <- loadBMP "assets/MinecraftTexture/Inimigominecraft.bmp"
+    botaostart <- loadBMP "assets/Buttons/BotaoStart.bmp"
     return  state {
         images = [
             (Default,
@@ -77,18 +83,20 @@ loadImages state = do
             ("inimigo", inimigo),
             ("moeda", moeda),
             ("martelo", martelo),
-            ("mariocair", mariocair)]),
+            ("mariocair", mariocair),
+            ("botaostart", botaostart)]),
             (Minecraft,
-            [("marioandar", marioandar),
-            ("mariosaltar", mariosaltar),
+            [("marioandar", steveandar),
+            ("mariosaltar", stevesaltar),
             ("escada", escada),
             ("plataforma", relva),
             ("alcapao", alcapao),
             ("tunel", tunel),
-            ("inimigo", inimigo),
-            ("moeda", moeda),
+            ("inimigo", inimigominecraft),
+            ("moeda", moedaminecraft),
             ("martelo", martelo),
-            ("mariocair", mariocair)])
+            ("mariocair", stevecair),
+            ("botaostart", botaostart)])
             ]
         }
 
