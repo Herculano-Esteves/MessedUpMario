@@ -75,7 +75,7 @@ getMapColisions x l (a,b) (Mapa c d (h:t)) = mapablocoshitbox x l (a,b) h ++ get
 
 
 
--- | a partir de uma sting de blocos retorna uma lista das suas hitbox - IMPORTANTE depende da dimensao do bloco 10x10
+-- | a partir de uma string de blocos retorna uma lista das suas hitbox - IMPORTANTE depende da dimensao do bloco 10x10
 mapablocoshitbox :: Double -> [Bloco] -> Posicao -> [Bloco] -> [Hitbox]
 mapablocoshitbox x l _ [] = []
 mapablocoshitbox x l (a,b) (h:t)    | h `elem` l = mapablocoshitbox x l (a+x,b) t ++ [gethitboxbloco x (a,b)]

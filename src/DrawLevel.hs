@@ -25,8 +25,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state), drawPlayer (mapa(jogo state)) texMariocair texMariosaltar texMarioandar (jogador (jogo state))] ++ drawMap (jogo state) texPlataforma ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel] ++
-                ([drawHammer texMartelo (jogador (jogo state)) | fst (aplicaDano (jogador (jogo state)))]))
+drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state)] ++ drawMap (jogo state) texPlataforma ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel] ++
+                ([drawHammer texMartelo (jogador (jogo state)) | fst (aplicaDano (jogador (jogo state)))]) ++ [drawPlayer (mapa(jogo state)) texMariocair texMariosaltar texMarioandar (jogador (jogo state))])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
           texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
@@ -42,10 +42,13 @@ drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texIn
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: Mapa -> Picture -> Picture -> Picture -> Personagem -> Picture
-drawPlayer mapa pixcair picsaltar picandar jog = Translate (((double2Float $ fst $ posicao jog) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2) ((-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (scale (if direcao jog == Este then 1 else -1) 1
-                                            (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
-                                            (if snd (velocidade jog) == 0 then picandar else
-                                            (if fst (velocidade jog) == 0 then pixcair else picsaltar)))) --rectangleSolid ((double2Float $ fst $ tamanho jog)* (double2Float escalaGloss)) ((double2Float $ snd $ tamanho jog)*double2Float escalaGloss)
+drawPlayer mapa pixcair picsaltar picandar jog = Translate (fst $ posMapToGloss (posicao jog)) (snd $ posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+    scale (if direcao jog == Este then 1 else -1) 1 $
+    if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then
+        picandar
+    else if snd (velocidade jog) == 0 then
+        picandar
+    else (if fst (velocidade jog) == 0 then pixcair else picsaltar)
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: Picture -> Jogo -> Picture

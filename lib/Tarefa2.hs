@@ -125,10 +125,6 @@ groupEscadasAux pos = sortOn fst pos
 getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]
 getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! double2Int y !! double2Int x == bloco]
 
--- ! Reminder to remove this
-getPosOfBlock' :: Bloco -> Mapa -> [Posicao]
-getPosOfBlock' bloco (Mapa _ _ mat) = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! double2Int y !! double2Int x == bloco]
-
 -- TODO: Discuss the size of blocks and player, needed for the 7th step
 -- | Verifica se os alçapões se encontram pelo menos em grupos de 2
 validaAlcapoes :: Mapa -> Bool

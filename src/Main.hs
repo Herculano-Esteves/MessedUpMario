@@ -39,9 +39,10 @@ draw state = do
     putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador (jogo state)) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador (jogo state)) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo state)) (jogador (jogo state))))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
-    putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
+    putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo state))
     putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo state))
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo state))
+
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)

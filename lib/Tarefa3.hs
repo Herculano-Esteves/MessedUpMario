@@ -98,10 +98,14 @@ removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
 
 
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) =
+seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (isOnBlockWithStairBelow ent mapa) =
                     ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = ((fst (velocidade ent)),0)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
+
+isOnBlockWithStairBelow :: Personagem -> Mapa -> Bool
+isOnBlockWithStairBelow jog (Mapa _ _ blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && (snd (velocidade jog) >= 0)
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo
@@ -214,7 +218,7 @@ checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
 checkEscadaList mapa = map (checkEscadaAux mapa)
 
 checkEscadaAux :: Mapa -> Personagem -> Personagem
-checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso) `elem` getPosOfBlock Escada mat}
+checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = (floorPos (posicao perso) `elem` getPosOfBlock Escada mat) || (any (\(x,y) -> floorPos (posicao perso) == (x,y-1)) (getPosOfBlock Escada mat) && any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlock Plataforma mat))}
 
 --INICIO DE AI
 

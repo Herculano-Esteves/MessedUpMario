@@ -40,8 +40,11 @@ atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions i
 -- TODO: Define how each character is going to jump
 atualizaPersonagem :: Jogo -> Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem jogo action inm = case action of
-        Just Subir -> if (emEscada inm) then inm {velocidade = (0,-1.2), direcao = Norte} else inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
-        Just Descer -> if (emEscada inm) then inm {velocidade = (0,1.2), direcao = Sul} else inm
+        Just Subir -> if emEscada inm then inm {velocidade = (0,-1.2), direcao = Norte} else inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
+        Just Descer -> if canGoDown inm (mapa jogo) then
+                inm {velocidade = (0,1.2), direcao = Sul}
+            else
+                inm
         Just AndarEsquerda -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
         Just Saltar -> if (snd (velocidade inm) == 0 ) then inm {velocidade = (fst $ (velocidade inm),-5)} else inm
         Just AndarDireita -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
@@ -51,3 +54,8 @@ atualizaPersonagem jogo action inm = case action of
     {-where onTopLadder :: Personagem -> Bool
           onTopLadder perso = floorPos (posicao perso) == head (agrupaEscadas (getPosOfBlock Escada mat))
           (Mapa _ _ mat) = mapa jogo-}
+
+canGoDown :: Personagem -> Mapa -> Bool
+canGoDown jog (Mapa _ _ blocos)= emEscada jog ||
+    (any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos))
