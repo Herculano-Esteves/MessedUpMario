@@ -22,9 +22,9 @@ window = InWindow
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
-eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {inGame = not (inGame state)}
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | inGame state = return state {jogo = eventHandlerInGame event (jogo state)}
+    | currentMenu state == InGame = return state {jogo = eventHandlerInGame event (jogo state)}
     | otherwise = eventHandlerInMenu event state
 
 timeHandler :: Float -> State -> IO State
@@ -40,8 +40,10 @@ draw state = do
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo state)) (jogador (jogo state))))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
     putStrLn ("CanGoToLeft: " ++ show (podeAndarParaEsquerdaBool (mapa (jogo state)) (jogador (jogo state))) )
+    putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo state))
+    putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo state))
     --putStrLn (show (mapa jogo))
-    if (inGame state) then return (drawLevel state)
+    if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
 
 bgColor :: Color
@@ -62,9 +64,11 @@ loadImages state = do
     moeda <- loadBMP "assets/Moeda.bmp"
     martelo <- loadBMP "assets/Martelo.bmp"
     mariocair <- loadBMP "assets/Mariocair.bmp"
+    relva <- loadBMP "assets/relva.bmp"
     return  state {
         images = [
-            ("marioandar", marioandar),
+            (Default,
+            [("marioandar", marioandar),
             ("mariosaltar", mariosaltar),
             ("escada", escada),
             ("plataforma", plataforma),
@@ -73,7 +77,18 @@ loadImages state = do
             ("inimigo", inimigo),
             ("moeda", moeda),
             ("martelo", martelo),
-            ("mariocair", mariocair)
+            ("mariocair", mariocair)]),
+            (Minecraft,
+            [("marioandar", marioandar),
+            ("mariosaltar", mariosaltar),
+            ("escada", escada),
+            ("plataforma", relva),
+            ("alcapao", alcapao),
+            ("tunel", tunel),
+            ("inimigo", inimigo),
+            ("moeda", moeda),
+            ("martelo", martelo),
+            ("mariocair", mariocair)])
             ]
         }
 

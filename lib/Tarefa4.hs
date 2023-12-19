@@ -46,7 +46,7 @@ atualizaPersonagem jogo action inm = case action of
         Just Saltar -> if (snd (velocidade inm) == 0 ) then inm {velocidade = (fst $ (velocidade inm),-5)} else inm
         Just AndarDireita -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
         -- Just Parar -> inm {velocidade = (0,if (emEscada inm) then 0 else snd (velocidade inm))} -- TODO: Make the player stop after releasing key when on ladder
-        Just Parar -> inm {velocidade = (0, snd (velocidade inm))}
+        Just Parar -> if (not $ emEscada inm) then inm {velocidade = (0, snd (velocidade inm))} else inm {velocidade = (0,0)}
         Nothing -> inm
     {-where onTopLadder :: Personagem -> Bool
           onTopLadder perso = floorPos (posicao perso) == head (agrupaEscadas (getPosOfBlock Escada mat))

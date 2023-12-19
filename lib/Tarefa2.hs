@@ -19,7 +19,7 @@ import GHC.Float (double2Int)
 -- Test data START
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
-                    tipo = Fantasma, 
+                    tipo = MacacoMalvado, 
                     emEscada = False, 
                     vida = 1, 
                     pontos = 0, 

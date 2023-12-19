@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog = checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
 
 
 --Dano Jogador START
@@ -64,7 +64,8 @@ gravidadeQuedaEnd dtime jogo = jogo {inimigos = gravidadeQueda dtime (mapa jogo)
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
-gravidadeQueda dtime mapa = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) []
+gravidadeQueda dtime mapa inms = map (\inm -> changeVelocidade dtime mapa inm) inms
+-- gravidadeQueda dtime mapa = foldl (\x y -> x ++ [changeVelocidade dtime mapa y]) []
 
 -- | Aplica a velocidade à personagem e aplca a gravidade quando não está no chão
 changeVelocidade :: Double -> Mapa -> Personagem -> Personagem
@@ -75,7 +76,7 @@ changeVelocidade dtime mapa perso
         }
     | otherwise = perso {
         posicao = (xPos, (snd (posicao perso)) + (snd (velocidade perso))*dtime),
-        velocidade = (fst (velocidade perso), min (snd (velocidade perso)) 0) -- this if resets the Y speed after falling
+        velocidade = (fst (velocidade perso), snd (velocidade perso)) -- this if resets the Y speed after falling
         }
     -- returns the X pos according to certain coditions
     where xPos = if (not (podeAndarParaDireitaBool mapa perso) && (fst $ velocidade perso) < 0) || (not (podeAndarParaEsquerdaBool mapa perso) && (fst $ (velocidade perso)) > 0) then

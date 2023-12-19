@@ -14,11 +14,15 @@ eventHandlerInMenu e jogo = return jogo
 
 -- | Função que deseha todos os elementos  visuais do menu
 drawMenu :: State -> Picture
-drawMenu state = Pictures [
-    drawTitle,
-    drawButton (selectedButton state) 0 "Start",
-    drawButton (selectedButton state) 1 "Exit",
-    drawButton (selectedButton state) 2 "Start2"
+drawMenu state 
+    | currentMenu state == MainMenu = Pictures [
+        drawTitle,
+        drawButton (selectedButton state) 0 "Start",
+        drawButton (selectedButton state) 1 "Exit",
+        drawButton (selectedButton state) 2 "Options"
+        ]
+    | currentMenu state == OptionsMenu = Pictures [
+        drawButton (selectedButton state) 0 "Change theme"
     ]
 
 drawTitle :: Picture
@@ -27,8 +31,10 @@ drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong
 -- | Executa a função correspondente quando um determinado botão é pressionado
 buttonPress :: State -> State
 buttonPress state
-    | selectedButton state == 0 = state { inGame = True}
+    | selectedButton state == 0 && currentMenu state == MainMenu = state { currentMenu = InGame}
+    | selectedButton state == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | selectedButton state == 1 = state { exitGame = True}
+    | selectedButton state == 2 = state { currentMenu = OptionsMenu}
     | otherwise = state
 
 -- | Desenha um botão, recebendo o indice atualmente desenhado, o indíce do próprio botão e o texto correspondente
