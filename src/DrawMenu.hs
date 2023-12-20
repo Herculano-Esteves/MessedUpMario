@@ -5,6 +5,7 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
 import Mapas
 import Data.Maybe (fromJust)
+import Utilities
 
 -- | Faz o tratamento do input quando o utilizador se encontra no menu
 eventHandlerInMenu :: Event -> State -> IO State
@@ -12,6 +13,8 @@ eventHandlerInMenu (EventKey (SpecialKey KeyDown) Down _ _) state = return state
 eventHandlerInMenu (EventKey (SpecialKey KeyUp) Down _ _) state = return state {menuState = (menuState state) {selectedButton = if selectedButton (menuState state)>0 then selectedButton (menuState state) - 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {menuState = (menuState state) {pressingButton = True}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
+eventHandlerInMenu (EventKey (Char '1') Down _ _) state = return state {currentLevel = 1}
+eventHandlerInMenu (EventKey (Char '0') Down _ _) state = return state {currentLevel = 0}
 eventHandlerInMenu e jogo = return jogo
 
 -- | Função que deseha todos os elementos  visuais do menu

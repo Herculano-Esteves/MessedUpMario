@@ -100,8 +100,8 @@ seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (ge
                     where ((p1,p2),(p3,p4)) = genHitbox ent
 
 isOnBlockWithStairBelow :: Personagem -> Mapa -> Bool
-isOnBlockWithStairBelow jog (Mapa _ _ blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
-    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && (snd (velocidade jog) >= 0)
+isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && ((snd (velocidade jog) == 1.2) || snd (velocidade jog) == -1.2 || emEscada jog)
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo

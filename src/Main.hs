@@ -10,9 +10,10 @@ import Mapas
 import DrawLevel
 import DrawMenu
 import GHC.Float (float2Double, double2Float)
-import Tarefa2 (jogoSamp)
 import System.Exit (exitSuccess)
 import System.Random
+import Data.Maybe (fromJust)
+import Utilities
 
 window :: Display
 window = InWindow
@@ -24,29 +25,31 @@ eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | currentMenu state == InGame = return state {jogo = eventHandlerInGame event (jogo state)}
+    | currentMenu state == InGame = return state {levels = updateValueDict (currentLevel state) (levels state) (eventHandlerInGame event jogo)}
     | otherwise = eventHandlerInMenu event state
+    where jogo = fromJust (lookup (currentLevel state) (levels state))
 
 timeHandler :: Float -> State -> IO State
 timeHandler time (State {exitGame = True}) = exitSuccess
 timeHandler time state = do generateRandomNumber <- randomRIO (1, 100 :: Int)
-                            return $ state {jogo = movimenta generateRandomNumber (float2Double time) (jogo state)}
-
+                            return $ state {levels = updateValueDict (currentLevel state) (levels state) $ movimenta generateRandomNumber (float2Double time) jogo}
+    where jogo = fromJust (lookup (currentLevel state) (levels state))
 
 draw :: State -> IO Picture
 draw state = do
-    putStrLn ("Posicao jog: " ++ (show (posicao $ jogador (jogo state))))
-    putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador (jogo state)) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador (jogo state)) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
-    putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo state)) (jogador (jogo state))))
-    putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo state))))
-    putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo state))
-    putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo state))
-    putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo state))
+    putStrLn ("Posicao jog: " ++ (show (posicao $ jogador jogo)))
+    putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
+    putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo)) (jogador jogo)))
+    putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo))))
+    putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo))
+    putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo))
+    putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
+    where jogo = fromJust (lookup (currentLevel state) (levels state))
 
 bgColor :: Color
 bgColor = black
@@ -121,6 +124,9 @@ loadImages state = do
             ("botaostart", botaostart)])
             ]
         }
+
+updateValueDict :: Eq a => a -> [(a,b)] -> b -> [(a,b)]
+updateValueDict key dict value = map (\(keyD, valueD) -> if key==keyD then (keyD, value) else (keyD, valueD)) dict
 
 main :: IO ()
 main = do

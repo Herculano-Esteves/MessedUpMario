@@ -9,7 +9,7 @@ Módulo para a realização da Tarefa 2 de LI1 em 2023/24.
 module Tarefa2 where
 
 import LI12324
-import Tarefa1 (sobreposicao, genHitbox, mapaTeste)
+import Tarefa1 (sobreposicao, genHitbox)
 import Data.List (elemIndex, elemIndices, groupBy, sortOn)
 import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
@@ -17,56 +17,7 @@ import GHC.Float (double2Int)
 
 
 -- Test data START
-inm :: [Personagem]
-inm = [Personagem {velocidade = (0,0), 
-                    tipo = MacacoMalvado, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (13.5,11.5), 
-                    tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste},
-        Personagem {velocidade = (0,0), 
-                    tipo = Fantasma, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (7.5,3.5), 
-                    tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste},
-        Personagem {velocidade = (0,0), 
-                    tipo = Fantasma, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (2.5,7.5), 
-                    tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste}]
-jog :: Personagem
-jog = Personagem {  velocidade = (0,0),
-                    tipo = Jogador,
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = False, 
-                    posicao = (6.0,3.5), 
-                    tamanho = (0.9,1.1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Este}
--- TESTE DATA END
 
-
-colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(2.5,11.5)),(Martelo,(7.5,7.5))]
-
-jogoSamp ::Jogo
-jogoSamp = Jogo mapaTeste inm colec jog
 -- Test data END
 
 valida :: Jogo -> Bool

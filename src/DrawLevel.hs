@@ -12,6 +12,7 @@ import Graphics.Gloss.Interface.IO.Game
 import GHC.Float (float2Double, double2Float)
 import Mapas
 import Data.Maybe (fromJust)
+import Utilities
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
 sizeWin :: (Int, Int)
@@ -25,8 +26,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state)] ++ drawMap (jogo state) texPlataforma ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel] ++
-                ([drawHammer texMartelo (jogador (jogo state)) | fst (aplicaDano (jogador (jogo state)))]) ++ [drawPlayer (mapa(jogo state)) texMariocair texMariosaltar texMarioandar (jogador (jogo state))])
+drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jogo] ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
+                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo)])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
           texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
@@ -38,6 +39,8 @@ drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texIn
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texMariocair = fromJust (lookup "mariocair" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+          jogo = fromJust (lookup (currentLevel state) (levels state))
+
 
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
