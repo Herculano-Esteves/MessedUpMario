@@ -30,6 +30,7 @@ data Bloco
   | Vazio        -- ^ Espaço
   | Vidro    
   | Tunel  
+  | Porta
   deriving (Ord, Eq, Read, Show)
 
 -- | Mapa de um 'Jogo', composto por uma posição e direção inicial, posição final e uma matriz de blocos.
@@ -68,6 +69,7 @@ data Entidade
 data Colecionavel
   = Moeda
   | Martelo
+  | Chave
   deriving (Ord, Eq, Read, Show)
 
 -- | Personagem do 'Jogo'.
