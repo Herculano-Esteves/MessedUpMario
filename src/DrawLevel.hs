@@ -25,7 +25,7 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state)] ++ drawMap (jogo state) texPlataforma ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel] ++
+drawLevel state = Pictures ([drawLadder (jogo state) texEscada,drawEnemies texInimigo (jogo state)] ++ [drawPorta (jogo state) texMoeda]  ++ drawMap (jogo state) texPlataforma ++ drawColecs texMoeda texMartelo (jogo state) ++ [drawAlcapao (jogo state) texAlcapao] ++ [drawTunel (jogo state) texTunel] ++
                 ([drawHammer texMartelo (jogador (jogo state)) | fst (aplicaDano (jogador (jogo state)))]) ++ [drawPlayer (mapa(jogo state)) texMariocair texMariosaltar texMarioandar (jogador (jogo state))])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
