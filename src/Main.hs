@@ -55,6 +55,7 @@ fr = 60
 
 loadImages :: State -> IO State
 loadImages state = do
+    -- Start of Default theme
     marioandar <- loadBMP "assets/MarioTexture/Marioandar.bmp"
     mariosaltar <- loadBMP "assets/MarioTexture/Mariosaltar.bmp"
     plataforma <- loadBMP "assets/MarioTexture/Plataforma.bmp"
@@ -65,6 +66,7 @@ loadImages state = do
     moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
     martelo <- loadBMP "assets/MarioTexture/Martelo.bmp"
     mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
+    -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
     steveandar <- loadBMP "assets/MinecraftTexture/Steveandar.bmp"
@@ -72,6 +74,12 @@ loadImages state = do
     stevecair <- loadBMP "assets/MinecraftTexture/Stevecair.bmp"
     inimigominecraft <- loadBMP "assets/MinecraftTexture/Inimigominecraft.bmp"
     botaostart <- loadBMP "assets/Buttons/BotaoStart.bmp"
+    botaostartHover <- loadBMP "assets/Buttons/BotaoStartHover.bmp"
+    botaoSettings <- loadBMP "assets/Buttons/BotaoSettings.bmp"
+    botaoSettingsHover <- loadBMP "assets/Buttons/BotaoSettingsHover.bmp"
+    menuBanner <- loadBMP "assets/MenuPrototype.bmp"
+    botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
+    botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
     return  state {
         images = [
             (Default,
@@ -85,7 +93,13 @@ loadImages state = do
             ("moeda", moeda),
             ("martelo", martelo),
             ("mariocair", mariocair),
-            ("botaostart", botaostart)]),
+            ("botaostart", botaostart),
+            ("botaostartHover", botaostartHover),
+            ("botaoSettings", botaoSettings),
+            ("botaoSettingsHover", botaoSettingsHover),
+            ("botaoQuit", botaoQuit),
+            ("botaoQuitHover", botaoQuitHover),
+            ("menuBanner", menuBanner)]),
             (Minecraft,
             [("marioandar", steveandar),
             ("mariosaltar", stevesaltar),

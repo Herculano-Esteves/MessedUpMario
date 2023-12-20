@@ -90,12 +90,8 @@ gravidadeQuedaonoff mapa perso = all not (map (sobreposicao (genHitbox perso)) (
     map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
 -- GRAVIDADE END
 
-
 removerjogChao :: Jogo -> Jogo
 removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
-
-
-
 
 seDentroSai :: Mapa -> Personagem -> Personagem
 seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (isOnBlockWithStairBelow ent mapa) =

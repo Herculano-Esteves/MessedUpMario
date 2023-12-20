@@ -92,6 +92,7 @@ eventHandlerInGame (EventKey (SpecialKey KeyDown) Up _ _) jogo = atualiza [Nothi
 eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = atualiza [Nothing, Nothing, Nothing] (Just Saltar) jogo
 --eventHandlInGameer (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
 eventHandlerInGame e jogo = jogo
+
 drawAlcapao :: Jogo -> Picture -> Picture
 drawAlcapao jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fromIntegral $
     (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Alcapao] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
