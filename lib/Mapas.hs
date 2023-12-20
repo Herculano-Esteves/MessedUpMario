@@ -13,8 +13,8 @@ import Utilities
 initialState :: State
 initialState = State {
     levels = [
-        (0,jogoSamp),
-        (1,jogo1)
+        jogoSamp,
+        jogo1
         ],
     currentLevel = 0,
     currentMenu = MainMenu,

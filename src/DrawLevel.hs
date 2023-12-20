@@ -39,7 +39,7 @@ drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jo
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texMariocair = fromJust (lookup "mariocair" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          jogo = fromJust (lookup (currentLevel state) (levels state))
+          jogo = (levels state) !! (currentLevel state)
 
 
 -- ? Set a scale for drawng according to the size of the window

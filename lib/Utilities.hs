@@ -4,7 +4,7 @@ import LI12324
 
 type Images = [(Theme, [(String,Picture)])]
 
-type Levels = [(Int, Jogo)]
+type Levels = [Jogo]
 
 data State = State {
     levels :: Levels,
@@ -27,3 +27,9 @@ data MenuState = MenuState {
 
 data Theme = Default | Minecraft deriving (Eq)
 data Menu = InGame | MainMenu | OptionsMenu deriving (Eq)
+
+-- | Função que substitui o valor de um determinado indíce de uma lista
+replace :: [a] -> (Int, a) -> [a]
+replace xs (i, e) = before ++ [e] ++ after
+  where
+    (before, _:after) = splitAt i xs

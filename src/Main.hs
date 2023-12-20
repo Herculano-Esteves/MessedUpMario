@@ -25,15 +25,15 @@ eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | currentMenu state == InGame = return state {levels = updateValueDict (currentLevel state) (levels state) (eventHandlerInGame event jogo)}
+    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo))}
     | otherwise = eventHandlerInMenu event state
-    where jogo = fromJust (lookup (currentLevel state) (levels state))
+    where jogo = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
 timeHandler time (State {exitGame = True}) = exitSuccess
 timeHandler time state = do generateRandomNumber <- randomRIO (1, 100 :: Int)
-                            return $ state {levels = updateValueDict (currentLevel state) (levels state) $ movimenta generateRandomNumber (float2Double time) jogo}
-    where jogo = fromJust (lookup (currentLevel state) (levels state))
+                            return $ state {levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double time) jogo)}
+    where jogo = (levels state) !! (currentLevel state)
 
 draw :: State -> IO Picture
 draw state = do
@@ -49,7 +49,7 @@ draw state = do
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
-    where jogo = fromJust (lookup (currentLevel state) (levels state))
+    where jogo = (levels state) !! (currentLevel state)
 
 bgColor :: Color
 bgColor = black
@@ -127,8 +127,9 @@ loadImages state = do
             ]
         }
 
-updateValueDict :: Eq a => a -> [(a,b)] -> b -> [(a,b)]
-updateValueDict key dict value = map (\(keyD, valueD) -> if key==keyD then (keyD, value) else (keyD, valueD)) dict
+updateValueDict :: Eq a => a -> [b] -> b -> [b]
+updateValueDict key dict value = dict --map (\(keyD, valueD) -> if key==keyD then (keyD, value) else (keyD, valueD)) dict
+
 
 main :: IO ()
 main = do
