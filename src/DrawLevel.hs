@@ -26,7 +26,7 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jogo] ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
+drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jogo] ++ [drawPorta jogo texMoeda]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
                 ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo)])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
@@ -81,6 +81,10 @@ drawLadder jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fro
 drawTunel :: Jogo -> Picture -> Picture
 drawTunel jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fromIntegral $
     (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Tunel] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
+
+drawPorta :: Jogo -> Picture -> Picture
+drawPorta jogo img = Pictures $ map (\(x,y) -> Translate ((double2Float x)-(fromIntegral $
+    (fst sizeWin))/2) ((fromIntegral $ (snd sizeWin))/2 - (double2Float y)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ img) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [Porta] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 
 
 eventHandlerInGame :: Event -> Jogo -> Jogo
