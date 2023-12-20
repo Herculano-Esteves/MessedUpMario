@@ -11,16 +11,20 @@ type Images = [(Theme, [(String,Picture)])]
 
 data State = State {
     jogo :: Jogo,
+    menuState :: MenuState,
     currentMenu :: Menu,
     options :: Options,
-    selectedButton :: Int,
     exitGame :: Bool,
     images :: Images
 }
 
 data Options = Options {
     currentTheme :: Theme
-    
+}
+
+data MenuState = MenuState {
+    selectedButton :: Int,
+    pressingButton :: Bool
 }
 
 data Theme = Default | Minecraft deriving (Eq)
@@ -34,7 +38,10 @@ initialState = State {
     options = Options {
         currentTheme = Default
         },
-    selectedButton = 0,
+    menuState = MenuState {
+        selectedButton = 0,
+        pressingButton = False
+    },
     exitGame = False,
     images = []
 }

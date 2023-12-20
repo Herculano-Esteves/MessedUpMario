@@ -42,6 +42,7 @@ draw state = do
     putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo state))
     putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo state))
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo state))
+    putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
@@ -75,11 +76,14 @@ loadImages state = do
     inimigominecraft <- loadBMP "assets/MinecraftTexture/Inimigominecraft.bmp"
     botaostart <- loadBMP "assets/Buttons/BotaoStart.bmp"
     botaostartHover <- loadBMP "assets/Buttons/BotaoStartHover.bmp"
+    botaostartPressed <- loadBMP "assets/Buttons/BotaoStartPressed.bmp"
     botaoSettings <- loadBMP "assets/Buttons/BotaoSettings.bmp"
     botaoSettingsHover <- loadBMP "assets/Buttons/BotaoSettingsHover.bmp"
+    botaoSettingsPressed <- loadBMP "assets/Buttons/BotaoSettingsPressed.bmp"
     menuBanner <- loadBMP "assets/MenuPrototype.bmp"
     botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
     botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
+    botaoQuitPressed <- loadBMP "assets/Buttons/BotaoQuitPressed.bmp"
     return  state {
         images = [
             (Default,
@@ -95,10 +99,13 @@ loadImages state = do
             ("mariocair", mariocair),
             ("botaostart", botaostart),
             ("botaostartHover", botaostartHover),
+            ("botaostartPressed", botaostartPressed),
             ("botaoSettings", botaoSettings),
             ("botaoSettingsHover", botaoSettingsHover),
+            ("botaoSettingsPressed", botaoSettingsPressed),
             ("botaoQuit", botaoQuit),
             ("botaoQuitHover", botaoQuitHover),
+            ("botaoQuitPressed", botaoQuitPressed),
             ("menuBanner", menuBanner)]),
             (Minecraft,
             [("marioandar", steveandar),
