@@ -7,9 +7,6 @@ import Utilities
 
 
 
-
-
-
 initialState :: State
 initialState = State {
     levels = [

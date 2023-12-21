@@ -13,6 +13,7 @@ import Tarefa1 (sobreposicao, genHitbox)
 import Data.List (elemIndex, elemIndices, groupBy, sortOn)
 import Data.Maybe (fromMaybe)
 import GHC.Float (double2Int)
+import Utilities
 
 
 
@@ -70,11 +71,6 @@ agrupaEscadasAux ((x,y):t)
 
 groupEscadasAux :: [Posicao] -> [Posicao]
 groupEscadasAux pos = sortOn fst pos
-
--- ? Maybe this should return the pos of a block as (0.5,0.5) instead of (0,0), however we would have to refactor the code
--- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
-getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]
-getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! double2Int y !! double2Int x == bloco]
 
 -- TODO: Discuss the size of blocks and player, needed for the 7th step
 -- | Verifica se os alçapões se encontram pelo menos em grupos de 2

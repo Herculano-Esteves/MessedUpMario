@@ -20,6 +20,7 @@ import LI12324
 import Tarefa1
 import Tarefa2
 import Tarefa3
+import Utilities
 
 
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
@@ -40,13 +41,16 @@ atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions i
 -- TODO: Define how each character is going to jump
 atualizaPersonagem :: Jogo -> Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem jogo action inm = case action of
-        Just Subir -> if emEscada inm then inm {velocidade = (0,-1.2), direcao = Norte} else inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
+        Just Subir -> if emEscada inm then inm {velocidade = (0,-ladderSpeed), direcao = Norte} else inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
         Just Descer -> if canGoDown inm (mapa jogo) then
-                inm {velocidade = (0,1.2), direcao = Sul}
+                inm {velocidade = (0,ladderSpeed), direcao = Sul}
             else
                 inm
         Just AndarEsquerda -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
-        Just Saltar -> if (snd (velocidade inm) == 0 ) then inm {velocidade = (fst $ (velocidade inm),-5)} else inm
+        Just Saltar -> if (snd (velocidade inm) == 0 ) && not (emEscada inm) || canJump inm (mapa jogo) then
+                inm {velocidade = (fst $ (velocidade inm),-5)}
+            else
+                inm
         Just AndarDireita -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
         -- Just Parar -> inm {velocidade = (0,if (emEscada inm) then 0 else snd (velocidade inm))} -- TODO: Make the player stop after releasing key when on ladder
         Just Parar -> if (not $ emEscada inm) then inm {velocidade = (0, snd (velocidade inm))} else inm {velocidade = (0,0)}
@@ -59,3 +63,8 @@ canGoDown :: Personagem -> Mapa -> Bool
 canGoDown jog (Mapa _ _ blocos)= emEscada jog ||
     (any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos))
+
+canJump :: Personagem -> Mapa -> Bool
+canJump jog (Mapa _ _ blocos) = fst (velocidade jog) /= 0 &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos)

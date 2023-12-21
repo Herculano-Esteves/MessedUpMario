@@ -12,6 +12,8 @@ import LI12324
 import Tarefa1
 import Tarefa2
 import GHC.Float (float2Double)
+import Utilities
+import Utilities (getPosOfBlockMap)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
@@ -86,8 +88,8 @@ changeVelocidade dtime mapa perso
 
 -- | Deteta se a gravidade presisa de estar on ou off
 gravidadeQuedaonoff :: Mapa -> Personagem -> Bool
-gravidadeQuedaonoff mapa perso = all not (map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Plataforma,Alcapao,Escada,Tunel,Porta] (1*0.5,1*0.5) mapa) ++
-    map (sobreposicao (genHitbox perso)) (getMapColisions 1 [Escada] (1*0.5,1*0.5) mapa))
+gravidadeQuedaonoff mapa perso = not (any (\hitbox -> (sobreposicao (genHitbox perso)) hitbox) (getMapColisions 1 [Plataforma,Alcapao,Tunel,Porta] (1*0.5,1*0.5) mapa)) &&
+    not (any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlockMap Escada mapa) && fst (velocidade perso) == 0)
 -- GRAVIDADE END
 
 removerjogChao :: Jogo -> Jogo
@@ -101,7 +103,7 @@ seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (ge
 
 isOnBlockWithStairBelow :: Personagem -> Mapa -> Bool
 isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
-    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && ((snd (velocidade jog) == 1.2) || snd (velocidade jog) == -1.2 || emEscada jog)
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && ((snd (velocidade jog) == ladderSpeed) || snd (velocidade jog) == -ladderSpeed || emEscada jog)
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo

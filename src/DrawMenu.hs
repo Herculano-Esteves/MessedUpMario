@@ -15,7 +15,7 @@ eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return stat
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
 eventHandlerInMenu (EventKey (Char '1') Down _ _) state = return state {currentLevel = 1}
 eventHandlerInMenu (EventKey (Char '0') Down _ _) state = return state {currentLevel = 0}
-eventHandlerInMenu e jogo = return jogo
+eventHandlerInMenu e state = return state
 
 -- | Função que deseha todos os elementos  visuais do menu
 drawMenu :: State -> Picture
