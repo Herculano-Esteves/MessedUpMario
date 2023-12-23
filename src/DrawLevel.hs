@@ -26,7 +26,7 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jogo] ++ [drawPorta jogo texMoeda]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
+drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jogo] ++ [drawPorta jogo texPorta]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo texChave jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
                 ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo)])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
@@ -38,6 +38,8 @@ drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo jo
           texMoeda = fromJust (lookup "moeda" imagesTheme)
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texMariocair = fromJust (lookup "mariocair" imagesTheme)
+          texChave = fromJust (lookup "chavemario" imagesTheme)
+          texPorta = fromJust (lookup "portaMario" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           jogo = (levels state) !! (currentLevel state)
 
@@ -61,8 +63,13 @@ drawEnemies tex jogo = Pictures $ map (drawEnemy tex) (inimigos jogo)
 drawEnemy :: Picture -> Personagem -> Picture
 drawEnemy tex inim = Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Scale 0.85 0.85 tex
 
-drawColecs :: Picture -> Picture -> Jogo -> [Picture]
-drawColecs moeda martelo jogo = map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.6 0.6 moeda) else Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo) (colecionaveis jogo)
+drawColecs :: Picture -> Picture -> Picture -> Jogo -> [Picture]
+drawColecs moeda martelo chave jogo = map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 
+                                                     if colec == Martelo then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo else 
+                                                     if colec == Chave then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ chave else
+                                                     Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo) 
+
+                                (colecionaveis jogo)
 
 drawHammer :: Picture -> Personagem -> Picture
 drawHammer tex jog = Color yellow $ Translate (if direcao jog == Este then p1 + (double2Float (fst (tamanho jog))*double2Float (escalaGloss)) else p1 - (double2Float (fst (tamanho jog)))*double2Float (escalaGloss)) p2 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ tex

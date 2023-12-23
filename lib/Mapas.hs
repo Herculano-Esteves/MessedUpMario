@@ -37,8 +37,8 @@ mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
     ,[Vazio, Escada, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Alcapao, Alcapao, Alcapao, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
-    ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Porta, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
-    ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Porta, Vazio, Vazio, Tunel, Vazio, Vazio, Escada, Vazio,Vazio]
+    ,[Vazio, Porta, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Porta, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
+    ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Tunel, Vazio, Vazio, Escada, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ]
 
@@ -52,7 +52,8 @@ inm = [Personagem {velocidade = (0,0),
                     posicao = (13.5,11.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
-                    direcao = Oeste},
+                    direcao = Oeste,
+                    temChave = False},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -62,7 +63,8 @@ inm = [Personagem {velocidade = (0,0),
                     posicao = (7.5,3.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
-                    direcao = Oeste},
+                    direcao = Oeste,
+                    temChave = False},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -72,7 +74,8 @@ inm = [Personagem {velocidade = (0,0),
                     posicao = (2.5,7.5), 
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
-                    direcao = Oeste}]
+                    direcao = Oeste,
+                    temChave = False}]
 jog :: Personagem
 jog = Personagem {  velocidade = (0,0),
                     tipo = Jogador,
@@ -83,12 +86,13 @@ jog = Personagem {  velocidade = (0,0),
                     posicao = (6.0,3.5), 
                     tamanho = (0.9,1.1), 
                     aplicaDano = (False, 0), 
-                    direcao = Este}
+                    direcao = Este,
+                    temChave = False}
 -- TESTE DATA END
 
 
 colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(2.5,11.5)),(Martelo,(7.5,7.5))]
+colec = [(Moeda,(2.5,11.5)),(Martelo,(7.5,7.5)),(Chave,(3.5,11.5))]
 
 jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog
