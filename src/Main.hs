@@ -72,6 +72,7 @@ loadImages state = do
     mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
     chavemario <- loadBMP "assets/MarioTexture/Key.bmp"
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
+    macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
@@ -119,7 +120,8 @@ loadImages state = do
             ("botaoQuitHover", botaoQuitHover),
             ("botaoQuitPressed", botaoQuitPressed),
             ("menuBanner", menuBanner),
-            ("portaMario",portamario)]),
+            ("portaMario",portamario),
+            ("macacoMalvado", macacomalvado)]),
             (Minecraft,
             [("marioandar", steveandar),
             ("mariosaltar", stevesaltar),
@@ -133,7 +135,8 @@ loadImages state = do
             ("mariocair", stevecair),
             ("chavemario", keyminecraft),
             ("botaostart", botaostart),
-            ("portaMario",portaminecraft)])
+            ("portaMario",portaminecraft),
+            ("macacoMalvado", macacomalvado)])
             ]
         }
 

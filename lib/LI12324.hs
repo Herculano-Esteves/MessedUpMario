@@ -107,6 +107,7 @@ gravidade :: Velocidade
 gravidade = (0, 10)
 
 
+
 -- | Definição base de um 'Jogo'.
 data Jogo =
   Jogo
