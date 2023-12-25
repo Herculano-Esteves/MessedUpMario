@@ -41,9 +41,18 @@ atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions i
 -- TODO: Define how each character is going to jump
 atualizaPersonagem :: Jogo -> Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem jogo action inm = case action of
-        Just Subir -> if emEscada inm then inm {velocidade = (0,-ladderSpeed), direcao = Norte} else inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
+        Just Subir -> if emEscada inm then
+                inm {
+                    posicao = (fromIntegral (floor (fst (posicao inm))) + 0.5, snd (posicao inm)),
+                    velocidade = (0,-ladderSpeed),
+                    direcao = Norte}
+            else
+                inm -- TODO: Check if it is on the head or last of the stair, so that you can´t go up or down on the start/end of the stairs
         Just Descer -> if canGoDown inm (mapa jogo) then
-                inm {velocidade = (0,ladderSpeed), direcao = Sul}
+                inm {
+                    posicao = (fromIntegral (floor (fst (posicao inm))) + 0.5, snd (posicao inm)),
+                    velocidade = (0,ladderSpeed),
+                    direcao = Sul}
             else
                 inm
         Just AndarEsquerda -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
