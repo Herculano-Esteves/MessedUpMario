@@ -84,7 +84,8 @@ data Personagem =
     , ressalta   :: Bool
     , vida       :: Int -- ^ não negativo
     , pontos     :: Int
-    , aplicaDano :: (Bool, Double) -- ^ se está armado e por quanto tempo ainda
+    , aplicaDano :: (Bool, Double)
+    , temChave   :: Bool -- ^ se está armado e por quanto tempo ainda
     }
   deriving (Eq, Read, Show)
 

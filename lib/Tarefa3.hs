@@ -17,7 +17,11 @@ import Utilities (getPosOfBlockMap)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = portasFuncao $ checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog = portasFuncao $ checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+
+
+distancia :: Posicao -> Posicao -> Double
+distancia (x,y) (a,b) = sqrt (abs((x-a)^2+(y-b)^2))
 
 
 --Dano Jogador START
@@ -96,7 +100,7 @@ removerjogChao :: Jogo -> Jogo
 removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
 
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (isOnBlockWithStairBelow ent mapa) =
+seDentroSai mapa ent | not (all ((==False) . sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (isOnBlockWithStairBelow ent mapa) =
                     ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = ((fst (velocidade ent)),0)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
@@ -116,18 +120,44 @@ perdeVidaJogador jog inm
 -- JOGADOR LIFE END
 
 -- JOGADOR E OBJETOS START
-coletarObjetos :: Jogo -> Jogo
-coletarObjetos jogo = jogo {colecionaveis = p1,jogador = (jogador jogo) {pontos = pontos (jogador jogo) + p3,aplicaDano = ((p4 == False && (snd (aplicaDano (jogador jogo)) > 0)) || p4,if p4 && snd (aplicaDano (jogador jogo)) == 0 then 10 else snd (aplicaDano (jogador jogo)))}}
-    where p1 = map fst (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
-          p2 = map snd (coletarObjetosaux (jogador jogo) (colecionaveis jogo))
-          p3 = sum (map fst p2)
-          p4 = not (all ((==False) . snd) p2)
 
-coletarObjetosaux :: Personagem -> [(Colecionavel,Posicao)] -> [((Colecionavel,Posicao),(Int,Bool))]
-coletarObjetosaux _ [] = []
-coletarObjetosaux jog ((x,y):t)
-    | estaTocarObjeto jog y = ((x,(-500,-500)),if x == Moeda then (10,False) else (0,True)) : coletarObjetosaux jog t
-    | otherwise = ((x,y),(0,False)) : coletarObjetosaux jog t
+coletarObjetos :: Tempo -> Jogo -> Jogo
+coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecionaveis jogo) (jogador jogo),jogador = (jogador jogo) {pontos = isMoedaApanhada (filterObjetos (colecionaveis jogo) Moeda) (jogador jogo) (pontos (jogador jogo)),
+                                                                                                                                aplicaDano = tempoDoAplicaDano (aplicaDanoFuncao (filterObjetos (colecionaveis jogo) Martelo) (jogador jogo) (aplicaDano (jogador jogo))) tempo, 
+                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo))}}
+filterObjetos :: [(Colecionavel,Posicao)] -> Colecionavel -> [(Colecionavel,Posicao)]
+filterObjetos [] _ = []
+filterObjetos (h:t) obj | fst h == obj = h : filterObjetos t obj
+                        | otherwise = filterObjetos t obj
+
+pegouChave :: [(Colecionavel,Posicao)] -> Personagem -> Bool -> Bool
+pegouChave [] _ v = v
+pegouChave (h:t) jog v  | v = True
+                        | estaTocarObjeto jog (snd h) = True
+                        | otherwise = pegouChave t jog v
+
+tempoDoAplicaDano :: (Bool,Double) -> Tempo -> (Bool,Double)
+tempoDoAplicaDano (a,b) tempo   | b > 0 = (a,b-tempo)
+                                | b <= 0 = (False,0)
+
+aplicaDanoFuncao :: [(Colecionavel,Posicao)] -> Personagem -> (Bool,Double) -> (Bool,Double)
+aplicaDanoFuncao [] _ (v,i) = (v,i)
+aplicaDanoFuncao (h:t) player (v,i) | estaTocarObjeto player (snd h) = (True,10)
+                                    | otherwise = aplicaDanoFuncao t player (v,i)
+
+isMoedaApanhada :: [(Colecionavel,Posicao)] -> Personagem -> Int -> Int
+isMoedaApanhada obj player ponto = ponto + length (filter (==True) (map (\y -> (estaTocarObjeto player (snd y))) obj))
+
+colecionarIndividualBool :: (Colecionavel,Posicao) -> Personagem -> Bool
+colecionarIndividualBool (c,p) player   | estaTocarObjeto player p = True
+                                        | otherwise = False
+
+coletarObjetosremover :: [(Colecionavel,Posicao)] -> Personagem -> [(Colecionavel,Posicao)]
+coletarObjetosremover itens player = map (\y -> colecionarIndividual y player) itens
+
+colecionarIndividual :: (Colecionavel,Posicao) -> Personagem -> (Colecionavel,Posicao)
+colecionarIndividual (c,p) player   | estaTocarObjeto player p = (c,(-10,-10))
+                                    | otherwise = (c,p)
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
 estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0.5,snd pos+dimensaobloco*0.5),(fst pos+dimensaobloco*0.5,snd pos-dimensaobloco*0.5))
@@ -195,8 +225,11 @@ gethitboxrightside x (a,b) = ((a+x*0.5,b-x*0.5),(a+x*0.5,b+x*0.5))
 
 --Portas Start
 
+
+
 portasFuncao :: Jogo -> Jogo
-portasFuncao jogo = if Chave `elem` map (fst) (colecionaveis jogo) then jogo {mapa = (mapa jogo)} else jogo {mapa = podeabrirporta (mapa jogo) (jogador jogo)}
+portasFuncao jogo = if not (temChave (jogador jogo)) then jogo {mapa = (mapa jogo)} else jogo {mapa = m, jogador = (jogador jogo) {temChave = if (m == (mapa jogo)) then temChave (jogador jogo) else False}}
+                    where m = podeabrirporta (mapa jogo) (jogador jogo)
 
 podeabrirporta :: Mapa -> Personagem -> Mapa
 podeabrirporta mapa player = acionarBlocoGeral mapa player Porta
@@ -217,7 +250,7 @@ removerBloco2 x l jog bloco | bloco `elem` head l = removerUmBloco x (dimensaobl
 
 removerUmBloco :: Double -> Double -> [Bloco] -> Personagem -> Bloco -> [Bloco]
 removerUmBloco _ _ [] _ _ = []
-removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p7,p8)) = Vazio : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
+removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p7,p8)) && (head l) == bloco = Vazio : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
                                 | otherwise = head l : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
                             where   ((p1,p2),(p3,p4)) = (genHitbox jog)
                                     ((p5,p6),(p7,p8)) = (gethitboxbloco dimensaobloco (x,y))
