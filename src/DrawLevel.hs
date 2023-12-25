@@ -26,8 +26,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo texMacaco jogo] ++ [drawPorta jogo texPorta]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo texChave jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
-                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo)])
+drawLevel state = Pictures ([drawLadder jogo texEscada] ++ [drawPorta jogo texPorta]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo texChave jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
+                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo])
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texMarioandar = fromJust (lookup "marioandar" imagesTheme)
           texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
@@ -41,6 +41,7 @@ drawLevel state = Pictures ([drawLadder jogo texEscada,drawEnemies texInimigo te
           texChave = fromJust (lookup "chavemario" imagesTheme)
           texPorta = fromJust (lookup "portaMario" imagesTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
+          texBarril = fromJust (lookup "barril" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           jogo = (levels state) !! (currentLevel state)
 
@@ -57,8 +58,9 @@ drawPlayer mapa pixcair picsaltar picandar jog = Translate (fst $ posMapToGloss 
     else (if fst (velocidade jog) == 0 then pixcair else picsaltar)
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
-drawEnemies :: Picture -> Picture -> Jogo -> Picture
-drawEnemies texinimigo texMacaco jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy texinimigo x else drawEnemy texMacaco x) (inimigos jogo)
+drawEnemies :: Picture -> Picture -> Picture -> Jogo -> Picture
+drawEnemies texinimigo texMacaco texBarril jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy texinimigo x else
+                                                            if tipo x == MacacoMalvado then drawEnemy texMacaco x else drawEnemy texBarril x) (inimigos jogo)
 
 -- TODO: Also check scale here
 drawEnemy :: Picture -> Personagem -> Picture

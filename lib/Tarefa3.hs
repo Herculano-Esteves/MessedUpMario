@@ -23,6 +23,7 @@ distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
 
+
 --Dano Jogador START
 hitboxDanoJogadorFinal :: Jogo -> Jogo
 hitboxDanoJogadorFinal jogo = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
@@ -320,12 +321,23 @@ movimentoMacacoMalvado :: Tempo -> Jogo -> Jogo
 movimentoMacacoMalvado tempo jogo = jogo {inimigos = aimacacomalvado tempo (inimigos jogo) (jogador jogo)}
 
 aimacacomalvado :: Tempo -> [Personagem] -> Personagem-> [Personagem]
-aimacacomalvado tempo enm p = foldl (\x y -> if tipo y == MacacoMalvado then aimacacomalvadoaux tempo y p : x else y : x) [] enm
+aimacacomalvado tempo enm p = ataqueMacacoBarril tempo (foldl (\x y -> if tipo y == MacacoMalvado then aimacacomalvadoaux tempo y p : x else y : x) [] enm)
 
 aimacacomalvadoaux :: Tempo -> Personagem -> Personagem -> Personagem
 aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-(2*tempo) else fst (posicao enm)+(2*tempo),snd (posicao enm)) ,
                                              velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,0) else (2,0),
-                                             aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (False,snd (aplicaDano enm)-tempo)}
+                                             aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
+
+ataqueMacacoBarril :: Tempo -> [Personagem] -> [Personagem]
+ataqueMacacoBarril tempo lista  | barril == [] = macaco ++ resto
+                                | macaco == [] = barril ++ resto
+                                | otherwise = ataqueMacacoBarrilaux tempo (head barril) (head macaco) : (macaco ++ resto)
+                                where (barril,macaco,resto) = foldl (\(a,b,c) y -> if tipo y == MacacoMalvado then (a, [y],c) else if tipo y == Barril then ([y], b, c) else (a,b, y : c)) ([],[],[]) lista
+
+
+ataqueMacacoBarrilaux :: Tempo -> Personagem -> Personagem -> Personagem
+ataqueMacacoBarrilaux tempo barril macaco | snd(aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
+                                          | otherwise = barril {posicao = (fst(posicao barril), snd(posicao barril) + (snd(velocidade barril))*tempo)}
 
 
 

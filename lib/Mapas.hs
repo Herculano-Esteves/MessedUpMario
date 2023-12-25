@@ -87,6 +87,17 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
+                    temChave = False},
+        Personagem {velocidade = (0,0), 
+                    tipo = Barril, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (-5,0), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
                     temChave = False}
                     ]
 jog :: Personagem
