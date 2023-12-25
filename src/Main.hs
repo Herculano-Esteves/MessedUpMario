@@ -60,7 +60,7 @@ fr = 60
 loadImages :: State -> IO State
 loadImages state = do
     -- Start of Default theme
-    marioandar <- loadBMP "assets/MarioTexture/Marioandar.bmp"
+    marioandar <- loadBMP "assets/MarioTexture/MarioParado.bmp"
     mariosaltar <- loadBMP "assets/MarioTexture/Mariosaltar.bmp"
     plataforma <- loadBMP "assets/MarioTexture/Plataforma.bmp"
     escada <- loadBMP "assets/MarioTexture/ladder.bmp"
@@ -72,6 +72,8 @@ loadImages state = do
     mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
     chavemario <- loadBMP "assets/MarioTexture/Key.bmp"
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
+    macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
+    barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
     -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
@@ -81,6 +83,9 @@ loadImages state = do
     inimigominecraft <- loadBMP "assets/MinecraftTexture/Inimigominecraft.bmp"
     alcapaominecraft <- loadBMP "assets/MinecraftTexture/AlcapaoMinecraft.bmp"
     espadaminecraft <- loadBMP "assets/MinecraftTexture/EspadaMinecraft.bmp"
+    escadaminecraft <- loadBMP "assets/MinecraftTexture/Escada.bmp"
+    portaminecraft <- loadBMP "assets/MinecraftTexture/Porta.bmp"
+    keyminecraft <- loadBMP "assets/MinecraftTexture/Key.bmp"
     --Start of buttons
     botaostart <- loadBMP "assets/Buttons/BotaoStart.bmp"
     botaostartHover <- loadBMP "assets/Buttons/BotaoStartHover.bmp"
@@ -116,11 +121,13 @@ loadImages state = do
             ("botaoQuitHover", botaoQuitHover),
             ("botaoQuitPressed", botaoQuitPressed),
             ("menuBanner", menuBanner),
-            ("portaMario",portamario)]),
+            ("portaMario",portamario),
+            ("macacoMalvado", macacomalvado),
+            ("barril",barrilmario)]),
             (Minecraft,
             [("marioandar", steveandar),
             ("mariosaltar", stevesaltar),
-            ("escada", escada),
+            ("escada", escadaminecraft),
             ("plataforma", relva),
             ("alcapao", alcapaominecraft),
             ("tunel", tunel),
@@ -128,9 +135,11 @@ loadImages state = do
             ("moeda", moedaminecraft),
             ("martelo", espadaminecraft),
             ("mariocair", stevecair),
-            ("chavemario", chavemario),
+            ("chavemario", keyminecraft),
             ("botaostart", botaostart),
-            ("portaMario",portamario)])
+            ("portaMario",portaminecraft),
+            ("macacoMalvado", macacomalvado),
+            ("barril",barrilmario)])
             ]
         }
 

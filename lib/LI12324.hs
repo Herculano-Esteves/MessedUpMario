@@ -63,6 +63,7 @@ data Entidade
   = MacacoMalvado
   | Fantasma
   | Jogador
+  | Barril
   deriving (Ord, Eq, Read, Show)
 
 -- | Tipos de items passiveis de ser colecionaveis por um 'Personagem'.
@@ -105,6 +106,7 @@ prop> gravidade == (0, 10)
 -}
 gravidade :: Velocidade
 gravidade = (0, 10)
+
 
 
 -- | Definição base de um 'Jogo'.
