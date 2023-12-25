@@ -11,6 +11,7 @@ data State = State {
     currentLevel :: Int,
     menuState :: MenuState,
     currentMenu :: Menu,
+    time :: Float,
     options :: Options,
     exitGame :: Bool,
     images :: Images

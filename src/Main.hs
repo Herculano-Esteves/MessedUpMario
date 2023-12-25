@@ -30,9 +30,12 @@ eventHandler event state
     where jogo = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
-timeHandler time (State {exitGame = True}) = exitSuccess
-timeHandler time state = do generateRandomNumber <- randomRIO (1, 100 :: Int)
-                            return $ state {levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double time) jogo)}
+timeHandler dTime (State {exitGame = True}) = exitSuccess
+timeHandler dTime state = do
+    generateRandomNumber <- randomRIO (1, 100 :: Int)
+    return $ state {
+        levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double dTime) jogo),
+        time = (time state) + dTime}
     where jogo = (levels state) !! (currentLevel state)
 
 draw :: State -> IO Picture
@@ -60,7 +63,9 @@ fr = 60
 loadImages :: State -> IO State
 loadImages state = do
     -- Start of Default theme
-    marioandar <- loadBMP "assets/MarioTexture/MarioParado.bmp"
+    marioParado <- loadBMP "assets/MarioTexture/MarioParado.bmp"
+    marioAndar1 <- loadBMP "assets/MarioTexture/MarioAni1.bmp"
+    marioAndar2 <- loadBMP "assets/MarioTexture/MarioAni2.bmp"
     mariosaltar <- loadBMP "assets/MarioTexture/Mariosaltar.bmp"
     plataforma <- loadBMP "assets/MarioTexture/Plataforma.bmp"
     escada <- loadBMP "assets/MarioTexture/ladder.bmp"
@@ -100,7 +105,9 @@ loadImages state = do
     return  state {
         images = [
             (Default,
-            [("marioandar", marioandar),
+            [("marioParado", marioParado),
+            ("marioAndar1", marioAndar1),
+            ("marioAndar2", marioAndar2),
             ("mariosaltar", mariosaltar),
             ("escada", escada),
             ("plataforma", plataforma),

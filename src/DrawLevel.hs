@@ -13,6 +13,7 @@ import GHC.Float (float2Double, double2Float)
 import Mapas
 import Data.Maybe (fromJust)
 import Utilities
+import Data.Fixed (mod')
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
 sizeWin :: (Int, Int)
@@ -27,17 +28,14 @@ f2d = float2Double
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures ([drawLadder jogo texEscada] ++ [drawPorta jogo texPorta]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo texChave jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
-                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer (mapa jogo) texMariocair texMariosaltar texMarioandar (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo])
+                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo])
     where texEscada = fromJust (lookup "escada" imagesTheme)
-          texMarioandar = fromJust (lookup "marioandar" imagesTheme)
-          texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
           texTunel = fromJust (lookup "tunel" imagesTheme)
           texInimigo = fromJust (lookup "inimigo" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
           texMartelo = fromJust (lookup "martelo" imagesTheme)
-          texMariocair = fromJust (lookup "mariocair" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
           texPorta = fromJust (lookup "portaMario" imagesTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
@@ -48,14 +46,20 @@ drawLevel state = Pictures ([drawLadder jogo texEscada] ++ [drawPorta jogo texPo
 
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
-drawPlayer :: Mapa -> Picture -> Picture -> Picture -> Personagem -> Picture
-drawPlayer mapa pixcair picsaltar picandar jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+drawPlayer :: State -> Personagem -> Picture
+drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 1 else -1) 1 $
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
-        picandar
+        playAnim (time state) [texMarioandar, texMarioandar1]
     else if snd (velocidade jog) == 0 then
-        picandar
-    else (if fst (velocidade jog) == 0 then pixcair else picsaltar)
+        texMarioParado
+    else (if fst (velocidade jog) == 0 then texMariocair else texMariosaltar)
+    where texMariocair = fromJust (lookup "mariocair" imagesTheme)
+          texMarioParado = fromJust (lookup "marioParado" imagesTheme)
+          texMarioandar = fromJust (lookup "marioAndar1" imagesTheme)
+          texMarioandar1 = fromJust (lookup "marioAndar2" imagesTheme)
+          texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
+          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: Picture -> Picture -> Picture -> Jogo -> Picture
@@ -95,6 +99,12 @@ drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss po
 drawLevelEnd :: Jogo -> Picture
 drawLevelEnd jogo = uncurry Translate (posMapToGloss pos) $ Color red $ rectangleSolid 25 25
     where (Mapa _ pos _) = mapa jogo
+
+playAnim :: Float -> [Picture] -> Picture
+playAnim time texs
+    | (time `mod'` (1/n)) < (1/(n*2)) = texs !! 0
+    | otherwise = texs !! 1
+    where n = 6 -- Animation speed
 
 eventHandlerInGame :: Event -> Jogo -> Jogo
 eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo

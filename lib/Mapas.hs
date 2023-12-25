@@ -14,6 +14,7 @@ initialState = State {
         ],
     currentLevel = 0,
     currentMenu = MainMenu,
+    time = 0,
     options = Options {
         currentTheme = Default
         },
