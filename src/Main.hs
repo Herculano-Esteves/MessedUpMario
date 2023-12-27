@@ -84,6 +84,8 @@ loadImages state = do
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
     steveandar <- loadBMP "assets/MinecraftTexture/Steveandar.bmp"
+    steveandar1 <- loadBMP "assets/MinecraftTexture/Steveandar.bmp"
+    steveandar2 <- loadBMP "assets/MinecraftTexture/Steveandar.bmp"
     stevesaltar <- loadBMP "assets/MinecraftTexture/Stevesaltar.bmp"
     stevecair <- loadBMP "assets/MinecraftTexture/Stevecair.bmp"
     inimigominecraft <- loadBMP "assets/MinecraftTexture/Inimigominecraft.bmp"
@@ -92,6 +94,8 @@ loadImages state = do
     escadaminecraft <- loadBMP "assets/MinecraftTexture/Escada.bmp"
     portaminecraft <- loadBMP "assets/MinecraftTexture/Porta.bmp"
     keyminecraft <- loadBMP "assets/MinecraftTexture/Key.bmp"
+    macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
+    barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
     --Start of buttons
     botaostart <- loadBMP "assets/Buttons/BotaoStart.bmp"
     botaostartHover <- loadBMP "assets/Buttons/BotaoStartHover.bmp"
@@ -133,7 +137,9 @@ loadImages state = do
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario)]),
             (Minecraft,
-            [("marioandar", steveandar),
+            [("marioParado", steveandar),
+            ("marioAndar1", steveandar1),
+            ("marioAndar2", steveandar2),
             ("mariosaltar", stevesaltar),
             ("escada", escadaminecraft),
             ("plataforma", relva),
