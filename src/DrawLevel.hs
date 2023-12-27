@@ -67,7 +67,14 @@ drawEnemies texinimigo texMacaco texBarril jogo = Pictures $ map (\x ->if tipo x
                                                             if tipo x == MacacoMalvado then drawEnemy texMacaco x else drawEnemy texBarril x) (inimigos jogo)
 
 drawEnemy :: Picture -> Personagem -> Picture
-drawEnemy tex inim = Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex
+drawEnemy tex inim = Pictures [Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex, drawHitbox inim]
+
+drawHitbox :: Personagem -> Picture
+drawHitbox inm = Color green $ uncurry Translate (posMapToGloss (posicao inm)) $ rectangleWire tx ty
+    where tx = (fst $ snd $ aux (genHitbox inm)) - (fst $ fst $ aux (genHitbox inm))
+          ty = (snd $ snd $ aux (genHitbox inm)) - (snd $ fst $ aux (genHitbox inm))
+          aux :: Hitbox -> ((Float,Float),(Float,Float))
+          aux (p1,p2) = (posMapToGloss p1, posMapToGloss p2)
 
 drawColecs :: Picture -> Picture -> Picture -> Jogo -> [Picture]
 drawColecs moeda martelo chave jogo = map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 

@@ -13,10 +13,11 @@ import Tarefa1
 import Tarefa2
 import GHC.Float (float2Double)
 import Utilities
+import Tarefa4 (atualizaPersonagem, canGoDown)
 
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerjogChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog = movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
 
 
 distancia :: Posicao -> Posicao -> Double
@@ -82,7 +83,7 @@ changeVelocidade dtime mapa perso
         }
     | otherwise = perso {
         posicao = (xPos, snd (posicao perso) + snd (velocidade perso)*dtime),
-        velocidade = velocidade perso -- this if resets the Y speed after falling
+        velocidade = velocidade perso
         }
     -- returns the X pos according to certain coditions
     where xPos = if not (podeAndarParaDireitaBool mapa perso) && fst (velocidade perso) < 0 || not (podeAndarParaEsquerdaBool mapa perso) && (fst (velocidade perso)) > 0 then
@@ -96,14 +97,19 @@ gravidadeQuedaonoff mapa perso = not (any (sobreposicao (genHitbox perso)) (getM
     not (any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlockMap Escada mapa) && fst (velocidade perso) == 0)
 -- GRAVIDADE END
 
-removerjogChao :: Jogo -> Jogo
-removerjogChao jog = jog {jogador = seDentroSai (mapa jog) (jogador jog)}
-
+-- ! This -0.01 was needed for the player to go up the ladder
 seDentroSai :: Mapa -> Personagem -> Personagem
-seDentroSai mapa ent | not (not (any (sobreposicao ((p1,p4),(p3,p4))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))) && not (isOnBlockWithStairBelow ent mapa) =
+seDentroSai mapa ent | any (sobreposicao ((p1,p4-0.01),(p3,p4-0.01))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa) && not (isOnBlockWithStairBelow ent mapa) =
                     ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = (fst (velocidade ent),0)}
                      | otherwise = ent
                     where ((p1,p2),(p3,p4)) = genHitbox ent
+
+removerPersoChao :: Jogo -> Jogo
+removerPersoChao jogo = jogo {
+    jogador = seDentroSai (mapa jogo) (jogador jogo),
+    inimigos = map (\inm -> if (tipo inm /= Barril) then seDentroSai (mapa jogo) inm else inm) (inimigos jogo)
+}
+--where onFstLadder = any (\)
 
 isOnBlockWithStairBelow :: Personagem -> Mapa -> Bool
 isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
@@ -233,14 +239,12 @@ checkEscadas jogo = jogo {
     inimigos = checkEscadaList (mapa jogo) (inimigos jogo),
     jogador = checkEscadaAux (mapa jogo) (jogador jogo)
 }
-    where Mapa _ _ mat = mapa jogo
-          startEndEscadas = agrupaEscadas (getPosOfBlock Escada mat)
 
 checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
 checkEscadaList mapa = map (checkEscadaAux mapa)
 
 checkEscadaAux :: Mapa -> Personagem -> Personagem
-checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso) `elem` getPosOfBlock Escada mat || any (\(x,y) -> floorPos (posicao perso) == (x,y-1)) (getPosOfBlock Escada mat) && any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlock Plataforma mat)}
+checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = any (\pos -> (floorPos (posicao perso)) == pos) (getPosOfBlock Escada mat) || (any (\(x,y) -> floorPos (posicao perso) == (x,y-1)) (getPosOfBlock Escada mat) && any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlock Plataforma mat))}
 
 --INICIO DE AI
 
@@ -248,20 +252,24 @@ checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = floorPos (posicao perso)
 movimentoInimigos :: Semente -> Jogo -> Jogo
 movimentoInimigos sem jogo = jogo {inimigos = movimentoInimigoscontrolo (geraAleatorios sem (length (inimigos jogo))) (mapa jogo) (inimigos jogo) jogo}
 
-movimentoInimigoscontrolo ::[Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
-movimentoInimigoscontrolo _ _ [] _ = []
-movimentoInimigoscontrolo [] _ _ _ = []
-movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = if tipo a == Fantasma then inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo else a : movimentoInimigoscontrolo t mapa b jogo
+-- movimentoInimigoscontrolo ::[Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
+-- movimentoInimigoscontrolo _ _ [] _ = []
+-- movimentoInimigoscontrolo [] _ _ _ = []
+-- movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = if tipo a == Fantasma then inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo else a : movimentoInimigoscontrolo t mapa b jogo
+
+movimentoInimigoscontrolo :: [Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
+movimentoInimigoscontrolo seeds mapa enms jogo = zipWith (\h a -> if tipo a == Fantasma then inimigoMove h mapa a else a) seeds enms
 
 inimigoMove :: Int -> Mapa -> Personagem -> Personagem
-inimigoMove start mapa enm  | read (take 3 (show start)) <= 305 && read (take 3 (show start)) >= 300 && p || inimigosubirdescerescadaBool mapa enm = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
+inimigoMove start mapa enm  | (read (take 3 (show start)) <= 305 && read (take 3 (show start)) >= 300 && (emEscada enm || canGoDown' enm mapa)) = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
+                            | inimigosubirdescerescadaBool mapa enm = enm
                             | otherwise = inimigoAndar start mapa enm
                             where p = not (all (not . sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 
 
 
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
-inimigoAndar start mapa enm     | fst (velocidade enm) == 0 = if start > 0 then enm {velocidade = (1.5,0)} else enm {velocidade = (-1.5,0)}
+inimigoAndar start mapa enm     | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,0)} else enm {velocidade = (-1.5,0)}
                                 | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-1.5,0)}
                                 | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (1.5,0)}
                                 | all not (foldl (\x y -> sobreposicao ((p1,p4),(p1-0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (1.5,0)}
@@ -271,14 +279,34 @@ inimigoAndar start mapa enm     | fst (velocidade enm) == 0 = if start > 0 then 
                                       p = not (all (not . sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
-inimigosubirdescerescada start mapa enm = if not (all (not . sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
-                                            then enm {velocidade = (if fst (velocidade enm) == 0 then 1.5 else fst (velocidade enm),0), posicao = (fst (posicao enm),fromInteger (floor (snd (posicao enm)))+0.5)}
-                                            else enm {velocidade = (0,-1.5)}
+inimigosubirdescerescada start mapa enm = --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
+                                            --then enm {velocidade = (if fst (velocidade enm) == 0 then 1.5 else fst (velocidade enm),0), posicao = (fst (posicao enm),fromInteger (floor (snd (posicao enm)))+0.5)}
+                                            if (canGoDown' enm mapa && snd (velocidade enm) >= 0) || snd (velocidade enm) == ladderSpeed then
+                                                enm {
+                                                    posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
+                                                    velocidade = (0,ladderSpeed)}
+                                            else if (onFstLadder enm mapa) then
+                                                enm {
+                                                    posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
+                                                    velocidade = (0,-ladderSpeed)}
+                                            else 
+                                                enm
+                                                
                                         where ((p1,p2),(p3,p4)) = genHitbox enm
 
 inimigosubirdescerescadaBool :: Mapa -> Personagem -> Bool
-inimigosubirdescerescadaBool mapa enm = fst (velocidade enm) == 0 && snd (velocidade enm) /= 0
+inimigosubirdescerescadaBool mapa enm = fst (velocidade enm) == 0 && (snd (velocidade enm) == -ladderSpeed || snd (velocidade enm) == ladderSpeed) -- && (emEscada enm || canGoDown' enm mapa))
 
+onFstLadder :: Personagem -> Mapa -> Bool
+onFstLadder jog (Mapa _ _ blocos) = (any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Escada blocos))
+
+
+canGoDown' :: Personagem -> Mapa -> Bool
+canGoDown' jog (Mapa _ _ blocos)= (any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y-1) ) (getPosOfBlock Plataforma blocos)) ||
+    (any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Escada blocos) &&
+    any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos))
 
 --Portas Start
 
@@ -336,8 +364,8 @@ ataqueMacacoBarril tempo lista  | barril == [] = macaco ++ resto
 
 
 ataqueMacacoBarrilaux :: Tempo -> Personagem -> Personagem -> Personagem
-ataqueMacacoBarrilaux tempo barril macaco | snd(aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
-                                          | otherwise = barril {posicao = (fst(posicao barril), snd(posicao barril) + (snd(velocidade barril))*tempo)}
+ataqueMacacoBarrilaux tempo barril macaco | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
+                                          | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + (snd (velocidade barril))*tempo)}
 
 
 

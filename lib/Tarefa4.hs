@@ -19,7 +19,6 @@ import LI12324
       Bloco(..) )
 import Tarefa1
 import Tarefa2
-import Tarefa3
 import Utilities
 
 
