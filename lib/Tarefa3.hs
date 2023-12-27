@@ -269,11 +269,11 @@ inimigoMove start mapa enm  | (read (take 3 (show start)) <= 305 && read (take 3
 
 
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
-inimigoAndar start mapa enm     | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,0)} else enm {velocidade = (-1.5,0)}
-                                | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-1.5,0)}
-                                | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (1.5,0)}
-                                | all not (foldl (\x y -> sobreposicao ((p1,p4),(p1-0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (1.5,0)}
-                                | all not (foldl (\x y -> sobreposicao ((p3,p4),(p3+0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (-1.5,0)}
+inimigoAndar start mapa enm     | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,snd (velocidade enm))} else enm {velocidade = (-1.5,snd (velocidade enm))}
+                                | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-1.5,snd (velocidade enm))}
+                                | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (1.5,snd (velocidade enm))}
+                                | all not (foldl (\x y -> sobreposicao ((p1,p4),(p1-0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (1.5,snd (velocidade enm))}
+                                | all not (foldl (\x y -> sobreposicao ((p3,p4),(p3+0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | otherwise = enm {velocidade = (fst (velocidade enm),0)}
                                 where ((p1,p2),(p3,p4)) = genHitbox enm
                                       p = not (all (not . sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
