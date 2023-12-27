@@ -23,21 +23,6 @@ dimensaobloco = 1
 
 
 
--- Test data START
-per = Personagem {
-    posicao = (2.0,2.5),
-    tamanho = (0.9,0.9),
-    aplicaDano = (True, 10)
-}
-
-
-per1 = Personagem {
-    posicao = (0.5,0.5),
-    tamanho = (1,1)
-}
--- Test data END
-
-
 
 
 -- | caso a personagem esteja fora do mapa a personagem esta a colidir com as paredes externas, || personagens a colidir com as platafromas do mapa

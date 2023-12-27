@@ -115,7 +115,7 @@ perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inim
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
+    | all not (foldl (\x y -> colisoesPersonagens jog y{tamanho = (0.7,0.7)} : x ) [] inm) = jog
     | otherwise = jog {vida = vida jog - 1}
 -- JOGADOR LIFE END
 
