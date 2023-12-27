@@ -48,6 +48,7 @@ draw state = do
     putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo))
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
+    putStrLn("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
