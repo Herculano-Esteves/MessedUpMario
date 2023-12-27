@@ -15,7 +15,7 @@ import GHC.Float (float2Double)
 import Utilities
 import Tarefa4 (atualizaPersonagem, canGoDown)
 import Data.Fixed (mod')
-
+import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog = movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
@@ -117,7 +117,9 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Jogo -> Jogo
-perdeVidaJogadorEnd jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
+perdeVidaJogadorEnd jogo | jogador jogo /= jogador1 = jogoSamp {jogador = jogador1 {posicao = posicao(jogador jogoSamp)}}
+                         | otherwise = jogo {jogador = jogador1}
+                        where jogador1 = perdeVidaJogador (jogador jogo) (inimigos jogo)
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
