@@ -31,11 +31,14 @@ eventHandler event state
 
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
-timeHandler dTime state = do
+timeHandler dTime state 
+    | vida (jogador jogo) == 911 = return state {currentLevel = (currentLevel state) + 1}
+    | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
     return $ state {
         levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double dTime) jogo),
         time = (time state) + dTime}
+    | otherwise = return state
     where jogo = (levels state) !! (currentLevel state)
 
 draw :: State -> IO Picture

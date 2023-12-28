@@ -18,7 +18,7 @@ import Data.Fixed (mod')
 import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog = checkLevelEndWrapper $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
 
 
 distancia :: Posicao -> Posicao -> Double
@@ -373,4 +373,12 @@ ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst(posicao b
 
 --Macaco Malvado End
 
+checkLevelEndWrapper :: Jogo -> Jogo
+checkLevelEndWrapper jogo = jogo {
+    jogador = checkLevelEnd (mapa jogo) (jogador jogo)
+}
 
+checkLevelEnd :: Mapa -> Personagem -> Personagem
+checkLevelEnd (Mapa _ posEnd _) perso
+    | floorPos (posicao perso) == floorPos posEnd = perso {vida = 911}
+    | otherwise = perso
