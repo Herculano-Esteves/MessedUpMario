@@ -47,7 +47,7 @@ drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPo
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
-drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ playDeadAnim state $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 1 else -1) 1 $
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
         playAnim (time state) [texMarioandar, texMarioandar1]
@@ -112,6 +112,9 @@ playAnim time texs
     | (time `mod'` (1/n)) < (1/(n*2)) = texs !! 0
     | otherwise = texs !! 1
     where n = 6 -- Animation speed
+
+playDeadAnim :: State -> Picture -> Picture
+playDeadAnim state tex = rotate ((2-(animTime state))*360) tex
 
 eventHandlerInGame :: Event -> Jogo -> Jogo
 eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo

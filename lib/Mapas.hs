@@ -23,7 +23,8 @@ initialState = State {
         pressingButton = False
     },
     exitGame = False,
-    images = []
+    images = [],
+    animTime = 2
 }
 
 mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5)
@@ -105,7 +106,7 @@ jog :: Personagem
 jog = Personagem {  velocidade = (0,0),
                     tipo = Jogador,
                     emEscada = False, 
-                    vida = 1, 
+                    vida = 3, 
                     pontos = 0, 
                     ressalta = False, 
                     posicao = (6.0,5.5), 

@@ -22,14 +22,16 @@ drawMenu :: State -> Picture
 drawMenu state 
     | currentMenu state == MainMenu = Pictures [
         --drawTitle,
-        drawButton (images state) "botaostart" (selectedButton (menuState state)) 0 (pressingButton (menuState state)),
-        drawButton (images state) "botaoSettings" (selectedButton (menuState state)) 1 (pressingButton (menuState state)),
-        drawButton (images state) "botaoQuit" (selectedButton (menuState state)) 2 (pressingButton (menuState state)),
+        drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
+        drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
+        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
         drawBanner (images state)
         ]
     | currentMenu state == OptionsMenu = Pictures [
         drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
     ]
+    | currentMenu state == LevelSelection = Pictures $
+        map (\(level, n) -> drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n)) [(level, n) | n <- [0..length (levels state)-1], level <- levels state]
 
 -- ! Remove
 drawTitle :: Picture
@@ -38,10 +40,11 @@ drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong
 -- | Executa a função correspondente quando um determinado botão é pressionado
 buttonPress :: State -> State
 buttonPress state
-    | selectedButton (menuState state) == 0 && currentMenu state == MainMenu = state { currentMenu = InGame}
+    | selectedButton (menuState state) == 0 && currentMenu state == MainMenu = state { currentMenu = LevelSelection}
+    | selectedButton (menuState state) == 1 && currentMenu state == MainMenu = state { currentMenu = OptionsMenu, menuState = (menuState state) {selectedButton = 0}}
+    | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
-    | selectedButton (menuState state) == 1 = state { currentMenu = OptionsMenu, menuState = (menuState state) {selectedButton = 0}}
-    | selectedButton (menuState state) == 2 = state { exitGame = True}
+    | currentMenu state == LevelSelection = state { currentMenu = InGame, currentLevel = selectedButton (menuState state)}
     | otherwise = state
 
 -- ! Remove (?)
@@ -52,8 +55,8 @@ drawButtonTextDebug isEnabled n textButton = Pictures [
     Color white $ Translate (-30) ((-10) - 40 * fromIntegral n) $ Scale 0.2 0.2 $ Text textButton
     ]
 
-drawButton :: Images -> String -> Int -> Int -> Bool -> Picture
-drawButton tex buttonType currentIndex index pressed
+drawButton :: Images -> String -> (Int, Int) -> Bool -> Picture
+drawButton tex buttonType (currentIndex, index) pressed
     | currentIndex == index && pressed = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTexPressed
     | currentIndex == index = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTexHover
     | otherwise = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTex

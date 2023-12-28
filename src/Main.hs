@@ -32,6 +32,8 @@ eventHandler event state
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state 
+    | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
+        else return state {animTime = 0}
     | vida (jogador jogo) == 911 = return state {currentLevel = (currentLevel state) + 1}
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
