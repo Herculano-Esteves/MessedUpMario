@@ -27,8 +27,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures ([drawLadder jogo texEscada] ++ [drawPorta jogo texPorta]  ++ drawMap jogo texPlataforma ++ drawColecs texMoeda texMartelo texChave jogo ++ [drawAlcapao jogo texAlcapao] ++ [drawTunel jogo texTunel] ++
-                ([drawHammer texMartelo (jogador jogo) | fst (aplicaDano (jogador jogo))]) ++ [drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo])
+drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -76,8 +76,8 @@ drawHitbox inm = Color green $ uncurry Translate (posMapToGloss (posicao inm)) $
           aux :: Hitbox -> ((Float,Float),(Float,Float))
           aux (p1,p2) = (posMapToGloss p1, posMapToGloss p2)
 
-drawColecs :: Picture -> Picture -> Picture -> Jogo -> [Picture]
-drawColecs moeda martelo chave jogo = map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 
+drawColecs :: Picture -> Picture -> Picture -> Jogo -> Picture
+drawColecs moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 
                                                      if colec == Martelo then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo else 
                                                      if colec == Chave then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ chave else
                                                      Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo) 
@@ -90,8 +90,8 @@ drawHammer tex jog = Color yellow $ Translate (if direcao jog == Este then p1 + 
                             p2 = (-(double2Float $ snd $ posicao jog) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2
 
 -- TODO: Maybe we should make the get center of hitbox not receive a scale to avoid having to set it to 1
-drawMap :: Jogo -> Picture -> [Picture]
-drawMap jogo img = map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
+drawMap :: Jogo -> Picture -> Picture
+drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
     --map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 
 drawLadder :: Jogo -> Picture -> Picture

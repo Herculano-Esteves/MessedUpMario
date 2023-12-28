@@ -62,4 +62,4 @@ drawButton tex buttonType currentIndex index pressed
           bTexPressed = fromJust $ lookup (buttonType ++ "Pressed") (fromJust $ lookup Default tex)
 
 drawBanner :: Images -> Picture
-drawBanner tex = scale 0.75 0.75 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
+drawBanner tex = scale 0.85 0.85 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
