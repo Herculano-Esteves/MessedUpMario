@@ -64,6 +64,7 @@ data Entidade
   | Fantasma
   | Jogador
   | Barril
+  | Boss
   deriving (Ord, Eq, Read, Show)
 
 -- | Tipos de items passiveis de ser colecionaveis por um 'Personagem'.
