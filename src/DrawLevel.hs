@@ -67,7 +67,7 @@ drawEnemies texinimigo texMacaco texBarril jogo = Pictures $ map (\x ->if tipo x
                                                             if tipo x == MacacoMalvado then drawEnemy texMacaco x else drawEnemy texBarril x) (inimigos jogo)
 
 drawEnemy :: Picture -> Personagem -> Picture
-drawEnemy tex inim = Pictures [Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex, drawHitbox inim]
+drawEnemy tex inim = Pictures [Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Rotate (if tipo inim == Barril then (fromInteger(floor (snd(posicao inim))))*90 else 0) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex, drawHitbox inim]
 
 drawHitbox :: Personagem -> Picture
 drawHitbox inm = Color green $ uncurry Translate (posMapToGloss (posicao inm)) $ rectangleWire tx ty

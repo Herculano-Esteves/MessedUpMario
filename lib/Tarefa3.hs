@@ -60,7 +60,7 @@ inimigoMortoEnd :: Jogo -> Jogo
 inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
-inimigoMorto = foldl (\x h-> if vida h == 0 then h {posicao = (-10,-10)} : x else h : x ) []
+inimigoMorto = foldl (\x h-> if vida h == 0 then h {posicao = (-5,-5)} : x else h : x ) []
 --Inimigo morto END
 
 
@@ -271,7 +271,8 @@ inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 
 
 
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
-inimigoAndar start mapa enm     | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,snd (velocidade enm))} else enm {velocidade = (-1.5,snd (velocidade enm))}
+inimigoAndar start mapa enm     | posicao enm == (-5,-5) = enm
+                                | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,snd (velocidade enm))} else enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (1.5,snd (velocidade enm))}
                                 | all not (foldl (\x y -> sobreposicao ((p1,p4),(p1-0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (1.5,snd (velocidade enm))}
@@ -366,8 +367,9 @@ ataqueMacacoBarril tempo lista  | null barril = macaco ++ resto
 
 
 ataqueMacacoBarrilaux :: Tempo -> Personagem -> Personagem -> Personagem
-ataqueMacacoBarrilaux tempo barril macaco | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
-                                          | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
+ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst(posicao barril) > 0 && fst(posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
+                                            | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
+                                            | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
 
 --Macaco Malvado End
 
