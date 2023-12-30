@@ -10,7 +10,8 @@ initialState :: State
 initialState = State {
     levels = [
         jogoSamp,
-        jogo1
+        jogo1,
+        jogo2
         ],
     currentLevel = 0,
     currentMenu = MainMenu,
@@ -25,6 +26,52 @@ initialState = State {
     exitGame = False,
     images = []
 }
+
+data Letra
+    = P
+    | E
+    | A
+    | V
+    | T
+    | O
+
+
+mapaTradutor :: [[Letra]] -> [[Bloco]]
+mapaTradutor lista = map (map trocaLetras) lista
+
+trocaLetras :: Letra -> Bloco
+trocaLetras a = case a of
+                E -> Escada
+                P -> Plataforma
+                A -> Alcapao
+                V -> Vazio
+                T -> Tunel
+                O -> Porta
+
+mapaDoBoss =    [
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P],
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P,P,P,P,P],
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P],
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
+            [V,E,V,V,P,P,P,P,P,P,P,P,P,P,P,P,V,E,V,V,P,P],
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]
+                ]
+
 
 mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
@@ -118,7 +165,7 @@ jog = Personagem {  velocidade = (0,0),
 -- TESTE DATA END
 
 colec :: [(Colecionavel, Posicao)]
-colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5))]
+colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
 
 jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog
@@ -144,3 +191,9 @@ mapa1 = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
 
 jogo1 ::Jogo
 jogo1 = Jogo mapa1 inm colec jog
+
+
+
+--Inicio Jogo2
+jogo2 :: Jogo
+jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inm colec jog

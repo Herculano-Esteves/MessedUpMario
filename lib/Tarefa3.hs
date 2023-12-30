@@ -18,7 +18,8 @@ import Data.Fixed (mod')
 import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog = checkLevelEndWrapper $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime (perdeVidaJogadorEnd (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog))))))))
+movimenta seed dtime jog | (snd (aplicaDano (jogador jog)) > 0 && not (fst (aplicaDano (jogador jog)))) || snd (aplicaDano (jogador jog)) < 0 = perdeVidaJogadorEnd dtime jog
+                         | otherwise = perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
 
 
 distancia :: Posicao -> Posicao -> Double
@@ -116,15 +117,25 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && (snd (velocidade jog) == ladderSpeed || snd (velocidade jog) == -ladderSpeed || emEscada jog)
 
 -- JOGADOR LIFE START
-perdeVidaJogadorEnd :: Jogo -> Jogo
-perdeVidaJogadorEnd jogo | jogador jogo /= jogador1 = jogoSamp {jogador = jogador1 {posicao = posicao(jogador jogoSamp)}}
-                         | otherwise = jogo {jogador = jogador1}
-                        where jogador1 = perdeVidaJogador (jogador jogo) (inimigos jogo)
+perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
+perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo)))) = jogo {jogador = animarMorte tempo (jogador jogo)}
+                                | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
+
+perdeVidaJogadorJogo :: Jogo -> Jogo
+perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
+
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y{tamanho = (0.7,0.7)} : x ) [] inm) = jog
-    | otherwise = jog {vida = vida jog - 1}
+    | all not (foldl (\x y -> colisoesPersonagens jog y{tamanho = (0.5,0.7)} : x ) [] inm) = jog
+    | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,3)}
+
+animarMorte :: Tempo -> Personagem -> Personagem
+animarMorte tempo jogador   | snd(aplicaDano jogador) > 2 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
+                            | snd(aplicaDano jogador) > 0 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
+                            | otherwise = jogador {aplicaDano = (False,-1)}
+                            where (a,b) = posicao jogador
+
 -- JOGADOR LIFE END
 
 -- JOGADOR E OBJETOS START
@@ -132,11 +143,17 @@ perdeVidaJogador jog inm
 coletarObjetos :: Tempo -> Jogo -> Jogo
 coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecionaveis jogo) (jogador jogo),jogador = (jogador jogo) {pontos = isMoedaApanhada (filterObjetos (colecionaveis jogo) Moeda) (jogador jogo) (pontos (jogador jogo)),
                                                                                                                                 aplicaDano = tempoDoAplicaDano (aplicaDanoFuncao (filterObjetos (colecionaveis jogo) Martelo) (jogador jogo) (aplicaDano (jogador jogo))) tempo,
-                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo))}}
+                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo)),
+                                                                                                                                vida = pegouEstrela (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}}
 filterObjetos :: [(Colecionavel,Posicao)] -> Colecionavel -> [(Colecionavel,Posicao)]
 filterObjetos [] _ = []
 filterObjetos (h:t) obj | fst h == obj = h : filterObjetos t obj
                         | otherwise = filterObjetos t obj
+
+
+pegouEstrela :: [(Colecionavel,Posicao)] -> Personagem -> Int
+pegouEstrela lista jog  | estaTocarObjeto jog (snd (head lista)) = 911
+                        | otherwise = vida jog
 
 pegouChave :: [(Colecionavel,Posicao)] -> Personagem -> Bool -> Bool
 pegouChave [] _ v = v
@@ -367,18 +384,14 @@ ataqueMacacoBarril tempo lista  | null barril = macaco ++ resto
 
 
 ataqueMacacoBarrilaux :: Tempo -> Personagem -> Personagem -> Personagem
-ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst(posicao barril) > 0 && fst(posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
+ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
                                             | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
                                             | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
 
 --Macaco Malvado End
 
-checkLevelEndWrapper :: Jogo -> Jogo
-checkLevelEndWrapper jogo = jogo {
-    jogador = checkLevelEnd (mapa jogo) (jogador jogo)
-}
+--Animacao Morte Start
 
-checkLevelEnd :: Mapa -> Personagem -> Personagem
-checkLevelEnd (Mapa _ posEnd _) perso
-    | floorPos (posicao perso) == floorPos posEnd = perso {vida = 911}
-    | otherwise = perso
+
+
+--Animacao Morte End

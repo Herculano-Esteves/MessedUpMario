@@ -17,7 +17,7 @@ import Data.Fixed (mod')
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
 sizeWin :: (Int, Int)
-sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss mapaTeste)), round $ fst $ (snd (getMapaDimensoes escalaGloss mapaTeste)))
+sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst $ (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
 posMapToGloss :: Posicao -> (Float,Float)
@@ -27,8 +27,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo]
+drawLevel state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril jogo,drawMorte jogo texMorte]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -40,6 +40,7 @@ drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPo
           texPorta = fromJust (lookup "portaMario" imagesTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
           texBarril = fromJust (lookup "barril" imagesTheme)
+          texMorte = fromJust (lookup "morreu" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           jogo = (levels state) !! (currentLevel state)
 
@@ -49,6 +50,7 @@ drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPo
 drawPlayer :: State -> Personagem -> Picture
 drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 1 else -1) 1 $
+    if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
         playAnim (time state) [texMarioandar, texMarioandar1]
     else if snd (velocidade jog) == 0 then
@@ -60,6 +62,7 @@ drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (
           texMarioandar1 = fromJust (lookup "marioAndar2" imagesTheme)
           texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+          escala = realToFrac(snd(aplicaDano jog))
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: Picture -> Picture -> Picture -> Jogo -> Picture
@@ -93,6 +96,9 @@ drawHammer tex jog = Color yellow $ Translate (if direcao jog == Este then p1 + 
 drawMap :: Jogo -> Picture -> Picture
 drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
     --map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
+drawMorte :: Jogo -> Picture -> Picture
+drawMorte jogo img = uncurry Translate (posMapToGloss(posicao (jogador jogo))) $ if snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo))) then scale (20*escala) (20*escala) img else scale 0 0 img
+                    where escala = realToFrac(snd(aplicaDano (jogador jogo)))+0.2
 
 drawLadder :: Jogo -> Picture -> Picture
 drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))
@@ -102,10 +108,6 @@ drawTunel jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss po
 
 drawPorta :: Jogo -> Picture -> Picture
 drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Porta] (1*0.5,1*0.5) (mapa jogo)))
-
-drawLevelEnd :: Jogo -> Picture
-drawLevelEnd jogo = uncurry Translate (posMapToGloss pos) $ Color red $ rectangleSolid 25 25
-    where (Mapa _ pos _) = mapa jogo
 
 playAnim :: Float -> [Picture] -> Picture
 playAnim time texs
