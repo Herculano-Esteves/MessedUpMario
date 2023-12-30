@@ -18,9 +18,9 @@ import Data.Fixed (mod')
 import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog | (snd (aplicaDano (jogador jog)) > 0 && not (fst (aplicaDano (jogador jog)))) || snd (aplicaDano (jogador jog)) < 0 = perdeVidaJogadorEnd dtime jog
+movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeVidaJogadorEnd dtime jog
                          | otherwise = perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
-
+                            where (a,b) = aplicaDano (jogador jog)
 
 distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
@@ -28,7 +28,8 @@ distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
 --Dano Jogador START
 hitboxDanoJogadorFinal :: Jogo -> Jogo
-hitboxDanoJogadorFinal jogo = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
+hitboxDanoJogadorFinal jogo | inimigos jogo == [] = jogo
+                            | otherwise = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogador x y
@@ -61,7 +62,8 @@ inimigoMortoEnd :: Jogo -> Jogo
 inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
-inimigoMorto = foldl (\x h-> if vida h == 0 then h {posicao = (-5,-5)} : x else h : x ) []
+inimigoMorto enm    | null enm = enm
+                    | otherwise = foldl (\x h-> if vida h == 0 then h {posicao = (-5,-5)} : x else h : x ) [] enm
 --Inimigo morto END
 
 
@@ -118,7 +120,7 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
-perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo)))) = jogo {jogador = animarMorte tempo (jogador jogo)}
+perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 17 && not (fst (aplicaDano (jogador jogo)))) && snd(aplicaDano (jogador jogo)) /= 16.5 = jogo {jogador = animarMorte tempo (jogador jogo)}
                                 | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
 
 perdeVidaJogadorJogo :: Jogo -> Jogo
@@ -128,12 +130,13 @@ perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (ini
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
     | all not (foldl (\x y -> colisoesPersonagens jog y{tamanho = (0.5,0.7)} : x ) [] inm) = jog
-    | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,3)}
+    | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,20)}
 
 animarMorte :: Tempo -> Personagem -> Personagem
-animarMorte tempo jogador   | snd(aplicaDano jogador) > 2 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
-                            | snd(aplicaDano jogador) > 0 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
-                            | otherwise = jogador {aplicaDano = (False,-1)}
+animarMorte tempo jogador   | snd(aplicaDano jogador) > 19 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
+                            | snd(aplicaDano jogador) > 17 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
+                            | snd(aplicaDano jogador) > 16 && snd(aplicaDano jogador) < 17 = jogador {aplicaDano = (False,16.5)}
+                            | otherwise = jogador
                             where (a,b) = posicao jogador
 
 -- JOGADOR LIFE END
@@ -162,7 +165,8 @@ pegouChave (h:t) jog v  | v = True
                         | otherwise = pegouChave t jog v
 
 tempoDoAplicaDano :: (Bool,Double) -> Tempo -> (Bool,Double)
-tempoDoAplicaDano (a,b) tempo   | b > 0 = (a,b-tempo)
+tempoDoAplicaDano (a,b) tempo   | b > 15 = (a,b)
+                                | b > 0 = (a,b-tempo)
                                 | b <= 0 = (False,0)
 
 aplicaDanoFuncao :: [(Colecionavel,Posicao)] -> Personagem -> (Bool,Double) -> (Bool,Double)
@@ -369,7 +373,8 @@ movimentoMacacoMalvado :: Tempo -> Jogo -> Jogo
 movimentoMacacoMalvado tempo jogo = jogo {inimigos = aimacacomalvado tempo (inimigos jogo) (jogador jogo)}
 
 aimacacomalvado :: Tempo -> [Personagem] -> Personagem-> [Personagem]
-aimacacomalvado tempo enm p = ataqueMacacoBarril tempo (foldl (\x y -> if tipo y == MacacoMalvado then aimacacomalvadoaux tempo y p : x else y : x) [] enm)
+aimacacomalvado tempo enm p | null enm = enm
+                            | otherwise = ataqueMacacoBarril tempo (foldl (\x y -> if tipo y == MacacoMalvado then aimacacomalvadoaux tempo y p : x else y : x) [] enm)
 
 aimacacomalvadoaux :: Tempo -> Personagem -> Personagem -> Personagem
 aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
@@ -377,7 +382,8 @@ aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fs
                                              aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
 
 ataqueMacacoBarril :: Tempo -> [Personagem] -> [Personagem]
-ataqueMacacoBarril tempo lista  | null barril = macaco ++ resto
+ataqueMacacoBarril tempo lista  | null barril && null macaco = resto
+                                | null barril = macaco ++ resto
                                 | null macaco = barril ++ resto
                                 | otherwise = ataqueMacacoBarrilaux tempo (head barril) (head macaco) : (macaco ++ resto)
                                 where (barril,macaco,resto) = foldl (\(a,b,c) y -> if tipo y == MacacoMalvado then (a, [y],c) else if tipo y == Barril then ([y], b, c) else (a,b, y : c)) ([],[],[]) lista

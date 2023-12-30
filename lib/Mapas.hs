@@ -48,30 +48,6 @@ trocaLetras a = case a of
                 T -> Tunel
                 O -> Porta
 
-mapaDoBoss =    [
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P],
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P,P,P,P,P],
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P],
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],
-            [V,E,V,V,P,P,P,P,P,P,P,P,P,P,P,P,V,E,V,V,P,P],
-            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
-            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
-            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]
-                ]
-
 
 mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
@@ -195,5 +171,69 @@ jogo1 = Jogo mapa1 inm colec jog
 
 
 --Inicio Jogo2
+inmjogo2 :: [Personagem]
+inmjogo2 = [Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (7.5,15.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False},
+        Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (3.5,19.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False},
+        Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (20.5,7.5), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False}
+                    ]
+
+colecjogo2 :: [(Colecionavel, Posicao)]
+colecjogo2 = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
+
+mapaDoBoss :: [[Letra]]
+mapaDoBoss =    [
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],--1
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--2
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--3
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--4
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P],--5
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],--6
+            [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V],--7
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],--8
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P,P,P,P,P],--9
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],--10
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],--11
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V],--12
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P],--13
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--14
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--15
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--16
+            [V,E,V,V,P,P,P,P,P,P,P,P,P,P,P,P,V,E,V,V,P,P],--17
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],--18
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],--19
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],--20
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]--21
+                ]
+                
 jogo2 :: Jogo
-jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inm colec jog
+jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog

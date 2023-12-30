@@ -98,7 +98,7 @@ drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posM
     --map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 drawMorte :: Jogo -> Picture -> Picture
 drawMorte jogo img = uncurry Translate (posMapToGloss(posicao (jogador jogo))) $ if snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo))) then scale (20*escala) (20*escala) img else scale 0 0 img
-                    where escala = realToFrac(snd(aplicaDano (jogador jogo)))+0.2
+                    where escala = realToFrac(snd(aplicaDano (jogador jogo)))-16.7
 
 drawLadder :: Jogo -> Picture -> Picture
 drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))
