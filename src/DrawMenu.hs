@@ -12,9 +12,12 @@ eventHandlerInMenu :: Event -> State -> IO State
 eventHandlerInMenu (EventKey (SpecialKey KeyDown) Down _ _) state = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)<2 then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyUp) Down _ _) state = return state {menuState = (menuState state) {selectedButton = if selectedButton (menuState state)>0 then selectedButton (menuState state) - 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {menuState = (menuState state) {pressingButton = True}}
-eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
-eventHandlerInMenu (EventKey (Char '1') Down _ _) state = return state {currentLevel = 1}
-eventHandlerInMenu (EventKey (Char '0') Down _ _) state = return state {currentLevel = 0}
+eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return $ if pressingButton $ menuState state then
+        (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
+    else
+        state
+--eventHandlerInMenu (EventKey (Char '1') Down _ _) state = return state {currentLevel = 1}
+--eventHandlerInMenu (EventKey (Char '0') Down _ _) state = return state {currentLevel = 0}
 eventHandlerInMenu e state = return state
 
 -- | Função que deseha todos os elementos  visuais do menu
@@ -31,7 +34,10 @@ drawMenu state
         drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
     ]
     | currentMenu state == LevelSelection = Pictures $
-        map (\(level, n) -> drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n)) [(level, n) | n <- [0..length (levels state)-1], level <- levels state]
+        map (\((level2, unlocked1), n) -> Pictures $
+            [drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n),
+            drawLock unlocked1 n ]
+            ) (zip (levels state) [0..]) --[(level1, n) | level1 <- levels state, n <- [0..length (levels state)-1]]
 
 -- ! Remove
 drawTitle :: Picture
@@ -66,3 +72,7 @@ drawButton tex buttonType (currentIndex, index) pressed
 
 drawBanner :: Images -> Picture
 drawBanner tex = scale 0.85 0.85 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
+
+drawLock :: Bool -> Int -> Picture
+drawLock unlocked n = Translate 90 (-10 + (-60 * fromIntegral n)) $ (if unlocked then Color green else Color red)
+    $ circleSolid 18 --map (\(game, unlocked) -> )

@@ -4,7 +4,7 @@ import LI12324
 
 type Images = [(Theme, [(String,Picture)])]
 
-type Levels = [Jogo]
+type Levels = [(Jogo, Bool)]
 
 data State = State {
     levels :: Levels,

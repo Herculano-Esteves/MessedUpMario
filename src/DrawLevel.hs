@@ -41,7 +41,7 @@ drawLevel state = Pictures [drawLevelEnd jogo, drawLadder jogo texEscada, drawPo
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
           texBarril = fromJust (lookup "barril" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          jogo = (levels state) !! (currentLevel state)
+          (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 
 -- ? Set a scale for drawng according to the size of the window

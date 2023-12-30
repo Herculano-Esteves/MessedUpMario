@@ -25,9 +25,9 @@ eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo))}
+    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo, unlocked))}
     | otherwise = eventHandlerInMenu event state
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
@@ -38,10 +38,10 @@ timeHandler dTime state
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
     return $ state {
-        levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double dTime) jogo),
+        levels = replace (levels state) ((currentLevel state),(movimenta generateRandomNumber (float2Double dTime) jogo, unlocked)),
         time = (time state) + dTime}
     | otherwise = return state
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 draw :: State -> IO Picture
 draw state = do
@@ -52,13 +52,14 @@ draw state = do
     putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo))
     putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo))
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
+    putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
     putStrLn("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else return (drawMenu state)
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 bgColor :: Color
 bgColor = black
