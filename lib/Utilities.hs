@@ -44,12 +44,12 @@ replace xs (i, e) = before ++ [e] ++ after
 replaceMat :: [[a]] -> (Int, Int, a) -> [[a]]
 replaceMat mat (x,y,a) = replace mat (y,replace (mat !! y) (x, a))
 
-replaceMapGame :: Posicao -> Jogo -> Jogo
-replaceMapGame (x,y) jog = jog {
+replaceMapGame :: Posicao -> Bloco -> Jogo -> Jogo
+replaceMapGame (x,y) bloco jog = jog {
     mapa = (Mapa a b mat')
 }
     where (Mapa a b mat) = mapa jog
-          mat' = replaceMat mat (floor x,floor y,Plataforma)
+          mat' = replaceMat mat (floor x,floor y,bloco)
 
 -- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
 getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]
