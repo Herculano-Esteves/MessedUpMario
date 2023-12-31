@@ -55,11 +55,7 @@ drawLevel state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, 
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
-<<<<<<< HEAD
 drawPlayer state jog = uncurry Translate (posMapToGlossNivel jog (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
-=======
-drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ playDeadAnim state $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
->>>>>>> nuno
     scale (if direcao jog == Este then 1 else -1) 1 $
     if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then

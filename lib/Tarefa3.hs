@@ -22,6 +22,7 @@ movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeV
                          | otherwise = perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
+
 distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
@@ -121,8 +122,8 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
 perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 17 && not (fst (aplicaDano (jogador jogo)))) && snd (aplicaDano (jogador jogo)) /= 16.5 = jogo {jogador = animarMorte tempo (jogador jogo)}
-                                | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
-
+                                -- | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
+                                | otherwise = jogo {lostGame = True}
 perdeVidaJogadorJogo :: Jogo -> Jogo
 perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
 

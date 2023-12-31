@@ -13,6 +13,7 @@ initialState = State {
         (jogo1, False),
         (jogo2,False)
         ],
+    initLevel = jogoSamp,
     currentLevel = 0,
     currentMenu = MainMenu,
     time = 0,
@@ -26,7 +27,10 @@ initialState = State {
     exitGame = False,
     images = [],
     animTime = 2,
-    levelEditorPos = (0.5,0.5)
+    editorState = EditorState {
+        levelEditorPos = (0.5,0.5),
+        changingBlocks = True
+    }
 }
 
 data Letra
@@ -146,7 +150,7 @@ colec :: [(Colecionavel, Posicao)]
 colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
 
 jogoSamp ::Jogo
-jogoSamp = Jogo mapaTeste inm colec jog
+jogoSamp = Jogo mapaTeste inm colec jog False
 
 emptyMap :: Mapa
 emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
@@ -168,7 +172,7 @@ mapa1 = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
     ]
 
 jogo1 ::Jogo
-jogo1 = Jogo mapa1 inm colec jog
+jogo1 = Jogo mapa1 inm colec jog False
 
 
 
@@ -250,4 +254,4 @@ mapaDoBoss =    [
                 ]
                 
 jogo2 :: Jogo
-jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog2
+jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog2 False
