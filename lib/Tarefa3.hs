@@ -303,20 +303,16 @@ inimigoAndar start mapa enm     | posicao enm == (-5,-5) = enm
                                       p = (any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
-inimigosubirdescerescada start mapa enm = --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
+inimigosubirdescerescada start mapa enm --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
                                             --then enm {velocidade = (if fst (velocidade enm) == 0 then 1.5 else fst (velocidade enm),0), posicao = (fst (posicao enm),fromInteger (floor (snd (posicao enm)))+0.5)}
-                                            if canGoDown' enm mapa && snd (velocidade enm) >= 0 || snd (velocidade enm) == ladderSpeed then
-                                                enm {
-                                                    posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
-                                                    velocidade = (0,ladderSpeed)}
-                                            else if onFstLadder enm mapa then
-                                                enm {
-                                                    posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
-                                                    velocidade = (0,-ladderSpeed)}
-                                            else
-                                                enm
-
-                                        where ((p1,p2),(p3,p4)) = genHitbox enm
+    | canGoDown' enm mapa && snd (velocidade enm) >= 0 || snd (velocidade enm) == ladderSpeed = enm {
+                                                posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
+                                                velocidade = (0,ladderSpeed)}
+    | onFstLadder enm mapa = enm {
+                                posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
+                                velocidade = (0,-ladderSpeed)}
+    | otherwise = enm
+    where ((p1,p2),(p3,p4)) = genHitbox enm
 
 inimigosubirdescerescadaBool :: Mapa -> Personagem -> Bool
 inimigosubirdescerescadaBool mapa enm = fst (velocidade enm) == 0 && (snd (velocidade enm) == -ladderSpeed || snd (velocidade enm) == ladderSpeed) -- && (emEscada enm || canGoDown' enm mapa))

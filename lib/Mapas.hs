@@ -9,9 +9,9 @@ import Utilities
 initialState :: State
 initialState = State {
     levels = [
-        jogoSamp,
-        jogo1,
-        jogo2
+        (jogoSamp, True),
+        (jogo1, False),
+        (jogo2,False)
         ],
     currentLevel = 0,
     currentMenu = MainMenu,
@@ -24,7 +24,9 @@ initialState = State {
         pressingButton = False
     },
     exitGame = False,
-    images = []
+    images = [],
+    animTime = 2,
+    levelEditorPos = (0.5,0.5)
 }
 
 data Letra

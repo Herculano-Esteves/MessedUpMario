@@ -14,6 +14,7 @@ import System.Exit (exitSuccess)
 import System.Random
 import Data.Maybe (fromJust)
 import Utilities
+import DrawLevelEditor (drawLevelEditor, reactLevelEditor)
 
 window :: Display
 window = InWindow
@@ -25,21 +26,24 @@ eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
-    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo))}
+    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo, unlocked))}
+    | currentMenu state == LevelEditor = reactLevelEditor event state
     | otherwise = eventHandlerInMenu event state
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state 
+    | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
+        else return state {animTime = 0}
     | vida (jogador jogo) == 911 = return state {currentLevel = (currentLevel state) + 1}
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
     return $ state {
-        levels = replace (levels state) ((currentLevel state),movimenta generateRandomNumber (float2Double dTime) jogo),
+        levels = replace (levels state) ((currentLevel state),(movimenta generateRandomNumber (float2Double dTime) jogo, unlocked)),
         time = (time state) + dTime}
     | otherwise = return state
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 draw :: State -> IO Picture
 draw state = do
@@ -50,13 +54,15 @@ draw state = do
     putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo))
     putStrLn ("Pontos jog: " ++ show (pontos $ jogador $ jogo))
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
+    putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
     putStrLn("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
+    else if (currentMenu state == LevelEditor) then return (drawLevelEditor state)
     else return (drawMenu state)
-    where jogo = (levels state) !! (currentLevel state)
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 bgColor :: Color
 bgColor = black
@@ -162,9 +168,6 @@ loadImages state = do
             ("morreu",mortemario)])
             ]
         }
-
-updateValueDict :: Eq a => a -> [b] -> b -> [b]
-updateValueDict key dict value = dict --map (\(keyD, valueD) -> if key==keyD then (keyD, value) else (keyD, valueD)) dict
 
 
 main :: IO ()

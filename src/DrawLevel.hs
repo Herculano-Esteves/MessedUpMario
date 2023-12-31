@@ -49,13 +49,17 @@ drawLevel state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, 
           texBarril = fromJust (lookup "barril" imagesTheme)
           texMorte = fromJust (lookup "morreu" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          jogo = (levels state) !! (currentLevel state)
+          (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
+<<<<<<< HEAD
 drawPlayer state jog = uncurry Translate (posMapToGlossNivel jog (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+=======
+drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ playDeadAnim state $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+>>>>>>> nuno
     scale (if direcao jog == Este then 1 else -1) 1 $
     if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
@@ -121,6 +125,9 @@ playAnim time texs
     | (time `mod'` (1/n)) < (1/(n*2)) = texs !! 0
     | otherwise = texs !! 1
     where n = 6 -- Animation speed
+
+playDeadAnim :: State -> Picture -> Picture
+playDeadAnim state tex = rotate ((2-(animTime state))*360) tex
 
 eventHandlerInGame :: Event -> Jogo -> Jogo
 eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
