@@ -9,7 +9,7 @@ import Utilities
 
 -- | Faz o tratamento do input quando o utilizador se encontra no menu
 eventHandlerInMenu :: Event -> State -> IO State
-eventHandlerInMenu (EventKey (SpecialKey KeyDown) Down _ _) state = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)<2 then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
+eventHandlerInMenu (EventKey (SpecialKey KeyDown) Down _ _) state = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)<3 then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyUp) Down _ _) state = return state {menuState = (menuState state) {selectedButton = if selectedButton (menuState state)>0 then selectedButton (menuState state) - 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {menuState = (menuState state) {pressingButton = True}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return $ if pressingButton $ menuState state then
@@ -28,6 +28,7 @@ drawMenu state
         drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
         drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
         drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
+        drawButtonTextDebug (selectedButton (menuState state)) 3 "Editor",
         drawBanner (images state)
         ]
     | currentMenu state == OptionsMenu = Pictures [
@@ -49,6 +50,7 @@ buttonPress state
     | selectedButton (menuState state) == 0 && currentMenu state == MainMenu = state { currentMenu = LevelSelection}
     | selectedButton (menuState state) == 1 && currentMenu state == MainMenu = state { currentMenu = OptionsMenu, menuState = (menuState state) {selectedButton = 0}}
     | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
+    | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { currentMenu = LevelEditor}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | currentMenu state == LevelSelection = state { currentMenu = InGame, currentLevel = selectedButton (menuState state)}
     | otherwise = state
@@ -57,8 +59,8 @@ buttonPress state
 -- | Desenha um botão, recebendo o indice atualmente desenhado, o indíce do próprio botão e o texto correspondente
 drawButtonTextDebug :: Int -> Int -> String -> Picture
 drawButtonTextDebug isEnabled n textButton = Pictures [
-    (if isEnabled == n then Color green else Color white) $ Translate 0 (-40 * fromIntegral n) $ rectangleWire 70 30,
-    Color white $ Translate (-30) ((-10) - 40 * fromIntegral n) $ Scale 0.2 0.2 $ Text textButton
+    (if isEnabled == n then Color green else Color white) $ Translate 0 (-110 -40 * fromIntegral n) $ rectangleWire 70 30,
+    Color white $ Translate (-30) ((-110) -10 - 40 * fromIntegral n) $ Scale 0.2 0.2 $ Text textButton
     ]
 
 drawButton :: Images -> String -> (Int, Int) -> Bool -> Picture

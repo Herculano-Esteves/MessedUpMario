@@ -14,6 +14,7 @@ import System.Exit (exitSuccess)
 import System.Random
 import Data.Maybe (fromJust)
 import Utilities
+import DrawLevelEditor (drawLevelEditor, reactLevelEditor)
 
 window :: Display
 window = InWindow
@@ -26,6 +27,7 @@ eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo, unlocked))}
+    | currentMenu state == LevelEditor = reactLevelEditor event state
     | otherwise = eventHandlerInMenu event state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
@@ -58,6 +60,7 @@ draw state = do
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
+    else if (currentMenu state == LevelEditor) then return (drawLevelEditor state)
     else return (drawMenu state)
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
@@ -162,9 +165,6 @@ loadImages state = do
             ("barril",barrilmario)])
             ]
         }
-
-updateValueDict :: Eq a => a -> [b] -> b -> [b]
-updateValueDict key dict value = dict --map (\(keyD, valueD) -> if key==keyD then (keyD, value) else (keyD, valueD)) dict
 
 
 main :: IO ()

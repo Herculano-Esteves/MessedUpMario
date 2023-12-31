@@ -15,7 +15,8 @@ data State = State {
     options :: Options,
     exitGame :: Bool,
     images :: Images,
-    animTime :: Float
+    animTime :: Float,
+    levelEditorPos :: Posicao
 }
 
 data Options = Options {
@@ -28,7 +29,7 @@ data MenuState = MenuState {
 }
 
 data Theme = Default | Minecraft deriving (Eq)
-data Menu = InGame | MainMenu | OptionsMenu | LevelSelection deriving (Eq)
+data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor deriving (Eq)
 
 -- Constante referente à velocidade que as personagens se movem nas escadas
 ladderSpeed :: Double
@@ -39,6 +40,16 @@ replace :: [a] -> (Int, a) -> [a]
 replace xs (i, e) = before ++ [e] ++ after
   where
     (before, _:after) = splitAt i xs
+
+replaceMat :: [[a]] -> (Int, Int, a) -> [[a]]
+replaceMat mat (x,y,a) = replace mat (y,replace (mat !! y) (x, a))
+
+replaceMapGame :: Posicao -> Jogo -> Jogo
+replaceMapGame (x,y) jog = jog {
+    mapa = (Mapa a b mat')
+}
+    where (Mapa a b mat) = mapa jog
+          mat' = replaceMat mat (floor x,floor y,Plataforma)
 
 -- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
 getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]

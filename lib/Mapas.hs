@@ -24,7 +24,8 @@ initialState = State {
     },
     exitGame = False,
     images = [],
-    animTime = 2
+    animTime = 2,
+    levelEditorPos = (0.5,0.5)
 }
 
 mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5)
