@@ -224,27 +224,27 @@ colecjogo2 = [(Moeda,(2.5,17.5)),(Martelo,(7.5,15.5)),(Chave,(4.5,11.5)),(Estrel
 
 mapaDoBoss :: [[Letra]]
 mapaDoBoss =    [
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],--1
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--2
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--3
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--4
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P],--5
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],--6
-            [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V],--7
-            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V],--8
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,P,P,P,P,P,P],--9
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V],--10
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V],--11
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V],--12
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P],--13
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--14
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--15
-            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V],--16
-            [V,E,V,V,P,P,P,P,P,P,P,P,P,P,P,P,V,E,V,V,P,P],--17
-            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],--18
-            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V],--19
-            [V,E,V,V,V,V,V,V,V,V,P,V,V,V,V,V,V,E,V,V,V,V],--20
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]--21
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],--1
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--2
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--3
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--4
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P],--5
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--6
+            [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V,V],--7
+            [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--8
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,P,P,P,P,P,P,P],--9
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--10
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--11
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--12
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P,P],--13
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V,V],--14
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V,V],--15
+            [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V,V],--16
+            [V,E,V,V,P,P,P,P,P,P,P,P,P,P,P,P,V,E,V,V,P,P,P],--17
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V,V],--18
+            [V,E,V,V,V,V,V,V,E,V,P,V,E,V,V,V,V,E,V,V,V,V,V],--19
+            [V,E,V,V,V,V,V,V,V,V,P,V,V,V,V,V,V,E,V,V,V,V,V],--20
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]--21
                 ]
                 
 jogo2 :: Jogo

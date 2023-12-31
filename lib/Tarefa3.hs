@@ -378,7 +378,7 @@ aimacacomalvado tempo enm p | null enm = enm
 
 aimacacomalvadoaux :: Tempo -> Personagem -> Personagem -> Personagem
 aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
-                                             velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,snd (velocidade jogador)) else (2,snd (velocidade jogador)),
+                                             velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,snd (velocidade enm)) else (2,snd (velocidade enm)),
                                              aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
 
 ataqueMacacoBarril :: Tempo -> [Personagem] -> [Personagem]

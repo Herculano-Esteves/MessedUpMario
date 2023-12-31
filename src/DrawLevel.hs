@@ -20,8 +20,12 @@ sizeWin :: (Int, Int)
 sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst $ (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
-posMapToGloss :: Posicao -> (Float,Float)
-posMapToGloss (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
+posMapToGloss :: Personagem -> Posicao -> (Float,Float)
+posMapToGloss jogador (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
+
+
+
+
 
 d2f = double2Float
 f2d = float2Double
@@ -48,7 +52,7 @@ drawLevel state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, 
 -- ? Set a scale for drawng according to the size of the window
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
-drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+drawPlayer state jog = uncurry Translate (posMapToGloss jog (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 1 else -1) 1 $
     if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
@@ -66,24 +70,24 @@ drawPlayer state jog = uncurry Translate (posMapToGloss (posicao jog)) $ scale (
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: Picture -> Picture -> Picture -> Jogo -> Picture
-drawEnemies texinimigo texMacaco texBarril jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy texinimigo x else
-                                                            if tipo x == MacacoMalvado then drawEnemy texMacaco x else drawEnemy texBarril x) (inimigos jogo)
+drawEnemies texinimigo texMacaco texBarril jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy  texinimigo x (jogador jogo) else
+                                                            if tipo x == MacacoMalvado then drawEnemy texMacaco x (jogador jogo) else drawEnemy texBarril x (jogador jogo)) (inimigos jogo)
 
-drawEnemy :: Picture -> Personagem -> Picture
-drawEnemy tex inim = Pictures [Translate (fst $ posMapToGloss (posicao inim)) (0.3+(snd $ posMapToGloss (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Rotate (if tipo inim == Barril then (fromInteger(floor (snd(posicao inim))))*90 else 0) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex, drawHitbox inim]
+drawEnemy :: Picture -> Personagem -> Personagem -> Picture
+drawEnemy tex inim jogador = Pictures [Translate (fst $ posMapToGloss jogador (posicao inim)) (0.3+(snd $ posMapToGloss jogador (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ Rotate (if tipo inim == Barril then (fromInteger(floor (snd(posicao inim))))*90 else 0) $ Scale (if fst(velocidade inim) > 0 then 1 else -1) 1 tex, drawHitbox jogador inim]
 
-drawHitbox :: Personagem -> Picture
-drawHitbox inm = Color green $ uncurry Translate (posMapToGloss (posicao inm)) $ rectangleWire tx ty
+drawHitbox :: Personagem -> Personagem -> Picture
+drawHitbox jogador inm = Color green $ uncurry Translate (posMapToGloss jogador (posicao inm)) $ rectangleWire tx ty
     where tx = (fst $ snd $ aux (genHitbox inm)) - (fst $ fst $ aux (genHitbox inm))
           ty = (snd $ snd $ aux (genHitbox inm)) - (snd $ fst $ aux (genHitbox inm))
           aux :: Hitbox -> ((Float,Float),(Float,Float))
-          aux (p1,p2) = (posMapToGloss p1, posMapToGloss p2)
+          aux (p1,p2) = (posMapToGloss jogador p1, posMapToGloss jogador p2)
 
 drawColecs :: Picture -> Picture -> Picture -> Jogo -> Picture
-drawColecs moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 
-                                                     if colec == Martelo then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo else 
-                                                     if colec == Chave then Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ chave else
-                                                     Translate (fst $ (posMapToGloss pos)) (snd $ (posMapToGloss pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo) 
+drawColecs moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then Translate (fst $ (posMapToGloss (jogador jogo) pos)) (snd $ (posMapToGloss (jogador jogo) pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ (Scale 0.7 0.7 moeda) else 
+                                                     if colec == Martelo then Translate (fst $ (posMapToGloss (jogador jogo) pos)) (snd $ (posMapToGloss (jogador jogo) pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo else 
+                                                     if colec == Chave then Translate (fst $ (posMapToGloss (jogador jogo) pos)) (snd $ (posMapToGloss (jogador jogo) pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ chave else
+                                                     Translate (fst $ (posMapToGloss (jogador jogo) pos)) (snd $ (posMapToGloss (jogador jogo) pos)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ martelo) 
 
                                 (colecionaveis jogo)
 
@@ -94,20 +98,20 @@ drawHammer tex jog = Color yellow $ Translate (if direcao jog == Este then p1 + 
 
 -- TODO: Maybe we should make the get center of hitbox not receive a scale to avoid having to set it to 1
 drawMap :: Jogo -> Picture -> Picture
-drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
+drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGloss (jogador jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
     --map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
 drawMorte :: Jogo -> Picture -> Picture
-drawMorte jogo img = uncurry Translate (posMapToGloss(posicao (jogador jogo))) $ if snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo))) then scale (20*escala) (20*escala) img else scale 0 0 img
+drawMorte jogo img = uncurry Translate (posMapToGloss (jogador jogo) (posicao (jogador jogo))) $ if snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo))) then scale (20*escala) (20*escala) img else scale 0 0 img
                     where escala = realToFrac(snd(aplicaDano (jogador jogo)))-16.7
 
 drawLadder :: Jogo -> Picture -> Picture
-drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))
+drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss (jogador jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))
 
 drawTunel :: Jogo -> Picture -> Picture
-drawTunel jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Tunel] (1*0.5,1*0.5) (mapa jogo)))
+drawTunel jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss (jogador jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Tunel] (1*0.5,1*0.5) (mapa jogo)))
 
 drawPorta :: Jogo -> Picture -> Picture
-drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Porta] (1*0.5,1*0.5) (mapa jogo)))
+drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGloss (jogador jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Porta] (1*0.5,1*0.5) (mapa jogo)))
 
 playAnim :: Float -> [Picture] -> Picture
 playAnim time texs
