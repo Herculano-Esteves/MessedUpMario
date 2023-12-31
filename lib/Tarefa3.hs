@@ -120,7 +120,7 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
-perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 17 && not (fst (aplicaDano (jogador jogo)))) && snd(aplicaDano (jogador jogo)) /= 16.5 = jogo {jogador = animarMorte tempo (jogador jogo)}
+perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 17 && not (fst (aplicaDano (jogador jogo)))) && snd (aplicaDano (jogador jogo)) /= 16.5 = jogo {jogador = animarMorte tempo (jogador jogo)}
                                 | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
 
 perdeVidaJogadorJogo :: Jogo -> Jogo
@@ -133,9 +133,9 @@ perdeVidaJogador jog inm
     | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,20)}
 
 animarMorte :: Tempo -> Personagem -> Personagem
-animarMorte tempo jogador   | snd(aplicaDano jogador) > 19 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
-                            | snd(aplicaDano jogador) > 17 = jogador {aplicaDano = (False,snd(aplicaDano jogador)-tempo)}
-                            | snd(aplicaDano jogador) > 16 && snd(aplicaDano jogador) < 17 = jogador {aplicaDano = (False,16.5)}
+animarMorte tempo jogador   | snd (aplicaDano jogador) > 19 = jogador {aplicaDano = (False,snd (aplicaDano jogador)-tempo)}
+                            | snd (aplicaDano jogador) > 17 = jogador {aplicaDano = (False,snd (aplicaDano jogador)-tempo)}
+                            | snd (aplicaDano jogador) > 16 && snd (aplicaDano jogador) < 17 = jogador {aplicaDano = (False,16.5)}
                             | otherwise = jogador
                             where (a,b) = posicao jogador
 
@@ -378,7 +378,7 @@ aimacacomalvado tempo enm p | null enm = enm
 
 aimacacomalvadoaux :: Tempo -> Personagem -> Personagem -> Personagem
 aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
-                                             velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,0) else (2,0),
+                                             velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,snd (velocidade jogador)) else (2,snd (velocidade jogador)),
                                              aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
 
 ataqueMacacoBarril :: Tempo -> [Personagem] -> [Personagem]
@@ -396,8 +396,17 @@ ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst (posicao 
 
 --Macaco Malvado End
 
---Animacao Morte Start
+--Boss AI START
 
+bossMovimento :: Tempo -> Jogo -> Jogo
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = moverBoss tempo (jogador jogo) (inimigos jogo)}
+                            | otherwise = jogo
 
+moverBoss :: Tempo -> Personagem -> [Personagem] -> [Personagem]
+moverBoss tempo jogador inim = foldl (\x y -> if tipo y == Boss then moverBossAux tempo jogador y : x else y : x) [] inim
 
---Animacao Morte End
+moverBossAux :: Tempo -> Personagem -> Personagem -> Personagem
+moverBossAux tempo jogador boss | distancia (posicao(jogador)) (posicao(boss)) < 4 = undefined
+                                | otherwise = undefined
+
+--Boss AI END
