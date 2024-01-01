@@ -7,7 +7,8 @@ import Tarefa1
 import Tarefa3
 import Tarefa4
 import Mapas
-import DrawLevel
+import DrawLevel ( drawLevel, eventHandlerInGame, sizeWin )
+
 import DrawMenu
 import GHC.Float (float2Double, double2Float)
 import System.Exit (exitSuccess)
@@ -15,12 +16,15 @@ import System.Random
 import Data.Maybe (fromJust)
 import Utilities
 import DrawLevelEditor (drawLevelEditor, reactLevelEditor)
+import Graphics.Gloss.Interface.Environment
 
 window :: Display
 window = InWindow
     "Donkeykong"
     sizeWin --(700,700)
     (300,200)
+
+
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
@@ -89,7 +93,9 @@ loadImages state = do
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
     macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
+    boss1mario <- loadBMP "assets/MarioTexture/Boss1.bmp"
     mortemario <- loadBMP "assets/Death.bmp"
+    
     -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
@@ -146,7 +152,8 @@ loadImages state = do
             ("portaMario",portamario),
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
-            ("morreu",mortemario)]),
+            ("morreu",mortemario),
+            ("boss1", boss1mario)]),
             (Minecraft,
             [("marioParado", steveandar),
             ("marioAndar1", steveandar1),
