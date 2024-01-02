@@ -12,7 +12,8 @@ module Tarefa1 where
 
 import LI12324
 import Graphics.Gloss.Data.Point (pointInBox)
-import GHC.Float (double2Float, double2Int)
+import GHC.Float (double2Float, double2Int, int2Double)
+import Graphics.Gloss.Interface.Environment (getScreenSize)
 
 
 escalaGloss :: Double

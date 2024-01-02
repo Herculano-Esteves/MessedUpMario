@@ -19,7 +19,7 @@ import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeVidaJogadorEnd dtime jog
-                         | otherwise = perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                         | otherwise = bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -64,13 +64,13 @@ inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
 inimigoMorto enm    | null enm = enm
-                    | otherwise = foldl (\x h-> if vida h == 0 then h {posicao = (-5,-5)} : x else h : x ) [] enm
+                    | otherwise = foldl (\x h-> if vida h == 0 then h {posicao = (-20,-20)} : x else h : x ) [] enm
 --Inimigo morto END
 
 
 -- GRAVIDADE START
 gravidadeQuedaEnd :: Double -> Jogo -> Jogo
-gravidadeQuedaEnd dtime jogo = jogo {inimigos = gravidadeQueda dtime (mapa jogo) (inimigos jogo), jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
+gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) (foldl (\x y -> if tipo y == Fantasma || tipo y == MacacoMalvado || tipo y == Barril then y : x else x) [] (inimigos jogo))) ++ (foldl (\x y -> if tipo y /= Fantasma && tipo y /= MacacoMalvado && tipo y /= Barril then y : x else x) [] (inimigos jogo)), jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
 
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
@@ -111,7 +111,7 @@ seDentroSai mapa ent | any (sobreposicao ((p1,p4-0.01),(p3,p4-0.01))) (getMapCol
 removerPersoChao :: Jogo -> Jogo
 removerPersoChao jogo = jogo {
     jogador = seDentroSai (mapa jogo) (jogador jogo),
-    inimigos = map (\inm -> if tipo inm /= Barril then seDentroSai (mapa jogo) inm else inm) (inimigos jogo)
+    inimigos = map (\inm -> (if (tipo inm /= Barril) && (tipo inm /= CuspoDeFogo) then seDentroSai (mapa jogo) inm else inm)) (inimigos jogo)
 }
 --where onFstLadder = any (\)
 
@@ -186,7 +186,7 @@ coletarObjetosremover :: [(Colecionavel,Posicao)] -> Personagem -> [(Colecionave
 coletarObjetosremover itens player = map (`colecionarIndividual` player) itens
 
 colecionarIndividual :: (Colecionavel,Posicao) -> Personagem -> (Colecionavel,Posicao)
-colecionarIndividual (c,p) player   | estaTocarObjeto player p = (c,(-10,-10))
+colecionarIndividual (c,p) player   | estaTocarObjeto player p = (c,(-20,-20))
                                     | otherwise = (c,p)
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
@@ -396,14 +396,26 @@ ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst (posicao 
 --Boss AI START
 
 bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = moverBoss tempo (jogador jogo) (inimigos jogo)}
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = map (\inm -> if tipo inm == Boss then controlarTempoBoss tempo inm else inm) (moverBoss tempo (jogador jogo) (inimigos jogo))}
                             | otherwise = jogo
 
 moverBoss :: Tempo -> Personagem -> [Personagem] -> [Personagem]
-moverBoss tempo jogador inim = foldl (\x y -> if tipo y == Boss then moverBossAux tempo jogador y : x else y : x) [] inim
+moverBoss tempo jogador inim = foldl (\x y -> if tipo y == CuspoDeFogo then moverBolaDeFogo tempo jogador y (head (foldl (\x y -> if tipo y == Boss then y : x else x) [] inim)) : x else y : x) [] inim
 
-moverBossAux :: Tempo -> Personagem -> Personagem -> Personagem
-moverBossAux tempo jogador boss | distancia (posicao(jogador)) (posicao(boss)) < 4 = undefined
-                                | otherwise = undefined
+controlarTempoBoss :: Tempo -> Personagem -> Personagem
+controlarTempoBoss tempo boss = boss {aplicaDano = (False,if snd (aplicaDano boss) <= 0 then 8 else snd (aplicaDano boss)-tempo)}
+
+moverBolaDeFogo :: Tempo -> Personagem -> Personagem -> Personagem -> Personagem
+moverBolaDeFogo tempo jogador fogo boss | snd (aplicaDano boss) > 0 = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
+                                --      | distancia (posicao(jogador)) (posicao(boss)) < 1 = fogo
+                                        | otherwise = ataqueLogeBoss boss fogo (jx-bx,jy-by)
+                                        where   (bx,by) = posicao boss
+                                                (jx,jy) = posicao jogador
+                                                (fx,fy) = posicao fogo
+                                                (vx,vy) = velocidade fogo
+
+ataqueLogeBoss :: Personagem -> Personagem -> (Double,Double) -> Personagem
+ataqueLogeBoss boss fogo (a,b) = fogo {posicao = posicao boss,velocidade = (c,d)}
+                                where (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
 
 --Boss AI END
