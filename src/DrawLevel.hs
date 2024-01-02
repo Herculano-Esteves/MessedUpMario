@@ -39,7 +39,7 @@ f2d = float2Double
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures [drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte]
+                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies (texCuspo1,texCuspo2) texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -53,6 +53,8 @@ drawLevel state = Pictures [drawHud jogo texPlataforma, drawBackground jogo texP
           texBarril = fromJust (lookup "barril" imagesTheme)
           texMorte = fromJust (lookup "morreu" imagesTheme)
           texBoss = fromJust (lookup "boss1" imagesTheme)
+          texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
+          texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           (jogo, unlocked) = (levels state) !! (currentLevel state)
 
@@ -77,19 +79,23 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel jog (posicao jog)) 
           escala = realToFrac (snd (aplicaDano jog))
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
-drawEnemies :: Picture -> Picture -> Picture -> Picture-> Jogo -> Picture
-drawEnemies texinimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy  texinimigo x (jogador jogo) else
+drawEnemies :: (Picture,Picture) ->  Picture -> Picture -> Picture -> Picture-> Jogo -> Picture
+drawEnemies cuspo texinimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy  texinimigo x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy texBarril x (jogador jogo) else
-                                                            if tipo x == Boss then drawEnemy texBoss x (jogador jogo) else drawEnemy texBarril x (jogador jogo))
+                                                            if tipo x == Boss then drawEnemy texBoss x (jogador jogo) else
+                                                            if tipo x == CuspoDeFogo then drawEnemy (if even (floor (fst (posicao x)) + floor (snd (posicao x))) then fst cuspo else snd cuspo) x (jogador jogo) else drawEnemy texBarril x (jogador jogo))
                                                             (inimigos jogo)
 
+
 drawEnemy :: Picture -> Personagem -> Personagem -> Picture
-drawEnemy tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel jogador (posicao inim)) (0.3+(snd $ posMapToGlossNivel jogador (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ 
+drawEnemy tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel jogador (posicao inim)) (0.3+(snd $ posMapToGlossNivel jogador (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
                                 if tipo inim == Barril then Rotate (fromInteger (floor (snd (posicao inim)))*90) $ Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex else
-                                if tipo inim == Boss then Scale (if fst(posicao jogador) > fst(posicao inim) then -2.2 else 2.2) 2.2 tex else
+                                if tipo inim == Boss then Scale (if fst (posicao jogador) > fst (posicao inim) then -2.2 else 2.2) 2.2 tex else
+                                if tipo inim == CuspoDeFogo then Rotate (-atan2 (d2f vx) (d2f vy) * 180 / pi) tex else
                                 Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex
-                                , drawHitbox jogador inim] 
-                                
+                                , drawHitbox jogador inim]
+                                where (vx,vy) = velocidade inim
+
 drawHitbox :: Personagem -> Personagem -> Picture
 drawHitbox jogador inm = Color green $ uncurry Translate (posMapToGlossNivel jogador (posicao inm)) $ rectangleWire tx ty
     where tx = (fst $ snd $ aux (genHitbox inm)) - (fst $ fst $ aux (genHitbox inm))
@@ -122,7 +128,7 @@ drawBackground jogo tex = pictures []
 
 drawHud :: Jogo -> Picture -> Picture
 drawHud jogo tex1 = pictures []
-                    
+
 
 
 

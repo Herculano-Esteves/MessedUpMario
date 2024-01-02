@@ -1,7 +1,8 @@
 module Main where
 
 import Graphics.Gloss
-import Graphics.Gloss.Interface.IO.Game
+import Graphics.Gloss.Interface.IO.Game 
+
 import LI12324
 import Tarefa1
 import Tarefa3
@@ -17,6 +18,7 @@ import Data.Maybe (fromJust)
 import Utilities
 import DrawLevelEditor (drawLevelEditor, reactLevelEditor)
 import Graphics.Gloss.Interface.Environment
+
 
 window :: Display
 window = InWindow
@@ -94,7 +96,10 @@ loadImages state = do
     macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
     boss1mario <- loadBMP "assets/MarioTexture/Boss1.bmp"
+    cuspo1 <- loadBMP "assets/MarioTexture/CuspoFogo1.bmp"
+    cuspo2 <- loadBMP "assets/MarioTexture/CuspoFogo2.bmp"
     mortemario <- loadBMP "assets/Death.bmp"
+
     
     -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
@@ -153,7 +158,9 @@ loadImages state = do
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
             ("morreu",mortemario),
-            ("boss1", boss1mario)]),
+            ("boss1", boss1mario),
+            ("cuspo1",cuspo1),
+            ("cuspo2",cuspo2)]),
             (Minecraft,
             [("marioParado", steveandar),
             ("marioAndar1", steveandar1),

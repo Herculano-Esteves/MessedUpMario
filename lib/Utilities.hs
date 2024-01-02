@@ -16,7 +16,8 @@ data State = State {
     exitGame :: Bool,
     images :: Images,
     animTime :: Float,
-    levelEditorPos :: Posicao
+    levelEditorPos :: Posicao,
+    windowSize :: (Int,Int)
 }
 
 data Options = Options {
