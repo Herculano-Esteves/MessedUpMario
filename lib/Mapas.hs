@@ -29,7 +29,8 @@ initialState = State {
     animTime = 2,
     editorState = EditorState {
         levelEditorPos = (0.5,0.5),
-        changingBlocks = True
+        changingBlocks = True,
+        removingEnemies = False
     }
 }
 
@@ -55,7 +56,7 @@ trocaLetras a = case a of
                 O -> Porta
 
 
-mapaTeste = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5)
+mapaTeste = Mapa ((6.0,5.5), Oeste) (0.5, 5.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
@@ -254,4 +255,4 @@ mapaDoBoss =    [
                 ]
                 
 jogo2 :: Jogo
-jogo2 = Jogo (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog2 False
+jogo2 = Jogo (Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog False

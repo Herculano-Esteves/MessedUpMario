@@ -30,10 +30,13 @@ reactLevelEditor (EventKey (SpecialKey KeyLeft) Down _ _) state = return state {
     where (px, py) = levelEditorPos $ editorState state
 reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
         levels = if changingBlocks $ editorState state then
-            replace (levels state) ((currentLevel state),(replaceBlock (levelEditorPos $ editorState state) jogo, unlocked))
-        else
-            replace (levels state) ((currentLevel state),(addRemoveEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-
+                replace (levels state) ((currentLevel state),(replaceBlock (levelEditorPos $ editorState state) jogo, unlocked))
+                else
+                    replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
+    }
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
+reactLevelEditor (EventKey (Char 'a') Down _ _) state = return state {
+        levels = replace (levels state) ((currentLevel state),(addRemoveEnemy (levelEditorPos $ editorState state) jogo, unlocked))
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
@@ -99,6 +102,24 @@ genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
           aux2 (_,0) = []
           aux2 (x,y) = aux x : aux2 (x,y-1)
 
+switchEnemy :: Posicao -> Jogo -> Jogo
+switchEnemy pos jog = jog {
+    inimigos = map (\enm -> if floorPos pos == floorPos (posicao enm) then
+                    Personagem {velocidade = (0,0), 
+                        tipo = case tipo enm of
+                            Fantasma -> MacacoMalvado
+                            MacacoMalvado -> Fantasma, 
+                        emEscada = False,
+                        vida = 1, 
+                        pontos = 0, 
+                        ressalta = True, 
+                        posicao = pos, 
+                        tamanho = (1,1), 
+                        aplicaDano = (False, 0), 
+                        direcao = Oeste,
+                        temChave = False} else enm) (inimigos jog)
+}
+
 addRemoveEnemy :: Posicao -> Jogo -> Jogo
 addRemoveEnemy pos jog = jog {
         inimigos = 
@@ -106,15 +127,15 @@ addRemoveEnemy pos jog = jog {
                 filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm)) (inimigos jog)
             else
                 Personagem {velocidade = (0,0), 
-                    tipo = Fantasma, 
-                    emEscada = False,
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = pos, 
-                    tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste,
-                    temChave = False} : (inimigos jog)
+                        tipo = Fantasma, 
+                        emEscada = False,
+                        vida = 1, 
+                        pontos = 0, 
+                        ressalta = True, 
+                        posicao = pos, 
+                        tamanho = (1,1), 
+                        aplicaDano = (False, 0), 
+                        direcao = Oeste,
+                        temChave = False} : inimigos jog
     }
     where enmLs = zip [1..] (inimigos jog)

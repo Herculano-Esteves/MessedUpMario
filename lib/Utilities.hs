@@ -25,8 +25,9 @@ data Options = Options {
 }
 
 data EditorState = EditorState {
-    levelEditorPos :: Posicao,
-    changingBlocks :: Bool
+    levelEditorPos  :: Posicao,
+    changingBlocks  :: Bool,
+    removingEnemies :: Bool
 }
 
 data MenuState = MenuState {
