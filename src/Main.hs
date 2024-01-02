@@ -42,6 +42,10 @@ timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state 
     | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         else return state {animTime = 0}
+    | lostGame jogo = return state {
+            levels = replace (levels state) ((currentLevel state),((initLevel state) 
+                {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}, unlocked))
+        }
     | vida (jogador jogo) == 911 = return state {currentLevel = (currentLevel state) + 1}
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)

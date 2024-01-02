@@ -8,6 +8,7 @@ type Levels = [(Jogo, Bool)]
 
 data State = State {
     levels :: Levels,
+    initLevel :: Jogo,
     currentLevel :: Int,
     menuState :: MenuState,
     currentMenu :: Menu,
@@ -16,12 +17,17 @@ data State = State {
     exitGame :: Bool,
     images :: Images,
     animTime :: Float,
-    levelEditorPos :: Posicao,
-    windowSize :: (Int,Int)
+    editorState :: EditorState
 }
 
 data Options = Options {
     currentTheme :: Theme
+}
+
+data EditorState = EditorState {
+    levelEditorPos  :: Posicao,
+    changingBlocks  :: Bool,
+    removingEnemies :: Bool
 }
 
 data MenuState = MenuState {

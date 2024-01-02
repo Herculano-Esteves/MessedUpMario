@@ -119,6 +119,7 @@ data Jogo =
     , inimigos      :: [Personagem] -- ^ lista de inimigos no mapa
     , colecionaveis :: [(Colecionavel, Posicao)] -- ^ lista de colecionaveis espalhados pelo mapa
     , jogador       :: Personagem -- ^ o jogador
+    , lostGame      :: Bool
     }
   deriving (Eq, Read, Show)
 
