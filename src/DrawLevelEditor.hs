@@ -8,7 +8,7 @@ import Data.Maybe (fromJust)
 import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
-import Mapas (jogoSamp)
+import Mapas (jogoSamp, jog)
 import Tarefa2 (floorPos, valida)
 
 reactLevelEditor :: Event -> State -> IO State
@@ -24,7 +24,7 @@ reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
-    editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 2) then 0 else (selectFunc $ editorState state) + 1}}
+    editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 3) then 0 else (selectFunc $ editorState state) + 1}}
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
 reactLevelEditor e state = return state {editorState = eventHandlerEditor e (editorState state)}
 reactLevelEditor e s = return s
@@ -34,7 +34,8 @@ eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) mstate = mstate {
     tempGame = case (selectFunc mstate) of
                     0 -> replaceBlock (tempGame mstate)
                     1 -> switchEnemy (tempGame mstate)
-                    2 -> switchEnemy (tempGame mstate)
+                    2 -> switchJogPos (tempGame mstate)
+                    3 -> switchColecs (tempGame mstate)
 }
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) mstate = mstate {
         tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px, py-1)}}
@@ -59,7 +60,7 @@ eventHandlerEditor e s = s
 
 drawLevelEditor :: State -> Picture
 drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawEnemies texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte, drawSelBox state]
+                drawEnemies texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -89,8 +90,13 @@ drawSelBox :: State -> Picture
 drawSelBox state = uncurry Translate (posMapToGlossNivel (jogador $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
     0 -> Color green
     1 -> Color red
-    2 -> Color blue) $ rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
+    2 -> Color blue
+    3 -> Color (dim cyan)) $ rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
     where (x,y) = posicao $ jogador $ tempGame $ editorState state
+
+drawSpawnPoint :: EditorState -> Picture
+drawSpawnPoint mstate = uncurry Translate (posMapToGlossNivel (jogador $ tempGame mstate) pos) $ Color (dim magenta) $ circleSolid 10
+    where (Mapa (pos,dir) _ _) = mapa $ tempGame mstate
 
 replaceBlock :: Jogo -> Jogo
 replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
@@ -99,17 +105,26 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
           newBlock c = case c of
             Plataforma -> Alcapao
             Alcapao -> Escada
-            Escada -> Vazio
+            Escada -> Porta
+            Porta -> Tunel
+            Tunel -> Vazio
             Vazio -> Plataforma
           (x,y) = posicao $ jogador jog
 
 addNewLevel :: State -> State
 addNewLevel state = state {
     levels = levels state ++ [(emptyGame, True)],
-    currentLevel = length (levels state)
+    currentLevel = length (levels state),
+    editorState = (editorState state) {
+        tempGame = emptyGame
+    }
 }
-    where emptyGame = jogoSamp {
-            mapa = genEmptyMap (22,15)
+    where emptyGame = Jogo {
+            jogador = jog,
+            inimigos = [],
+            colecionaveis = [],
+            mapa = genEmptyMap (22,15),
+            lostGame = False
           }
 
 genEmptyMap :: (Int, Int) -> Mapa
@@ -127,7 +142,8 @@ switchEnemy jog = jog {
                     Personagem {velocidade = (0,0), 
                         tipo = case tipo enm of
                             Fantasma -> MacacoMalvado
-                            MacacoMalvado -> Fantasma, 
+                            MacacoMalvado -> Boss
+                            Boss -> Fantasma, 
                         emEscada = False,
                         vida = 1, 
                         pontos = 0, 
@@ -161,11 +177,23 @@ addRemoveEnemy jog = jog {
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
 
-switchJogPos :: Posicao -> Jogo -> Jogo
-switchJogPos pos jog = jog {
+switchJogPos :: Jogo -> Jogo
+switchJogPos jog = jog {
     mapa = (Mapa (pos, Oeste) p1 mat),
     jogador = (jogador jog) {
         posicao = pos
     }
 }
     where (Mapa (p,dir) p1 mat) = mapa jog
+          pos = posicao $ jogador jog
+
+switchColecs :: Jogo -> Jogo
+switchColecs jog = jog {
+    colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
+        map (\(col, pos) -> if floorPos pos == floorPos (posicao $ jogador jog) then
+            (case col of
+                Moeda -> Martelo
+                Martelo -> Moeda, pos)
+            else (col, pos)) (colecionaveis jog)
+        else (colecionaveis jog)
+}

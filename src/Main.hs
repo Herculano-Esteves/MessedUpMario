@@ -75,6 +75,7 @@ draw state = do
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else if (currentMenu state == LevelEditor) then return (drawLevelEditor state)
+    
     else return (drawMenu state)
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
