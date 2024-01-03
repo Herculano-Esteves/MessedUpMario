@@ -9,45 +9,57 @@ import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
 import Mapas (jogoSamp)
-import Tarefa2 (floorPos)
+import Tarefa2 (floorPos, valida)
 
 reactLevelEditor :: Event -> State -> IO State
-reactLevelEditor (EventKey (SpecialKey KeyUp) Down _ _) state = return state {
-        editorState = (editorState state) {levelEditorPos = (px, py - 1)}
+{-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
+        levels = case (selectFunc $ editorState state) of
+                    0 -> replace (levels state) ((currentLevel state),(replaceBlock jogo, unlocked))
+                    1 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
+                    2 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
     }
-    where (px, py) = levelEditorPos $ editorState state 
-reactLevelEditor (EventKey (SpecialKey KeyDown) Down _ _) state = return state {
-        editorState = (editorState state) {levelEditorPos = (px, py + 1)}
-    }
-    where (px, py) = levelEditorPos $ editorState state
-reactLevelEditor (EventKey (SpecialKey KeyRight) Down _ _) state = return state {
-        editorState = (editorState state) {levelEditorPos = (px+1, py)}
-    }
-    where (px, py) = levelEditorPos $ editorState state
-reactLevelEditor (EventKey (SpecialKey KeyLeft) Down _ _) state = return state {
-        editorState = (editorState state) {levelEditorPos = (px-1, py)}
-    }
-    where (px, py) = levelEditorPos $ editorState state
-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
-        levels = if changingBlocks $ editorState state then
-                replace (levels state) ((currentLevel state),(replaceBlock (levelEditorPos $ editorState state) jogo, unlocked))
-                else
-                    replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-    }
-    where (jogo, unlocked) = (levels state) !! (currentLevel state)
-reactLevelEditor (EventKey (Char 'a') Down _ _) state = return state {
-        levels = replace (levels state) ((currentLevel state),(addRemoveEnemy (levelEditorPos $ editorState state) jogo, unlocked))
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)-}
+reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
+        levels = replace (levels state) ((currentLevel state),(if valida (tempGame $ editorState state) then tempGame $ editorState state else jogo, unlocked))
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
-    editorState = (editorState state) {changingBlocks = if (changingBlocks $ editorState state) then False else True}}
+    editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 2) then 0 else (selectFunc $ editorState state) + 1}}
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
+reactLevelEditor e state = return state {editorState = eventHandlerEditor e (editorState state)}
 reactLevelEditor e s = return s
 
+eventHandlerEditor :: Event -> EditorState -> EditorState
+eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) mstate = mstate {
+    tempGame = case (selectFunc mstate) of
+                    0 -> replaceBlock (tempGame mstate)
+                    1 -> switchEnemy (tempGame mstate)
+                    2 -> switchEnemy (tempGame mstate)
+}
+eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) mstate = mstate {
+        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px, py-1)}}
+    }
+    where (px, py) = posicao $ jogador $ tempGame mstate 
+eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) mstate = mstate {
+        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px, py+1)}}
+    }
+    where (px, py) = posicao $ jogador $ tempGame mstate
+eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) mstate = mstate {
+        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px-1, py)}}
+    }
+    where (px, py) = posicao $ jogador $ tempGame mstate
+eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) mstate = mstate {
+        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px+1, py)}}
+    }
+    where (px, py) = posicao $ jogador $ tempGame mstate
+eventHandlerEditor (EventKey (Char 'a') Down _ _) mstate = mstate {
+        tempGame = addRemoveEnemy (tempGame mstate)
+    }
+eventHandlerEditor e s = s
 
 drawLevelEditor :: State -> Picture
 drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawPlayer state (jogador jogo),drawEnemies (texCuspo1,texCuspo2) texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte, drawSelBox state (levelEditorPos $ editorState state)]
+                drawEnemies texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte, drawSelBox state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -64,21 +76,26 @@ drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texP
           texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
           texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          (jogo, unlocked) = (levels state) !! (currentLevel state)
+          --(jogo, unlocked) = (levels state) !! (currentLevel state)
+          jogo = tempGame $ editorState state
 
 drawLevelEditor' :: State -> Picture
 drawLevelEditor' state = Pictures [
     drawMap jogo texPlataforma, 
-    drawSelBox state (levelEditorPos $ editorState state)]
+    drawSelBox state ]
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
 
-drawSelBox :: State -> Posicao -> Picture
-drawSelBox state pos = uncurry Translate (posMapToGloss pos) $ (if (changingBlocks $ editorState state) then Color green else Color red) $ rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
+drawSelBox :: State -> Picture
+drawSelBox state = uncurry Translate (posMapToGlossNivel (jogador $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
+    0 -> Color green
+    1 -> Color red
+    2 -> Color blue) $ rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
+    where (x,y) = posicao $ jogador $ tempGame $ editorState state
 
-replaceBlock :: Posicao -> Jogo -> Jogo
-replaceBlock (x,y) jog = replaceMapGame (x,y) (newBlock currentBlock) jog
+replaceBlock :: Jogo -> Jogo
+replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
     where currentBlock = blocos !! floor y !! floor x
           (Mapa _ _ blocos) = mapa jog
           newBlock c = case c of
@@ -86,6 +103,7 @@ replaceBlock (x,y) jog = replaceMapGame (x,y) (newBlock currentBlock) jog
             Alcapao -> Escada
             Escada -> Vazio
             Vazio -> Plataforma
+          (x,y) = posicao $ jogador jog
 
 addNewLevel :: State -> State
 addNewLevel state = state {
@@ -105,8 +123,8 @@ genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
           aux2 (_,0) = []
           aux2 (x,y) = aux x : aux2 (x,y-1)
 
-switchEnemy :: Posicao -> Jogo -> Jogo
-switchEnemy pos jog = jog {
+switchEnemy ::  Jogo -> Jogo
+switchEnemy jog = jog {
     inimigos = map (\enm -> if floorPos pos == floorPos (posicao enm) then
                     Personagem {velocidade = (0,0), 
                         tipo = case tipo enm of
@@ -121,10 +139,11 @@ switchEnemy pos jog = jog {
                         aplicaDano = (False, 0), 
                         direcao = Oeste,
                         temChave = False} else enm) (inimigos jog)
-}
+    }
+    where pos = posicao $ jogador jog
 
-addRemoveEnemy :: Posicao -> Jogo -> Jogo
-addRemoveEnemy pos jog = jog {
+addRemoveEnemy :: Jogo -> Jogo
+addRemoveEnemy jog = jog {
         inimigos = 
             if any (\enm -> (floorPos pos) == (floorPos $ posicao enm)) (inimigos jog) then
                 filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm)) (inimigos jog)
@@ -142,3 +161,13 @@ addRemoveEnemy pos jog = jog {
                         temChave = False} : inimigos jog
     }
     where enmLs = zip [1..] (inimigos jog)
+          pos = posicao $ jogador jog
+
+switchJogPos :: Posicao -> Jogo -> Jogo
+switchJogPos pos jog = jog {
+    mapa = (Mapa (pos, Oeste) p1 mat),
+    jogador = (jogador jog) {
+        posicao = pos
+    }
+}
+    where (Mapa (p,dir) p1 mat) = mapa jog

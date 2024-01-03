@@ -25,8 +25,9 @@ data Options = Options {
 }
 
 data EditorState = EditorState {
+    tempGame       :: Jogo,
     levelEditorPos  :: Posicao,
-    changingBlocks  :: Bool,
+    selectFunc  :: Int,
     removingEnemies :: Bool
 }
 

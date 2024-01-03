@@ -86,6 +86,7 @@ drawEnemies cuspo texinimigo texMacaco texBarril texBoss jogo = Pictures $ map (
                                                             if tipo x == Boss then drawEnemy texBoss x (jogador jogo) else
                                                             if tipo x == CuspoDeFogo then drawEnemy (if even (floor (fst (posicao x)) + floor (snd (posicao x))) then fst cuspo else snd cuspo) x (jogador jogo) else drawEnemy texBarril x (jogador jogo))
                                                             (inimigos jogo)
+                                                            
 
 
 drawEnemy :: Picture -> Personagem -> Personagem -> Picture
