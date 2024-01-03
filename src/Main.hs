@@ -91,7 +91,8 @@ loadImages state = do
     escada <- loadBMP "assets/MarioTexture/ladder.bmp"
     alcapao <- loadBMP "assets/MarioTexture/Alcapao.bmp"
     tunel <- loadBMP "assets/MarioTexture/Tunel.bmp"
-    inimigo <- loadBMP "assets/MarioTexture/Inimigo.bmp"
+    inimigo1 <- loadBMP "assets/MarioTexture/Fantasma1.bmp"
+    inimigo2 <- loadBMP "assets/MarioTexture/Fantasma2.bmp"
     moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
     martelo <- loadBMP "assets/MarioTexture/Martelo.bmp"
     mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
@@ -143,7 +144,8 @@ loadImages state = do
             ("plataforma", plataforma),
             ("alcapao", alcapao),
             ("tunel", tunel),
-            ("inimigo", inimigo),
+            ("inimigo1", inimigo1),
+            ("inimigo2", inimigo2),
             ("moeda", moeda),
             ("martelo", martelo),
             ("mariocair", mariocair),

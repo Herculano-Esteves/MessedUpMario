@@ -82,7 +82,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (13.5,13.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -93,7 +93,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (19.5,5.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -104,7 +104,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (9.5,9.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -139,7 +139,7 @@ jog = Personagem {  velocidade = (0,0),
                     pontos = 0, 
                     ressalta = False, 
                     posicao = (6.0,5.5), 
-                    tamanho = (0.9,1.1), 
+                    tamanho = (0.8,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
                     temChave = False}
@@ -156,7 +156,7 @@ jogoSamp = Jogo mapaTeste inm colec jog False
 emptyMap :: Mapa
 emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
 
-mapa1 = Mapa ((0.5, 2.5), Oeste) (0.5, 2.5)
+mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
@@ -186,7 +186,7 @@ jog2 = Personagem {  velocidade = (0,0),
                     pontos = 0, 
                     ressalta = False, 
                     posicao = (3.0,3.5), 
-                    tamanho = (0.9,1.1), 
+                    tamanho = (0.8,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
                     temChave = False}
@@ -198,7 +198,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (7.5,15.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -209,7 +209,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (3.5,19.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -220,7 +220,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (20.5,7.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.75,0.75), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -242,7 +242,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (-100.5,-100.5), 
-                    tamanho = (1,1), 
+                    tamanho = (0.5,0.5), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False}
@@ -261,10 +261,10 @@ mapaDoBoss =    [
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--6
             [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V,V],--7
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--8
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,P,P,P,P,P,P,P],--9
+            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P,P,P,P,P,P],--9
             [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--10
             [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--11
-            [V,V,V,V,V,V,V,V,P,V,V,V,P,E,V,V,V,V,V,V,V,V,V],--12
+            [V,V,V,V,V,V,V,V,P,V,V,V,P,V,V,V,V,V,V,V,V,V,V],--12
             [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,V,V,P,P,P],--13
             [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V,V],--14
             [V,E,V,V,P,V,V,V,V,V,V,V,V,V,V,P,V,E,V,V,V,V,V],--15

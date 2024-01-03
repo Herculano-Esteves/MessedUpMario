@@ -38,13 +38,14 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies (texCuspo1,texCuspo2) texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte]
+drawLevel state = Pictures [drawHitbox (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                if fst $ aplicaDano (jogador jogo) then drawHammer texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies (texCuspo1,texCuspo2) texInimigo1 texMacaco texBarril texBoss jogo,drawMorte jogo texMorte]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
           texTunel = fromJust (lookup "tunel" imagesTheme)
-          texInimigo = fromJust (lookup "inimigo" imagesTheme)
+          texInimigo1 = fromJust (lookup "inimigo1" imagesTheme)
+          texInimigo2 = fromJust (lookup "inimigo2" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
