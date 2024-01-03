@@ -60,12 +60,12 @@ eventHandlerEditor e s = s
 
 drawLevelEditor :: State -> Picture
 drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawEnemies texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state]
+                drawEnemies (texCuspo1, texCuspo2) texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
           texTunel = fromJust (lookup "tunel" imagesTheme)
-          texInimigo = fromJust (lookup "inimigo" imagesTheme)
+          texInimigo = fromJust (lookup "inimigo1" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
