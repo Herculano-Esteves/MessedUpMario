@@ -130,7 +130,7 @@ perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (ini
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y{tamanho = (0.5,0.7)} : x ) [] inm) = jog
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
     | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,20)}
 
 animarMorte :: Tempo -> Personagem -> Personagem
