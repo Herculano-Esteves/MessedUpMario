@@ -54,18 +54,21 @@ buttonPress state
     | selectedButton (menuState state) == 0 && currentMenu state == MainMenu = state { currentMenu = LevelSelection}
     | selectedButton (menuState state) == 1 && currentMenu state == MainMenu = state { currentMenu = OptionsMenu, menuState = (menuState state) {selectedButton = 0}}
     | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
-    | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { currentMenu = LevelEditor}
+    | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state {
+        currentMenu = LevelEditor,
+        editorState = (editorState state) {tempGame = jogo' {jogador = jog}}}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | currentMenu state == LevelSelection = state { 
             currentMenu = InGame, 
             currentLevel = selectedButton (menuState state), 
-            initLevel = jog,
+            initLevel = jog',
             levels = replace (levels state) (selectedButton (menuState state), (jog', unlocked))
         }
     | otherwise = state
-    where (jog, unlocked) = (levels state) !! (selectedButton (menuState state))
-          (Mapa (pos, dir) pos1 mat) = mapa jog
-          jog' = jog {jogador = (jogador jog) {posicao = pos}}
+    where (jogo, unlocked) = (levels state) !! (selectedButton (menuState state))
+          jogo' = initLevel state--(levels state) !! (currentLevel state)
+          (Mapa (pos, dir) pos1 mat) = mapa jogo
+          jog' = jogo {jogador = jog {posicao = pos}}
 
 -- ! Remove (?)
 -- | Desenha um botão, recebendo o indice atualmente desenhado, o indíce do próprio botão e o texto correspondente

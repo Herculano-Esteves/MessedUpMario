@@ -42,9 +42,12 @@ timeHandler dTime state
         else return state {animTime = 0}
     | lostGame jogo = return state {
             levels = replace (levels state) ((currentLevel state),((initLevel state) 
-                {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}, unlocked))
+                {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
         }
-    | vida (jogador jogo) == 911 = return state {currentLevel = (currentLevel state) + 1}
+    | vida (jogador jogo) == 911 = return state {
+            currentLevel = (currentLevel state) + 1,
+            levels = replace (levels state) (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1))
+        }
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
     return $ state {
@@ -52,6 +55,9 @@ timeHandler dTime state
         time = (time state) + dTime}
     | otherwise = return state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
+          (jogo1, unlckd1) = (levels state) !! (currentLevel state + 1)
+          (Mapa (pinit1, dir1) _ _) = mapa jogo1
+          (Mapa (pinit, dir) _ _) = mapa $ initLevel state
 
 draw :: State -> IO Picture
 draw state = do

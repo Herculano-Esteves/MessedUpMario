@@ -82,6 +82,7 @@ drawEnemies texinimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->i
                                                             if tipo x == MacacoMalvado then drawEnemy texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy texBoss x (jogador jogo) else drawEnemy texBarril x (jogador jogo))
                                                             (inimigos jogo)
+                                                            
 
 drawEnemy :: Picture -> Personagem -> Personagem -> Picture
 drawEnemy tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel jogador (posicao inim)) (0.3+(snd $ posMapToGlossNivel jogador (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ 

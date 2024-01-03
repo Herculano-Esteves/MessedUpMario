@@ -28,8 +28,9 @@ initialState = State {
     images = [],
     animTime = 2,
     editorState = EditorState {
+        tempGame = jogoSamp,
         levelEditorPos = (0.5,0.5),
-        changingBlocks = True,
+        selectFunc = 0,
         removingEnemies = False
     }
 }
@@ -138,7 +139,7 @@ jog = Personagem {  velocidade = (0,0),
                     vida = 3, 
                     pontos = 0, 
                     ressalta = False, 
-                    posicao = (6.0,5.5), 
+                    posicao = (0.5,0.5), 
                     tamanho = (0.9,1.1), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
