@@ -4,6 +4,11 @@ import LI12324
 --import Tarefa2 (jogoSamp, jog, colec, inm)
 import Graphics.Gloss
 import Utilities
+import Tarefa1
+
+generateInicialHitbox :: Mapa -> Hitbox
+generateInicialHitbox (Mapa ((x,y),b) _ _) = ((x-4,y-3),(x+4,y+3))
+
 
 
 initialState :: State
@@ -83,7 +88,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (13.5,13.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -94,7 +99,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (19.5,5.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -105,7 +110,7 @@ inm = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (9.5,9.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -152,7 +157,7 @@ colec :: [(Colecionavel, Posicao)]
 colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
 
 jogoSamp ::Jogo
-jogoSamp = Jogo mapaTeste inm colec jog False
+jogoSamp = Jogo mapaTeste inm colec jog False (generateInicialHitbox mapaTeste)
 
 emptyMap :: Mapa
 emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
@@ -174,7 +179,7 @@ mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
     ]
 
 jogo1 ::Jogo
-jogo1 = Jogo mapa1 inm colec jog False
+jogo1 = Jogo mapa1 inm colec jog False (generateInicialHitbox mapa1)
 
 
 
@@ -199,7 +204,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (7.5,15.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -210,7 +215,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (3.5,19.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -221,7 +226,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (20.5,7.5), 
-                    tamanho = (0.75,0.75), 
+                    tamanho = (0.7,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
                     temChave = False},
@@ -278,4 +283,5 @@ mapaDoBoss =    [
                 ]
                 
 jogo2 :: Jogo
-jogo2 = Jogo (Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)) inmjogo2 colecjogo2 jog False
+jogo2 = Jogo mapa inmjogo2 colecjogo2 jog False (generateInicialHitbox mapa)
+        where mapa = Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)
