@@ -72,13 +72,14 @@ eventHandlerEditor e s = s
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
     | savingGame $ editorState state = Color red $ scale 0.2 0.2 $ if valida (tempGame $ editorState state) then Text "Saved" else Text "Not saved! Invalid map"
-    | otherwise = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawEnemies (texCuspo1, texCuspo2) texInimigo texMacaco texBarril texBoss jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
+    | otherwise = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
           texTunel = fromJust (lookup "tunel" imagesTheme)
-          texInimigo = fromJust (lookup "inimigo1" imagesTheme)
+          texInimigo1 = fromJust (lookup "inimigo1" imagesTheme)
+          texInimigo2 = fromJust (lookup "inimigo2" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
           texMartelo = fromJust (lookup "martelo" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
@@ -86,7 +87,12 @@ drawLevelEditor state
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
           texBarril = fromJust (lookup "barril" imagesTheme)
           texMorte = fromJust (lookup "morreu" imagesTheme)
-          texBoss = fromJust (lookup "boss1" imagesTheme)
+          texBoss1 = fromJust (lookup "boss1" imagesTheme)
+          texBoss2 = fromJust (lookup "boss2" imagesTheme)
+          texBoss3 = fromJust (lookup "boss3" imagesTheme)
+          texBoss4 = fromJust (lookup "boss4" imagesTheme)
+          texBoss5 = fromJust (lookup "boss5" imagesTheme)
+          texBoss6 = fromJust (lookup "boss6" imagesTheme)
           texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
           texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
@@ -102,7 +108,7 @@ drawLevelEditor' state = Pictures [
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
 
 drawSelBox :: State -> Picture
-drawSelBox state = uncurry Translate (posMapToGlossNivel (jogador $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
+drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
     0 -> Color green
     1 -> Color red
     2 -> Color blue
@@ -110,7 +116,7 @@ drawSelBox state = uncurry Translate (posMapToGlossNivel (jogador $ tempGame $ e
     where (x,y) = posicao $ jogador $ tempGame $ editorState state
 
 drawSpawnPoint :: EditorState -> Picture
-drawSpawnPoint estate = uncurry Translate (posMapToGlossNivel (jogador $ tempGame estate) pos) $ Color (dim magenta) $ circleSolid 10
+drawSpawnPoint estate = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame estate) pos) $ Color (dim magenta) $ circleSolid 10
     where (Mapa (pos,dir) _ _) = mapa $ tempGame estate
 
 drawMapLimits :: EditorState -> Picture

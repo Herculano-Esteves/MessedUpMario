@@ -16,20 +16,26 @@ import Utilities
 import Tarefa4 (atualizaPersonagem, canGoDown)
 import Data.Fixed (mod')
 import Mapas
+import Text.Read (Lexeme(String))
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeVidaJogadorEnd dtime jog
-                         | otherwise = ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                         | otherwise = cameraHitbox dtime $ ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
 distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
+firstDecimal :: Double -> Int
+firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
+
+
+
 
 --Dano Jogador START
 hitboxDanoJogadorFinal :: Jogo -> Jogo
-hitboxDanoJogadorFinal jogo | inimigos jogo == [] = jogo
+hitboxDanoJogadorFinal jogo | null (inimigos jogo) = jogo
                             | otherwise = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
@@ -305,7 +311,7 @@ inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 
 
 
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
-inimigoAndar start mapa enm     | posicao enm == (-5,-5) = enm
+inimigoAndar start mapa enm     | posicao enm == (-20,-20) = enm
                                 | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,snd (velocidade enm))} else enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | not (podeAndarParaEsquerdaBool mapa enm) = enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | not (podeAndarParaDireitaBool mapa enm) = enm {velocidade = (1.5,snd (velocidade enm))}
@@ -415,7 +421,7 @@ moverBoss :: Tempo -> Personagem -> [Personagem] -> [Personagem]
 moverBoss tempo jogador inim = foldl (\x y -> if tipo y == CuspoDeFogo then moverBolaDeFogo tempo jogador y (head (foldl (\x y -> if tipo y == Boss then y : x else x) [] inim)) : x else y : x) [] inim
 
 controlarTempoBoss :: Tempo -> Personagem -> Personagem
-controlarTempoBoss tempo boss = boss {aplicaDano = (False,if snd (aplicaDano boss) <= 0 then 8 else snd (aplicaDano boss)-tempo)}
+controlarTempoBoss tempo boss = boss {aplicaDano = (snd (aplicaDano boss) > 7,if snd (aplicaDano boss) <= 0 then 8 else snd (aplicaDano boss)-tempo)}
 
 moverBolaDeFogo :: Tempo -> Personagem -> Personagem -> Personagem -> Personagem
 moverBolaDeFogo tempo jogador fogo boss | snd (aplicaDano boss) > 0 = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
@@ -431,3 +437,22 @@ ataqueLogeBoss boss fogo (a,b) = fogo {posicao = posicao boss,velocidade = (c,d)
                                 where (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
 
 --Boss AI END
+
+--Contrlo de Camera
+cameraHitbox :: Tempo -> Jogo -> Jogo
+cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux tempo (jogador jogo) (cameraControl jogo) }
+
+cameraHitboxaux :: Tempo -> Personagem -> Hitbox -> Hitbox
+cameraHitboxaux tempo jog hit | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
+--                      esquerda
+                        | ba < bx = ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
+--                      direita
+                        | tb > ty = ((ta,tb-vy*tempo),(ba,bb-vy*tempo))
+                    --  cima
+                        | bb < by = ((ta,tb+vy*tempo),(ba,bb+vy*tempo))
+                    --  baixo
+                        | otherwise = hit
+                     where  ((ta,tb),(ba,bb)) = hit
+                            ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
+                            (z,w) = posicao jog
+                            (vx,vy) = (if abs (fst (velocidade jog)) == 0 then 1 else abs (fst (velocidade jog)),if abs (snd (velocidade jog)) == 0 then 1 else abs (snd (velocidade jog)))

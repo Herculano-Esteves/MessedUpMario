@@ -119,10 +119,39 @@ loadImages state = do
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
     macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
-    boss1mario <- loadBMP "assets/MarioTexture/Boss1.bmp"
+    mortemario <- loadBMP "assets/Death.bmp"
+    --Boss Mario
+    boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
+    boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"
+    boss3mario <- loadBMP "assets/Bosses/Boss3.bmp"
+    boss4mario <- loadBMP "assets/Bosses/Boss4.bmp"
+    boss5mario <- loadBMP "assets/Bosses/Boss5.bmp"
+    boss6mario <- loadBMP "assets/Bosses/Boss6.bmp"
     cuspo1 <- loadBMP "assets/MarioTexture/CuspoFogo1.bmp"
     cuspo2 <- loadBMP "assets/MarioTexture/CuspoFogo2.bmp"
-    mortemario <- loadBMP "assets/Death.bmp"
+    ataque1 <- loadBMP "assets/Bosses/ataque/ataque1.bmp"
+    ataque2 <- loadBMP "assets/Bosses/ataque/ataque2.bmp"
+    ataque3 <- loadBMP "assets/Bosses/ataque/ataque3.bmp"
+    ataque4 <- loadBMP "assets/Bosses/ataque/ataque4.bmp"
+    ataque5 <- loadBMP "assets/Bosses/ataque/ataque5.bmp"
+    ataque6 <- loadBMP "assets/Bosses/ataque/ataque6.bmp"
+    ataque7 <- loadBMP "assets/Bosses/ataque/ataque7.bmp"
+    ataque8 <- loadBMP "assets/Bosses/ataque/ataque8.bmp"
+    ataque9 <- loadBMP "assets/Bosses/ataque/ataque9.bmp"
+    ataque10 <- loadBMP "assets/Bosses/ataque/ataque10.bmp"
+    -- Estrela mario
+    estrela1 <- loadBMP "assets/Estrela/Estrela1.bmp"
+    estrela2 <- loadBMP "assets/Estrela/Estrela2.bmp"
+    estrela3 <- loadBMP "assets/Estrela/Estrela3.bmp"
+    estrela4 <- loadBMP "assets/Estrela/Estrela4.bmp"
+    estrela5 <- loadBMP "assets/Estrela/Estrela5.bmp"
+    estrela6 <- loadBMP "assets/Estrela/Estrela6.bmp"
+    estrela7 <- loadBMP "assets/Estrela/Estrela7.bmp"
+    estrela8 <- loadBMP "assets/Estrela/Estrela8.bmp"
+    estrela9 <- loadBMP "assets/Estrela/Estrela9.bmp"
+    estrela10 <- loadBMP "assets/Estrela/Estrela10.bmp"
+    estrela11 <- loadBMP "assets/Estrela/Estrela11.bmp"
+    estrela12 <- loadBMP "assets/Estrela/Estrela12.bmp"
 
     
     -- Start of Minecraft theme
@@ -183,9 +212,39 @@ loadImages state = do
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
             ("morreu",mortemario),
+            -- Boss Mario
             ("boss1", boss1mario),
+            ("boss2", boss2mario),
+            ("boss3", boss3mario),
+            ("boss4", boss4mario),
+            ("boss5", boss5mario),
+            ("boss6", boss6mario),
             ("cuspo1",cuspo1),
-            ("cuspo2",cuspo2)]),
+            ("cuspo2",cuspo2),
+            ("ataqueboss1",ataque1),
+            ("ataqueboss2",ataque2),
+            ("ataqueboss3",ataque3),
+            ("ataqueboss4",ataque4),
+            ("ataqueboss5",ataque5),
+            ("ataqueboss6",ataque6),
+            ("ataqueboss7",ataque7),
+            ("ataqueboss8",ataque8),
+            ("ataqueboss9",ataque9),
+            ("ataqueboss10",ataque10),
+            -- Estrela Mario
+            ("estrela1",estrela1),
+            ("estrela2",estrela2),
+            ("estrela3",estrela3),
+            ("estrela4",estrela4),
+            ("estrela5",estrela5),
+            ("estrela6",estrela6),
+            ("estrela7",estrela7),
+            ("estrela8",estrela8),
+            ("estrela9",estrela9),
+            ("estrela10",estrela10),
+            ("estrela11",estrela11),
+            ("estrela12",estrela12)
+            ]),
             (Minecraft,
             [("marioParado", steveandar),
             ("marioAndar1", steveandar1),

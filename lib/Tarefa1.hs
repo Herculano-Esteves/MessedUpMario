@@ -17,7 +17,7 @@ import Graphics.Gloss.Interface.Environment (getScreenSize)
 
 
 escalaGloss :: Double
-escalaGloss = 50
+escalaGloss = 75
 
 dimensaobloco :: Double
 dimensaobloco = 1
