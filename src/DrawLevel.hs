@@ -39,7 +39,7 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawHitbox jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+drawLevel state = Pictures [drawHitbox jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
                 if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawCameracontrol jogo]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
@@ -89,7 +89,7 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: State -> (Picture,Picture) ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
-drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy jogo (playAnim (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
+drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy jogo texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
                                                             if tipo x == CuspoDeFogo then drawEnemy jogo (if even (floor (fst (posicao x)) + floor (snd (posicao x))) then fst cuspo else snd cuspo) x (jogador jogo) else drawEnemy jogo texBarril x (jogador jogo))
@@ -128,13 +128,27 @@ drawHitbox jogo jogador inm = (Color green $ uncurry Translate (posMapToGlossNiv
           aux :: Hitbox -> ((Float,Float),(Float,Float))
           aux (p1,p2) = (posMapToGlossNivel (cameraControl jogo) p1, posMapToGlossNivel (cameraControl jogo) p2)
 
-drawColecs :: Picture -> Picture -> Picture -> Jogo -> Picture
-drawColecs moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (Scale 0.7 0.7 moeda) else
+drawColecs :: State -> Picture -> Picture -> Picture -> Jogo -> Picture
+drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (Scale 0.7 0.7 moeda) else
                                                      if colec == Martelo then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo else
                                                      if colec == Chave then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) chave else
+                                                     if colec == Estrela then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (playAnimAny (length estrelaAnim -3) (time state) estrelaAnim) else
                                                      uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo)
-
-                                (colecionaveis jogo)
+                                                     (colecionaveis jogo)
+                                                     where  estrelaAnim = [estrela1,estrela2,estrela3,estrela4,estrela5,estrela6,estrela7,estrela8,estrela9,estrela10,estrela11,estrela12]
+                                                            estrela1 = fromJust (lookup "estrela1" imagesTheme)
+                                                            estrela2 = fromJust (lookup "estrela2" imagesTheme)
+                                                            estrela3 = fromJust (lookup "estrela3" imagesTheme)
+                                                            estrela4 = fromJust (lookup "estrela4" imagesTheme)
+                                                            estrela5 = fromJust (lookup "estrela5" imagesTheme)
+                                                            estrela6 = fromJust (lookup "estrela6" imagesTheme)
+                                                            estrela7 = fromJust (lookup "estrela7" imagesTheme)
+                                                            estrela8 = fromJust (lookup "estrela8" imagesTheme)
+                                                            estrela9 = fromJust (lookup "estrela9" imagesTheme)
+                                                            estrela10 = fromJust (lookup "estrela10" imagesTheme)
+                                                            estrela11 = fromJust (lookup "estrela11" imagesTheme)
+                                                            estrela12 = fromJust (lookup "estrela12" imagesTheme)
+                                                            imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 drawHammer :: Jogo -> Picture -> Personagem -> Picture
 drawHammer jogo tex jog = Translate (fst (posMapToGlossNivel (cameraControl jogo) (posicao jog)) + (if direcao jog == Este then d2f escalaGloss else d2f (-escalaGloss))) (snd (posMapToGlossNivel (cameraControl jogo) (posicao jog))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) tex

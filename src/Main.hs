@@ -127,7 +127,19 @@ loadImages state = do
     ataque8 <- loadBMP "assets/Bosses/ataque/ataque8.bmp"
     ataque9 <- loadBMP "assets/Bosses/ataque/ataque9.bmp"
     ataque10 <- loadBMP "assets/Bosses/ataque/ataque10.bmp"
-    
+    -- Estrela mario
+    estrela1 <- loadBMP "assets/Estrela/Estrela1.bmp"
+    estrela2 <- loadBMP "assets/Estrela/Estrela2.bmp"
+    estrela3 <- loadBMP "assets/Estrela/Estrela3.bmp"
+    estrela4 <- loadBMP "assets/Estrela/Estrela4.bmp"
+    estrela5 <- loadBMP "assets/Estrela/Estrela5.bmp"
+    estrela6 <- loadBMP "assets/Estrela/Estrela6.bmp"
+    estrela7 <- loadBMP "assets/Estrela/Estrela7.bmp"
+    estrela8 <- loadBMP "assets/Estrela/Estrela8.bmp"
+    estrela9 <- loadBMP "assets/Estrela/Estrela9.bmp"
+    estrela10 <- loadBMP "assets/Estrela/Estrela10.bmp"
+    estrela11 <- loadBMP "assets/Estrela/Estrela11.bmp"
+    estrela12 <- loadBMP "assets/Estrela/Estrela12.bmp"
 
     
     -- Start of Minecraft theme
@@ -206,7 +218,20 @@ loadImages state = do
             ("ataqueboss7",ataque7),
             ("ataqueboss8",ataque8),
             ("ataqueboss9",ataque9),
-            ("ataqueboss10",ataque10)
+            ("ataqueboss10",ataque10),
+            -- Estrela Mario
+            ("estrela1",estrela1),
+            ("estrela2",estrela2),
+            ("estrela3",estrela3),
+            ("estrela4",estrela4),
+            ("estrela5",estrela5),
+            ("estrela6",estrela6),
+            ("estrela7",estrela7),
+            ("estrela8",estrela8),
+            ("estrela9",estrela9),
+            ("estrela10",estrela10),
+            ("estrela11",estrela11),
+            ("estrela12",estrela12)
             ]),
             (Minecraft,
             [("marioParado", steveandar),

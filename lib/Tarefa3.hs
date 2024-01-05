@@ -35,7 +35,7 @@ firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
 
 --Dano Jogador START
 hitboxDanoJogadorFinal :: Jogo -> Jogo
-hitboxDanoJogadorFinal jogo | inimigos jogo == [] = jogo
+hitboxDanoJogadorFinal jogo | null (inimigos jogo) = jogo
                             | otherwise = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
