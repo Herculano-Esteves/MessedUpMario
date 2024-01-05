@@ -56,7 +56,7 @@ buttonPress state
     | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
     | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state {
         currentMenu = LevelEditor,
-        editorState = (editorState state) {tempGame = jogo' {jogador = jog}}}
+        editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | currentMenu state == LevelSelection = state { 
             currentMenu = InGame, 

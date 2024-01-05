@@ -31,6 +31,16 @@ window = InWindow
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
+eventHandler (EventKey (Char 'u') Down _ _) state = do
+    writeFile "game.txt" (show (tempGame $ editorState state))
+    return $ state
+eventHandler (EventKey (Char 'y') Down _ _) state = do
+    gameFile <-readFile "game.txt"
+    return $ state {
+        editorState = (editorState state) {
+            tempGame = read gameFile
+        }
+    }
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo, unlocked))}
     | currentMenu state == LevelEditor = reactLevelEditor event state
@@ -72,7 +82,9 @@ draw state = do
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
-    putStrLn("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn ("selected Level: " ++ show (currentLevel state))
+    putStrLn ("length Level: " ++ show (length $ levels state))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)

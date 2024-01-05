@@ -19,7 +19,7 @@ import Mapas
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeVidaJogadorEnd dtime jog
-                         | otherwise = bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                         | otherwise = ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -269,6 +269,18 @@ checkEscadaList mapa = map (checkEscadaAux mapa)
 
 checkEscadaAux :: Mapa -> Personagem -> Personagem
 checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = any (\pos -> floorPos (posicao perso) == pos) (getPosOfBlock Escada mat) || any (\(x,y) -> floorPos (posicao perso) == (x,y-1)) (getPosOfBlock Escada mat) && any (\(x,y) -> floorPos (posicao perso) == (x,y)) (getPosOfBlock Plataforma mat)}
+
+ladderConditions :: Jogo -> Jogo
+ladderConditions jog = jog {
+    jogador = (jogador jog) {
+        velocidade = if (emEscada (jogador jog) &&
+            (snd $ velocidade $ jogador jog) < 0 && 
+            (snd $ velocidade $ jogador jog) /= -ladderSpeed ) then
+                (0,0)
+            else
+                velocidade $ jogador jog
+    }
+}
 
 --INICIO DE AI
 

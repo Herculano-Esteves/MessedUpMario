@@ -1,7 +1,6 @@
 module Mapas where
 
 import LI12324
---import Tarefa2 (jogoSamp, jog, colec, inm)
 import Graphics.Gloss
 import Utilities
 
@@ -31,7 +30,8 @@ initialState = State {
         tempGame = jogoSamp,
         levelEditorPos = (0.5,0.5),
         selectFunc = 0,
-        removingEnemies = False
+        removingEnemies = False,
+        savingGame = False
     }
 }
 
