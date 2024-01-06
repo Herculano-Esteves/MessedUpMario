@@ -30,8 +30,8 @@ distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 firstDecimal :: Double -> Int
 firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
 
-
-
+onlyOneTipo :: [Personagem] -> Entidade -> ([Personagem],[Personagem])
+onlyOneTipo lista ent = foldl (\(a,b) y -> if tipo y == ent then (y : a,b) else (a,y : b)) ([],[]) lista
 
 --Dano Jogador START
 hitboxDanoJogadorFinal :: Jogo -> Jogo
@@ -232,13 +232,13 @@ removerUmAlcapao y x l jog bloco  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0
 
 --Logistica de movimento Start
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
@@ -319,7 +319,7 @@ inimigoAndar start mapa enm     | posicao enm == (-20,-20) = enm
                                 | all not (foldl (\x y -> sobreposicao ((p3,p4),(p3+0.1,p4-0.5)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = enm {velocidade = (-1.5,snd (velocidade enm))}
                                 | otherwise = enm {velocidade = (fst (velocidade enm),0)}
                                 where ((p1,p2),(p3,p4)) = genHitbox enm
-                                      p = (any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
+                                      p = (any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta,Espinho] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
 inimigosubirdescerescada start mapa enm --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
@@ -383,59 +383,65 @@ removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p
 --Portas End
 
 --Macaco Malvado Start
-
 movimentoMacacoMalvado :: Tempo -> Jogo -> Jogo
-movimentoMacacoMalvado tempo jogo = jogo {inimigos = aimacacomalvado tempo (inimigos jogo) (jogador jogo)}
+movimentoMacacoMalvado tempo jogo   | MacacoMalvado `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaBarris (mapa jogo) tempo (animaMacacoMalvado tempo (jogador jogo) a) c ++ d}
+                                    | otherwise = jogo
+                                    where   (a,b) = onlyOneTipo (inimigos jogo) MacacoMalvado
+                                            (c,d) = onlyOneTipo b Barril
 
-aimacacomalvado :: Tempo -> [Personagem] -> Personagem-> [Personagem]
-aimacacomalvado tempo enm p | null enm = enm
-                            | otherwise = ataqueMacacoBarril tempo (foldl (\x y -> if tipo y == MacacoMalvado then aimacacomalvadoaux tempo y p : x else y : x) [] enm)
-
-aimacacomalvadoaux :: Tempo -> Personagem -> Personagem -> Personagem
-aimacacomalvadoaux tempo enm jogador = enm  {posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
+--sabendo que só pode existir um macaco malvado no mapa
+animaMacacoMalvado :: Tempo -> Personagem -> [Personagem] -> Personagem
+animaMacacoMalvado tempo jogador macaco = enm{posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
                                              velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,snd (velocidade enm)) else (2,snd (velocidade enm)),
                                              aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
+                                        where enm = head macaco
 
-ataqueMacacoBarril :: Tempo -> [Personagem] -> [Personagem]
-ataqueMacacoBarril tempo lista  | null barril && null macaco = resto
-                                | null barril = macaco ++ resto
-                                | null macaco = barril ++ resto
-                                | otherwise = ataqueMacacoBarrilaux tempo (head barril) (head macaco) : (macaco ++ resto)
-                                where (barril,macaco,resto) = foldl (\(a,b,c) y -> if tipo y == MacacoMalvado then (a, [y],c) else if tipo y == Barril then ([y], b, c) else (a,b, y : c)) ([],[],[]) lista
+movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
+movimentaBarris mapa tempo macaco lista | snd(aplicaDano macaco) == 8 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}] 
+                                        | null lista = [macaco]
+                                        | otherwise = macaco : foldl (\x y -> if sobreposicao ((a,b),(c,d)) (genHitbox y) then movimentaBarrisaux tempo y macaco : x else x) [] lista
+                                        where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
 
 
-ataqueMacacoBarrilaux :: Tempo -> Personagem -> Personagem -> Personagem
-ataqueMacacoBarrilaux tempo barril macaco   | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
-                                            | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
-                                            | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
-
+movimentaBarrisaux :: Tempo -> Personagem -> Personagem -> Personagem
+movimentaBarrisaux tempo barril macaco  | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
+                                        | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
+                                        | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
 --Macaco Malvado End
 
 --Boss AI START
-
 bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = map (\inm -> if tipo inm == Boss then controlarTempoBoss tempo inm else inm) (moverBoss tempo (jogador jogo) (inimigos jogo))}
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = ataqueDoBoss tempo (jogador jogo) ( movimentaBoss tempo a) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
                             | otherwise = jogo
+                            where   (a,b) = onlyOneTipo (inimigos jogo) Boss
+                                    (c,d) = onlyOneTipo b CuspoDeFogo
 
-moverBoss :: Tempo -> Personagem -> [Personagem] -> [Personagem]
-moverBoss tempo jogador inim = foldl (\x y -> if tipo y == CuspoDeFogo then moverBolaDeFogo tempo jogador y (head (foldl (\x y -> if tipo y == Boss then y : x else x) [] inim)) : x else y : x) [] inim
+--Sabendo que so pode existir um boss
+movimentaBoss :: Tempo -> [Personagem] -> Personagem
+movimentaBoss tempo bosses = boss {aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss)}
+                    where   boss = head bosses
+                            tboss = snd (aplicaDano boss)-tempo
 
-controlarTempoBoss :: Tempo -> Personagem -> Personagem
-controlarTempoBoss tempo boss = boss {aplicaDano = (snd (aplicaDano boss) > 7,if snd (aplicaDano boss) <= 0 then 8 else snd (aplicaDano boss)-tempo)}
+ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
+ataqueDoBoss tempo jogador boss   | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                            | tboss == 8-42*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                           
+                            | otherwise = [boss]
+                            where tboss = snd (aplicaDano boss)
+                                  (bx,by) = posicao boss
+                                  (jx,jy) = posicao jogador
+                                  (a,b) = (jx-bx,jy-by)
+                                  (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
 
-moverBolaDeFogo :: Tempo -> Personagem -> Personagem -> Personagem -> Personagem
-moverBolaDeFogo tempo jogador fogo boss | snd (aplicaDano boss) > 0 = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
-                                --      | distancia (posicao(jogador)) (posicao(boss)) < 1 = fogo
-                                        | otherwise = ataqueLogeBoss boss fogo (jx-bx,jy-by)
-                                        where   (bx,by) = posicao boss
-                                                (jx,jy) = posicao jogador
-                                                (fx,fy) = posicao fogo
-                                                (vx,vy) = velocidade fogo
+movimentaCuspo :: Mapa -> Tempo -> [Personagem] -> [Personagem]
+movimentaCuspo mapa tempo cuspos | null cuspos = cuspos
+                            | otherwise = foldl (\x y -> if sobreposicao ((a,b),(d,c)) (genHitbox y) then movimentaCuspoaux tempo y : x else x) [] cuspos
+                            where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
 
-ataqueLogeBoss :: Personagem -> Personagem -> (Double,Double) -> Personagem
-ataqueLogeBoss boss fogo (a,b) = fogo {posicao = posicao boss,velocidade = (c,d)}
-                                where (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
-
+movimentaCuspoaux :: Tempo -> Personagem -> Personagem
+movimentaCuspoaux tempo fogo = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
+                where   (fx,fy) = posicao fogo
+                        (vx,vy) = velocidade fogo
 --Boss AI END
 
 --Contrlo de Camera
@@ -456,3 +462,4 @@ cameraHitboxaux tempo jog hit | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
                             ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
                             (z,w) = posicao jog
                             (vx,vy) = (if abs (fst (velocidade jog)) == 0 then 1 else abs (fst (velocidade jog)),if abs (snd (velocidade jog)) == 0 then 1 else abs (snd (velocidade jog)))
+--Camera control end

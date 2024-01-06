@@ -39,8 +39,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawHitbox jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawCameracontrol jogo]
+drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -60,13 +60,16 @@ drawLevel state = Pictures [drawHitbox jogo (jogador jogo) (jogador jogo), drawH
           texBoss4 = fromJust (lookup "boss4" imagesTheme)
           texBoss5 = fromJust (lookup "boss5" imagesTheme)
           texBoss6 = fromJust (lookup "boss6" imagesTheme)
+          texcamera = fromJust (lookup "cameraman" imagesTheme)
           texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
           texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
+          texEspinho = fromJust (lookup "espinho" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           (jogo, unlocked) = levels state !! currentLevel state
 
-drawCameracontrol :: Jogo -> Picture
-drawCameracontrol jogo = color green $ rectangleWire (75*7) (75 * 5)
+drawCameracontrol :: Bool ->Picture -> Jogo -> Picture
+drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75*7) (75 * 5)
+                                | otherwise = Pictures []
 
 -- ? Set a scale for drawng according to the size of the wind
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
@@ -89,10 +92,10 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
 
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: State -> (Picture,Picture) ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
-drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
-                                                            if tipo x == MacacoMalvado then drawEnemy jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy jogo texBarril x (jogador jogo) else
-                                                            if tipo x == Boss then drawEnemy jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
-                                                            if tipo x == CuspoDeFogo then drawEnemy jogo (if even (floor (fst (posicao x)) + floor (snd (posicao x))) then fst cuspo else snd cuspo) x (jogador jogo) else drawEnemy jogo texBarril x (jogador jogo))
+drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
+                                                            if tipo x == MacacoMalvado then drawEnemy controlo jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
+                                                            if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
+                                                            if tipo x == CuspoDeFogo then drawEnemy controlo jogo (if even (floor (fst (posicao x)) + floor (snd (posicao x))) then fst cuspo else snd cuspo) x (jogador jogo) else drawEnemy controlo jogo texBarril x (jogador jogo))
                                                             (inimigos jogo)
                                                             where   ataqueboss = [texataque1,texataque2,texataque3,texataque4,texataque5,texataque6,texataque7,texataque8,texataque9,texataque10]
                                                                     texataque1 = fromJust (lookup "ataqueboss1" imagesTheme)
@@ -108,21 +111,23 @@ drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ ma
                                                                     imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                                     escala = realToFrac (snd (aplicaDano jog))
                                                                     (jogo, unlocked) = levels state !! currentLevel state
+                                                                    controlo = cheats state
 
 
 
-drawEnemy :: Jogo -> Picture -> Personagem -> Personagem -> Picture
-drawEnemy jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture
+drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
                                 if tipo inim == Barril then Rotate (fromInteger (floor (snd (posicao inim)))*90) $ Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex else
                                 if tipo inim == Boss then Scale (if fst (posicao jogador) > fst (posicao inim) then -2.2 else 2.2) 2.2 tex else
                                 if tipo inim == CuspoDeFogo then Rotate (-atan2 (d2f vx) (d2f vy) * 180 / pi) tex else
                                 if tipo inim == Fantasma then Scale (if fst (velocidade inim) > 0 then 1.2 else -1.2) 1.2 tex else
                                 Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex
-                                , drawHitbox jogo jogador inim]
+                                , drawHitbox controlo jogo jogador inim]
                                 where (vx,vy) = velocidade inim
 
-drawHitbox :: Jogo -> Personagem -> Personagem -> Picture
-drawHitbox jogo jogador inm = (Color green $ uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao inm)) $ rectangleWire tx ty)
+drawHitbox :: Bool -> Jogo -> Personagem -> Personagem -> Picture
+drawHitbox controlo jogo jogador inm    | controlo = (Color green $ uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao inm)) $ rectangleWire tx ty)
+                                        | otherwise = Pictures []
     where tx = fst (snd $ aux (genHitbox inm)) - fst (fst $ aux (genHitbox inm))
           ty = snd (snd $ aux (genHitbox inm)) - snd (fst $ aux (genHitbox inm))
           aux :: Hitbox -> ((Float,Float),(Float,Float))
@@ -183,6 +188,11 @@ drawTunel jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNiv
 
 drawPorta :: Jogo -> Picture -> Picture
 drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Porta] (1*0.5,1*0.5) (mapa jogo)))
+
+drawEspinho :: Jogo -> Picture -> Picture
+drawEspinho jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Espinho] (1*0.5,1*0.5) (mapa jogo)))
+
+
 
 playAnim :: Float -> [Picture] -> Picture
 playAnim time texs

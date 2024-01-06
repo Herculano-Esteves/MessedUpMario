@@ -15,7 +15,8 @@ initialState = State {
     levels = [
         (jogoSamp, True),
         (jogo1, False),
-        (jogo2,False)
+        (jogo2,False),
+        (jogoTurorial,False)
         ],
     initLevel = jogoSamp,
     currentLevel = 0,
@@ -37,7 +38,8 @@ initialState = State {
         selectFunc = 0,
         removingEnemies = False,
         savingGame = False
-    }
+    },
+    cheats = False
 }
 
 data Letra
@@ -47,6 +49,22 @@ data Letra
     | V
     | T
     | O
+    | D
+
+mapaTutorialLetras :: [[Letra]]
+mapaTutorialLetras = 
+    [
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,D,D,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]
+    ]
+
 
 
 mapaTradutor :: [[Letra]] -> [[Bloco]]
@@ -60,6 +78,7 @@ trocaLetras a = case a of
                 V -> Vazio
                 T -> Tunel
                 O -> Porta
+                D -> Espinho
 
 
 mapaTeste = Mapa ((6.0,5.5), Oeste) (0.5, 5.5)
@@ -79,6 +98,30 @@ mapaTeste = Mapa ((6.0,5.5), Oeste) (0.5, 5.5)
     ,[Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio,Vazio]
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ]
+
+cuspopersonagem = Personagem {velocidade = (0,0), 
+                    tipo = CuspoDeFogo, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (-100.5,-100.5), 
+                    tamanho = (0.5,0.5), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False}
+
+barrilpersonagem =Personagem {velocidade = (0,0), 
+                    tipo = Barril, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (-5,0), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False}
 
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
@@ -124,17 +167,6 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
-        Personagem {velocidade = (0,0), 
-                    tipo = Barril, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (-5,0), 
-                    tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste,
                     temChave = False}
                     ]
 jog :: Personagem
@@ -160,7 +192,7 @@ jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog False (generateInicialHitbox mapaTeste)
 
 emptyMap :: Mapa
-emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
+emptyMap = Mapa ((2,2),Norte) (0,0) [[]]
 
 mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
@@ -238,18 +270,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     ressalta = True, 
                     posicao = (10.5,10.5), 
                     tamanho = (1,1), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste,
-                    temChave = False},
-        Personagem {velocidade = (0,0), 
-                    tipo = CuspoDeFogo, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (-100.5,-100.5), 
-                    tamanho = (0.5,0.5), 
-                    aplicaDano = (False, 0), 
+                    aplicaDano = (False, 6), 
                     direcao = Oeste,
                     temChave = False}
                     ]
@@ -285,3 +306,6 @@ mapaDoBoss =    [
 jogo2 :: Jogo
 jogo2 = Jogo mapa inmjogo2 colecjogo2 jog False (generateInicialHitbox mapa)
         where mapa = Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)
+
+jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog False (generateInicialHitbox mapa)
+            where mapa = Mapa ((3,3.5),Norte) (0,0) (mapaTradutor mapaTutorialLetras)
