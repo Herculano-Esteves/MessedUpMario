@@ -16,7 +16,8 @@ initialState = State {
     levels = [
         (jogoSamp, True),
         (jogo1, False),
-        (jogo2,False)
+        (jogo2,False),
+        (jogoTurorial,False)
         ],
     initLevel = jogoSamp,
     currentLevel = 0,
@@ -37,7 +38,8 @@ initialState = State {
         levelEditorPos = (0.5,0.5),
         selectFunc = 0,
         removingEnemies = False
-    }
+    },
+    cheats = False
 }
 
 data Letra
@@ -47,6 +49,22 @@ data Letra
     | V
     | T
     | O
+    | D
+
+mapaTutorialLetras :: [[Letra]]
+mapaTutorialLetras = 
+    [
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,D,D,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],
+        [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P]
+    ]
+
 
 
 mapaTradutor :: [[Letra]] -> [[Bloco]]
@@ -60,6 +78,7 @@ trocaLetras a = case a of
                 V -> Vazio
                 T -> Tunel
                 O -> Porta
+                D -> Espinho
 
 
 mapaTeste = Mapa ((6.0,5.5), Oeste) (0.5, 5.5)
@@ -173,7 +192,7 @@ jogoSamp ::Jogo
 jogoSamp = Jogo mapaTeste inm colec jog False (generateInicialHitbox mapaTeste)
 
 emptyMap :: Mapa
-emptyMap = Mapa ((0,0),Norte) (0,0) [[]]
+emptyMap = Mapa ((2,2),Norte) (0,0) [[]]
 
 mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
@@ -287,3 +306,6 @@ mapaDoBoss =    [
 jogo2 :: Jogo
 jogo2 = Jogo mapa inmjogo2 colecjogo2 jog False (generateInicialHitbox mapa)
         where mapa = Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)
+
+jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog False (generateInicialHitbox mapa)
+            where mapa = Mapa ((3,3.5),Norte) (0,0) (mapaTradutor mapaTutorialLetras)

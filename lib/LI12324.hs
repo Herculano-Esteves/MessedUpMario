@@ -30,6 +30,7 @@ data Bloco
   | Vazio        -- ^ Espaço
   | Tunel        -- ^ Ponto de Partida
   | Porta        -- ^ Possivel abrir com chave
+  | Espinho      -- ^ Espinhos
   deriving (Ord, Eq, Read, Show)
 
 -- | Mapa de um 'Jogo', composto por uma posição e direção inicial, posição final e uma matriz de blocos.

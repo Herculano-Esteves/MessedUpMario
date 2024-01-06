@@ -1,7 +1,7 @@
 module Main where
 
 import Graphics.Gloss
-import Graphics.Gloss.Interface.IO.Game 
+import Graphics.Gloss.Interface.IO.Game
 
 import LI12324
 import Tarefa1
@@ -31,19 +31,20 @@ window = InWindow
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
+eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state)}
 eventHandler event state
-    | currentMenu state == InGame = return state {levels = replace (levels state) ((currentLevel state),(eventHandlerInGame event jogo, unlocked))}
+    | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
     | currentMenu state == LevelEditor = reactLevelEditor event state
     | otherwise = eventHandlerInMenu event state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
-timeHandler dTime state 
+timeHandler dTime state
     | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         else return state {animTime = 0}
     | lostGame jogo = return state {
-            levels = replace (levels state) ((currentLevel state),((initLevel state) 
+            levels = replace (levels state) ((currentLevel state),((initLevel state)
                 {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
         }
     | vida (jogador jogo) == 911 = return state {
@@ -72,12 +73,12 @@ draw state = do
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
-    putStrLn("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else if (currentMenu state == LevelEditor) then return (drawLevelEditor state)
-    
+
     else return (drawMenu state)
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
@@ -98,6 +99,7 @@ loadImages state = do
     escada <- loadBMP "assets/MarioTexture/ladder.bmp"
     alcapao <- loadBMP "assets/MarioTexture/Alcapao.bmp"
     tunel <- loadBMP "assets/MarioTexture/Tunel.bmp"
+    cameraman <- loadBMP "assets/MarioTexture/CameraMan.bmp"
     inimigo1 <- loadBMP "assets/MarioTexture/Fantasma1.bmp"
     inimigo2 <- loadBMP "assets/MarioTexture/Fantasma2.bmp"
     moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
@@ -107,6 +109,7 @@ loadImages state = do
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
     macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
+    espinho <- loadBMP "assets/MarioTexture/Espinho.bmp"
     mortemario <- loadBMP "assets/Death.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
@@ -141,7 +144,7 @@ loadImages state = do
     estrela11 <- loadBMP "assets/Estrela/Estrela11.bmp"
     estrela12 <- loadBMP "assets/Estrela/Estrela12.bmp"
 
-    
+
     -- Start of Minecraft theme
     relva <- loadBMP "assets/MinecraftTexture/relva.bmp"
     moedaminecraft <- loadBMP "assets/MinecraftTexture/Moedaminecraft.bmp"
@@ -200,6 +203,8 @@ loadImages state = do
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
             ("morreu",mortemario),
+            ("cameraman", cameraman),
+            ("espinho",espinho),
             -- Boss Mario
             ("boss1", boss1mario),
             ("boss2", boss2mario),

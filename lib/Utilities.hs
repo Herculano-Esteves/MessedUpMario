@@ -17,7 +17,8 @@ data State = State {
     exitGame :: Bool,
     images :: Images,
     animTime :: Float,
-    editorState :: EditorState
+    editorState :: EditorState,
+    cheats :: Bool
 }
 
 data Options = Options {
