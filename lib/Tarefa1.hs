@@ -28,7 +28,7 @@ dimensaobloco = 1
 
 -- | caso a personagem esteja fora do mapa a personagem esta a colidir com as paredes externas, || personagens a colidir com as platafromas do mapa
 
---dimensao de cada bloco é 10x10 por
+--dimensao de cada bloco é 1x1 por
 colisoesParede :: Mapa -> Personagem -> Bool
 colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes dimensaobloco mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
 
