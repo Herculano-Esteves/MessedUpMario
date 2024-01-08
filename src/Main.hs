@@ -25,6 +25,8 @@ window = InWindow
     "Donkeykong"
     sizeWin --(700,700)
     (300,200)
+-- window :: Display
+-- window = FullScreen
 
 
 
@@ -184,6 +186,19 @@ loadImages state = do
     botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
     botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
     botaoQuitPressed <- loadBMP "assets/Buttons/BotaoQuitPressed.bmp"
+    -- Numbers
+    um <- loadBMP "assets/Numbers/Um.bmp"
+    dois <- loadBMP "assets/Numbers/Dois.bmp"
+    tres <- loadBMP "assets/Numbers/Tres.bmp"
+    quatro <- loadBMP "assets/Numbers/Quatro.bmp"
+    cinco <- loadBMP "assets/Numbers/Cinco.bmp"
+    seis <- loadBMP "assets/Numbers/Seis.bmp"
+    sete <- loadBMP "assets/Numbers/Sete.bmp"
+    oito <- loadBMP "assets/Numbers/Oito.bmp"
+    nove <- loadBMP "assets/Numbers/Nove.bmp"
+    zero <- loadBMP "assets/Numbers/Zero.bmp"
+    -- Backgrounds
+    bgMenu <- loadBMP "assets/Backgrounds/menubackgrounds.bmp"
     return  state {
         images = [
             (Default,
@@ -248,7 +263,20 @@ loadImages state = do
             ("estrela9",estrela9),
             ("estrela10",estrela10),
             ("estrela11",estrela11),
-            ("estrela12",estrela12)
+            ("estrela12",estrela12),
+            -- numeros
+            ("um", um),
+            ("dois", dois),
+            ("tres", tres),
+            ("quatro", quatro),
+            ("cinco", cinco),
+            ("seis", seis),
+            ("sete", sete),
+            ("oito", oito),
+            ("nove", nove),
+            ("zero", zero),
+            -- Backgrounds
+            ("bgMenu", bgMenu)
             ]),
             (Minecraft,
             [("marioParado", steveandar),
