@@ -160,7 +160,8 @@ addNewLevel state = state {
             ],
             mapa = genEmptyMap (22,15),
             lostGame = 3,
-            cameraControl = ((0,0),(0,0))
+            cameraControl = ((0,0),(0,0)),
+            animacaoJogo = 0
           }
 
 genEmptyMap :: (Int, Int) -> Mapa
