@@ -19,8 +19,9 @@ import Mapas
 import Text.Read (Lexeme(String))
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
-                         | otherwise = cameraHitbox dtime $ ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+movimenta seed dtime jog    | lostGame jog == 5 = jog
+                            | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
+                            | otherwise = cameraHitbox dtime $ ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 

@@ -32,7 +32,8 @@ window = InWindow
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
-eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu,levels = replace (levels state) (currentLevel state,(jogo {lostGame = 4}, unlocked))}
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
 eventHandler (EventKey (Char 'u') Down _ _) state = do
     writeFile "game.txt" (show (tempGame $ editorState state))
     return $ state
@@ -41,8 +42,10 @@ eventHandler (EventKey (Char 'y') Down _ _) state = do
     return $ state {
         editorState = (editorState state) {
             tempGame = read gameFile
-        }
-    }
+        }}
+eventHandler (EventKey (Char 'p') Down _ _) state = return $ state {levels = replace (levels state) (currentLevel state,(jogo {lostGame = if lostGame jogo == 3 then 5 else 3}, unlocked))}
+    where (jogo, unlocked) = (levels state) !! (currentLevel state)
+    
 eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state)}
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
