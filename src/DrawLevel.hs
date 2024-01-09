@@ -177,8 +177,8 @@ drawHud jogo tex1 = pictures []
 
 
 drawMorte :: Jogo -> Picture -> Picture
-drawMorte jogo img = uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao (jogador jogo))) $ if snd (aplicaDano (jogador jogo)) > 0 && not (fst (aplicaDano (jogador jogo))) then scale (20*escala) (20*escala) img else scale 0 0 img
-                    where escala = realToFrac (snd (aplicaDano (jogador jogo)))-16.7
+drawMorte jogo img = uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao (jogador jogo))) $ if animacaoJogo jogo > 0 then scale (20*escala) (20*escala) img else scale 0 0 img
+                    where escala = realToFrac (animacaoJogo jogo)*2+0.4
 
 drawLadder :: Jogo -> Picture -> Picture
 drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))

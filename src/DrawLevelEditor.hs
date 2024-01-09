@@ -132,7 +132,7 @@ addNewLevel state = state {
             inimigos = [],
             colecionaveis = [],
             mapa = genEmptyMap (22,15),
-            lostGame = False
+            lostGame = 3
           }
 
 genEmptyMap :: (Int, Int) -> Mapa

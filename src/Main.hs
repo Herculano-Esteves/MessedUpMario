@@ -43,11 +43,11 @@ timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state
     | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         else return state {animTime = 0}
-    | lostGame jogo = return state {
+    | lostGame jogo == 4 = return state {
             levels = replace (levels state) ((currentLevel state),((initLevel state)
                 {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
         }
-    | vida (jogador jogo) == 911 = return state {
+    | lostGame jogo == 1 = return state {
             currentLevel = (currentLevel state) + 1,
             levels = replace (levels state) (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1))
         }

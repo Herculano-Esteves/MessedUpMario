@@ -189,12 +189,12 @@ colec :: [(Colecionavel, Posicao)]
 colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
 
 jogoSamp ::Jogo
-jogoSamp = Jogo mapaTeste inm colec jog False (generateInicialHitbox mapaTeste)
+jogoSamp = Jogo mapaTeste inm colec jog 3 (generateInicialHitbox mapaTeste) 0
 
 emptyMap :: Mapa
 emptyMap = Mapa ((2,2),Norte) (0,0) [[]]
 
-mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
+mapa1 = Mapa ((3, 3), Oeste) (0.5, 2.5)
     [[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
     ,[Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio,Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio,Vazio]
@@ -211,7 +211,7 @@ mapa1 = Mapa ((0.5, 0.5), Oeste) (0.5, 2.5)
     ]
 
 jogo1 ::Jogo
-jogo1 = Jogo mapa1 inm colec jog False (generateInicialHitbox mapa1)
+jogo1 = Jogo mapa1 inm colec jog 3 (generateInicialHitbox mapa1) 0
 
 
 
@@ -284,7 +284,7 @@ mapaDoBoss =    [
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--2
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--3
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V],--4
-            [P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P],--5
+            [P,P,P,P,V,P,P,P,P,P,P,P,P,P,P,P,P,P,A,A,A,P,P],--5
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--6
             [V,V,V,V,V,V,V,V,V,V,V,V,O,V,V,V,E,V,V,V,V,V,V],--7
             [V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,V,E,V,V,V,V,V,V],--8
@@ -304,8 +304,8 @@ mapaDoBoss =    [
                 ]
                 
 jogo2 :: Jogo
-jogo2 = Jogo mapa inmjogo2 colecjogo2 jog False (generateInicialHitbox mapa)
+jogo2 = Jogo mapa inmjogo2 colecjogo2 jog 3 (generateInicialHitbox mapa) 0
         where mapa = Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)
 
-jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog False (generateInicialHitbox mapa)
+jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog 3 (generateInicialHitbox mapa) 0
             where mapa = Mapa ((3,3.5),Norte) (0,0) (mapaTradutor mapaTutorialLetras)

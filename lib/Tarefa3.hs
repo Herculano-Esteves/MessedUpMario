@@ -11,7 +11,7 @@ module Tarefa3 where
 import LI12324
 import Tarefa1
 import Tarefa2
-import GHC.Float (float2Double)
+import GHC.Float (float2Double, double2Float)
 import Utilities
 import Tarefa4 (atualizaPersonagem, canGoDown)
 import Data.Fixed (mod')
@@ -19,7 +19,7 @@ import Mapas
 import Text.Read (Lexeme(String))
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog | ((b > 15 && not a)) && (a,b) /= (False,16.5) = perdeVidaJogadorEnd dtime jog
+movimenta seed dtime jog | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
                          | otherwise = cameraHitbox dtime $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
@@ -127,24 +127,32 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
-perdeVidaJogadorEnd tempo jogo  | (snd (aplicaDano (jogador jogo)) > 17 && not (fst (aplicaDano (jogador jogo)))) && snd (aplicaDano (jogador jogo)) /= 16.5 = jogo {jogador = animarMorte tempo (jogador jogo)}
+perdeVidaJogadorEnd tempo jogo  | lostGame jogo == 2 && animacaoJogo jogo > 0 = jogo {animacaoJogo = animarMorte tempo (animacaoJogo jogo)}
+                                | lostGame jogo == 2 && animacaoJogo jogo <= 0 = jogo {lostGame = 4}
                                 -- | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
-                                | otherwise = jogo {lostGame = True}
+                                | otherwise = jogo {lostGame = 3}
 perdeVidaJogadorJogo :: Jogo -> Jogo
-perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo)}
+perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (lostGame jogo) (jogador jogo) (inimigos jogo)}
 
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
     | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
-    | otherwise = jog {vida = vida jog - 1,aplicaDano = (False,20)}
+    | otherwise = jog {vida = vida jog - 1}
 
-animarMorte :: Tempo -> Personagem -> Personagem
-animarMorte tempo jogador   | snd (aplicaDano jogador) > 19 = jogador {aplicaDano = (False,snd (aplicaDano jogador)-tempo)}
-                            | snd (aplicaDano jogador) > 17 = jogador {aplicaDano = (False,snd (aplicaDano jogador)-tempo)}
-                            | snd (aplicaDano jogador) > 16 && snd (aplicaDano jogador) < 17 = jogador {aplicaDano = (False,16.5)}
-                            | otherwise = jogador
-                            where (a,b) = posicao jogador
+perdeVidaJogador1 :: Personagem -> [Personagem] -> Float
+perdeVidaJogador1 jog inm
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = 0
+    | otherwise = 3
+
+perdeVidaJogador2 :: Int -> Personagem -> [Personagem] -> Int
+perdeVidaJogador2 n jog inm
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = n
+    | otherwise = 2
+
+animarMorte :: Tempo -> Float -> Float
+animarMorte tempo con   | con > 0 = con - double2Float tempo
+                        | otherwise = 0
 
 -- JOGADOR LIFE END
 
@@ -153,17 +161,16 @@ animarMorte tempo jogador   | snd (aplicaDano jogador) > 19 = jogador {aplicaDan
 coletarObjetos :: Tempo -> Jogo -> Jogo
 coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecionaveis jogo) (jogador jogo),jogador = (jogador jogo) {pontos = isMoedaApanhada (filterObjetos (colecionaveis jogo) Moeda) (jogador jogo) (pontos (jogador jogo)),
                                                                                                                                 aplicaDano = tempoDoAplicaDano (aplicaDanoFuncao (filterObjetos (colecionaveis jogo) Martelo) (jogador jogo) (aplicaDano (jogador jogo))) tempo,
-                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo)),
-                                                                                                                                vida = pegouEstrela (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}}
+                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo))},lostGame = pegouEstrela (lostGame jogo) (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}
 filterObjetos :: [(Colecionavel,Posicao)] -> Colecionavel -> [(Colecionavel,Posicao)]
 filterObjetos [] _ = []
 filterObjetos (h:t) obj | fst h == obj = h : filterObjetos t obj
                         | otherwise = filterObjetos t obj
 
 
-pegouEstrela :: [(Colecionavel,Posicao)] -> Personagem -> Int
-pegouEstrela lista jog  | estaTocarObjeto jog (snd (head lista)) = 911
-                        | otherwise = vida jog
+pegouEstrela :: Int -> [(Colecionavel,Posicao)] -> Personagem -> Int
+pegouEstrela n lista jog  | estaTocarObjeto jog (snd (head lista)) = 1
+                        | otherwise = n
 
 pegouChave :: [(Colecionavel,Posicao)] -> Personagem -> Bool -> Bool
 pegouChave [] _ v = v
@@ -437,7 +444,8 @@ cameraHitbox :: Tempo -> Jogo -> Jogo
 cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux tempo (jogador jogo) (cameraControl jogo) }
 
 cameraHitboxaux :: Tempo -> Personagem -> Hitbox -> Hitbox
-cameraHitboxaux tempo jog hit | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
+cameraHitboxaux tempo jog hit 
+                        | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
 --                      esquerda
                         | ba < bx = ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
 --                      direita
