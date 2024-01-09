@@ -25,12 +25,24 @@ window = InWindow
     "Donkeykong"
     sizeWin --(700,700)
     (300,200)
+-- window :: Display
+-- window = FullScreen
 
 
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu}
+eventHandler (EventKey (Char 'u') Down _ _) state = do
+    writeFile "game.txt" (show (tempGame $ editorState state))
+    return $ state
+eventHandler (EventKey (Char 'y') Down _ _) state = do
+    gameFile <-readFile "game.txt"
+    return $ state {
+        editorState = (editorState state) {
+            tempGame = read gameFile
+        }
+    }
 eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state)}
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
@@ -73,7 +85,9 @@ draw state = do
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
-    putStrLn ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn  ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn ("selected Level: " ++ show (currentLevel state))
+    putStrLn ("length Level: " ++ show (length $ levels state))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
@@ -172,6 +186,19 @@ loadImages state = do
     botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
     botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
     botaoQuitPressed <- loadBMP "assets/Buttons/BotaoQuitPressed.bmp"
+    -- Numbers
+    um <- loadBMP "assets/Numbers/Um.bmp"
+    dois <- loadBMP "assets/Numbers/Dois.bmp"
+    tres <- loadBMP "assets/Numbers/Tres.bmp"
+    quatro <- loadBMP "assets/Numbers/Quatro.bmp"
+    cinco <- loadBMP "assets/Numbers/Cinco.bmp"
+    seis <- loadBMP "assets/Numbers/Seis.bmp"
+    sete <- loadBMP "assets/Numbers/Sete.bmp"
+    oito <- loadBMP "assets/Numbers/Oito.bmp"
+    nove <- loadBMP "assets/Numbers/Nove.bmp"
+    zero <- loadBMP "assets/Numbers/Zero.bmp"
+    -- Backgrounds
+    bgMenu <- loadBMP "assets/Backgrounds/menubackgrounds.bmp"
     return  state {
         images = [
             (Default,
@@ -236,7 +263,20 @@ loadImages state = do
             ("estrela9",estrela9),
             ("estrela10",estrela10),
             ("estrela11",estrela11),
-            ("estrela12",estrela12)
+            ("estrela12",estrela12),
+            -- numeros
+            ("um", um),
+            ("dois", dois),
+            ("tres", tres),
+            ("quatro", quatro),
+            ("cinco", cinco),
+            ("seis", seis),
+            ("sete", sete),
+            ("oito", oito),
+            ("nove", nove),
+            ("zero", zero),
+            -- Backgrounds
+            ("bgMenu", bgMenu)
             ]),
             (Minecraft,
             [("marioParado", steveandar),

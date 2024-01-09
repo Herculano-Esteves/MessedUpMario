@@ -3,13 +3,14 @@ import Utilities
 import Graphics.Gloss
 import LI12324
 import DrawLevel
-import Tarefa1 (escalaGloss)
+import Tarefa1 (escalaGloss, getMapaDimensoes)
 import Data.Maybe (fromJust)
 import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
 import Mapas (jogoSamp, jog)
 import Tarefa2 (floorPos, valida)
+import Tarefa3 (cameraHitbox)
 
 reactLevelEditor :: Event -> State -> IO State
 {-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
@@ -20,47 +21,64 @@ reactLevelEditor :: Event -> State -> IO State
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)-}
 reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
-        levels = replace (levels state) ((currentLevel state),(if valida (tempGame $ editorState state) then tempGame $ editorState state else jogo, unlocked))
+        levels = if valid then
+                replace (levels state) ((currentLevel state),( tempGame $ editorState state, unlocked))
+            else if (currentLevel state) == ((length $ levels state) -1) then
+                init (levels state)
+            else
+                (levels state),
+        currentLevel = if not valid && (currentLevel state) == ((length $ levels state) -1) then
+                (currentLevel state) -1 
+            else
+                (currentLevel state),
+        editorState = (editorState state) {
+            savingGame = True
+        }
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
+          valid = valida (tempGame $ editorState state)
 reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
     editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 3) then 0 else (selectFunc $ editorState state) + 1}}
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
 reactLevelEditor e state = return state {editorState = eventHandlerEditor e (editorState state)}
-reactLevelEditor e s = return s
 
 eventHandlerEditor :: Event -> EditorState -> EditorState
-eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) mstate = mstate {
-    tempGame = case (selectFunc mstate) of
-                    0 -> replaceBlock (tempGame mstate)
-                    1 -> switchEnemy (tempGame mstate)
-                    2 -> switchJogPos (tempGame mstate)
-                    3 -> switchColecs (tempGame mstate)
+eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) estate = estate {
+    tempGame = case (selectFunc estate) of
+                    0 -> replaceBlock (tempGame estate)
+                    1 -> switchEnemy (tempGame estate)
+                    2 -> switchJogPos (tempGame estate)
+                    3 -> switchColecs (tempGame estate)
 }
-eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) mstate = mstate {
-        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px, py-1)}}
+eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) estate = estate {
+        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
     }
-    where (px, py) = posicao $ jogador $ tempGame mstate 
-eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) mstate = mstate {
-        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px, py+1)}}
+    where (px, py) = posicao $ jogador $ tempGame estate 
+eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) estate = estate {
+        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py+1)}}
     }
-    where (px, py) = posicao $ jogador $ tempGame mstate
-eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) mstate = mstate {
-        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px-1, py)}}
+    where (px, py) = posicao $ jogador $ tempGame estate
+eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) estate = estate {
+        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px-1, py)}}
     }
-    where (px, py) = posicao $ jogador $ tempGame mstate
-eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) mstate = mstate {
-        tempGame = (tempGame mstate) {jogador = (jogador $ tempGame mstate) {posicao = (px+1, py)}}
+    where (px, py) = posicao $ jogador $ tempGame estate
+eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) estate = estate {
+        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px+1, py)}}
     }
-    where (px, py) = posicao $ jogador $ tempGame mstate
-eventHandlerEditor (EventKey (Char 'a') Down _ _) mstate = mstate {
-        tempGame = addRemoveEnemy (tempGame mstate)
+    where (px, py) = posicao $ jogador $ tempGame estate
+eventHandlerEditor (EventKey (Char 'a') Down _ _) estate = estate {
+        tempGame = case selectFunc estate of
+            1 -> addRemoveEnemy (tempGame estate)
+            3 -> addRemoveColecs (tempGame estate)
+            _ -> tempGame estate
     }
 eventHandlerEditor e s = s
 
 drawLevelEditor :: State -> Picture
-drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state]
+drawLevelEditor state 
+    | savingGame $ editorState state = Color red $ scale 0.2 0.2 $ if valida (tempGame $ editorState state) then Text "Saved" else Text "Not saved! Invalid map"
+    | otherwise = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -83,7 +101,6 @@ drawLevelEditor state = Pictures [drawLadder jogo texEscada, drawPorta jogo texP
           texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
           texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          --(jogo, unlocked) = (levels state) !! (currentLevel state)
           jogo = tempGame $ editorState state
 
 drawLevelEditor' :: State -> Picture
@@ -103,8 +120,16 @@ drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGa
     where (x,y) = posicao $ jogador $ tempGame $ editorState state
 
 drawSpawnPoint :: EditorState -> Picture
-drawSpawnPoint mstate = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame mstate) pos) $ Color (dim magenta) $ circleSolid 10
-    where (Mapa (pos,dir) _ _) = mapa $ tempGame mstate
+drawSpawnPoint estate = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame estate) pos) $ Color (dim magenta) $ circleSolid 10
+    where (Mapa (pos,dir) _ _) = mapa $ tempGame estate
+
+drawMapLimits :: EditorState -> Picture
+drawMapLimits estate = Color green $ uncurry Translate (posMapToGlossNivel (cameraControl (tempGame estate)) ((fromIntegral tx/2), (fromIntegral ty/2))) $ (rectangleWire (d2f $ (fromIntegral tx)*escalaGloss) (d2f $ ((fromIntegral ty)*escalaGloss)))
+    where sizeR :: (Int, Int)
+          sizeR = (round $ snd (snd (getMapaDimensoes 1 (mapa jog))), round $ fst $ (snd (getMapaDimensoes 1 (mapa jog))))
+          (tx, ty) = sizeR
+          jog = tempGame estate
+          
 
 replaceBlock :: Jogo -> Jogo
 replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
@@ -130,9 +155,12 @@ addNewLevel state = state {
     where emptyGame = Jogo {
             jogador = jog,
             inimigos = [],
-            colecionaveis = [],
+            colecionaveis = [
+                (Estrela, (0.5,2.5))
+            ],
             mapa = genEmptyMap (22,15),
-            lostGame = 3
+            lostGame = 3,
+            cameraControl = ((0,0),(0,0))
           }
 
 genEmptyMap :: (Int, Int) -> Mapa
@@ -201,7 +229,17 @@ switchColecs jog = jog {
         map (\(col, pos) -> if floorPos pos == floorPos (posicao $ jogador jog) then
             (case col of
                 Moeda -> Martelo
-                Martelo -> Moeda, pos)
+                Martelo -> Chave
+                Chave -> Moeda
+                , pos)
             else (col, pos)) (colecionaveis jog)
         else (colecionaveis jog)
+}
+
+addRemoveColecs :: Jogo -> Jogo
+addRemoveColecs jog = jog {
+    colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
+            filter (\(col,pos) -> floorPos pos /= floorPos (posicao $ jogador jog)) (colecionaveis jog)
+        else
+            (Moeda, posicao $ jogador jog) : colecionaveis jog
 }

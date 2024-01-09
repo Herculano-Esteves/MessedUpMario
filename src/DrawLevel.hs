@@ -40,7 +40,7 @@ f2d = float2Double
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo]
+                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawPoints (pontos $ jogador jogo) state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -110,7 +110,6 @@ drawEnemies state cuspo inimigo texMacaco texBarril texBoss jogo = Pictures $ ma
                                                                     texataque10 = fromJust (lookup "ataqueboss10" imagesTheme)
                                                                     imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                                     escala = realToFrac (snd (aplicaDano jog))
-                                                                    (jogo, unlocked) = levels state !! currentLevel state
                                                                     controlo = cheats state
 
 
@@ -207,9 +206,6 @@ playAnimAny x time texs = texs !! frame
     n = fromIntegral x -- Número de frames
     frame = floor (time * n) `mod` length texs
 
-
-
-
 playDeadAnim :: State -> Picture -> Picture
 playDeadAnim state = rotate ((2-animTime state)*360)
 
@@ -228,3 +224,29 @@ eventHandlerInGame e jogo = jogo
 
 drawAlcapao :: Jogo -> Picture -> Picture
 drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
+
+drawPoints :: Int -> State -> Picture
+drawPoints n state = Pictures $ (foldl (\p c -> (Translate (700 + (60*(fromIntegral $ length p))) 400 $
+    case c of
+        '1' -> um
+        '2' -> dois
+        '3' -> tres
+        '4' -> quatro
+        '5' -> cinco
+        '6' -> seis
+        '7' -> sete
+        '8' -> oito
+        '9' -> nove
+        _ -> zero) : p) [] (show n))
+    where um = fromJust (lookup "um" imagesTheme)
+          dois = fromJust (lookup "dois" imagesTheme)
+          tres = fromJust (lookup "tres" imagesTheme)
+          quatro = fromJust (lookup "quatro" imagesTheme)
+          cinco = fromJust (lookup "cinco" imagesTheme)
+          seis = fromJust (lookup "seis" imagesTheme)
+          sete = fromJust (lookup "sete" imagesTheme)
+          oito = fromJust (lookup "oito" imagesTheme)
+          nove = fromJust (lookup "nove" imagesTheme)
+          zero = fromJust (lookup "zero" imagesTheme)
+          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+          

@@ -6,6 +6,7 @@ import Graphics.Gloss.Interface.IO.Game
 import Mapas
 import Data.Maybe (fromJust)
 import Utilities
+import DrawLevel (sizeWin)
 
 -- | Faz o tratamento do input quando o utilizador se encontra no menu
 eventHandlerInMenu :: Event -> State -> IO State
@@ -38,7 +39,7 @@ drawMenu state
     | currentMenu state == OptionsMenu = Pictures [
         drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
     ]
-    | currentMenu state == LevelSelection = Pictures $
+    | currentMenu state == LevelSelection = Pictures $ [drawBg state] ++
         map (\((level2, unlocked1), n) -> Pictures $
             [drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n),
             drawLock unlocked1 n ]
@@ -48,6 +49,11 @@ drawMenu state
 drawTitle :: Picture
 drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong"
 
+drawBg :: State -> Picture
+drawBg state = scale (5*ratio) (5*ratio) $ img
+    where img = fromJust $ lookup "bgMenu" (fromJust $ lookup Default (images state))
+          ratio = (fromIntegral $ fst sizeWin) / (fromIntegral $ snd sizeWin)
+
 -- | Executa a função correspondente quando um determinado botão é pressionado
 buttonPress :: State -> State
 buttonPress state
@@ -56,7 +62,7 @@ buttonPress state
     | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
     | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state {
         currentMenu = LevelEditor,
-        editorState = (editorState state) {tempGame = jogo' {jogador = jog}}}
+        editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | currentMenu state == LevelSelection = state { 
             currentMenu = InGame, 

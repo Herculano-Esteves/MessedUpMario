@@ -26,10 +26,11 @@ data Options = Options {
 }
 
 data EditorState = EditorState {
-    tempGame       :: Jogo,
+    tempGame        :: Jogo,
     levelEditorPos  :: Posicao,
-    selectFunc  :: Int,
-    removingEnemies :: Bool
+    selectFunc      :: Int,
+    removingEnemies :: Bool,
+    savingGame      :: Bool
 }
 
 data MenuState = MenuState {

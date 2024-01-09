@@ -1,7 +1,6 @@
 module Mapas where
 
 import LI12324
---import Tarefa2 (jogoSamp, jog, colec, inm)
 import Graphics.Gloss
 import Utilities
 import Tarefa1
@@ -37,7 +36,8 @@ initialState = State {
         tempGame = jogoSamp,
         levelEditorPos = (0.5,0.5),
         selectFunc = 0,
-        removingEnemies = False
+        removingEnemies = False,
+        savingGame = False
     },
     cheats = False
 }
@@ -176,7 +176,7 @@ jog = Personagem {  velocidade = (0,0),
                     vida = 3, 
                     pontos = 0, 
                     ressalta = False, 
-                    posicao = (0.5,0.5), 
+                    posicao = (5.5,5.5), 
                     tamanho = (0.8,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
