@@ -133,7 +133,8 @@ perdeVidaJogadorEnd tempo jogo  | lostGame jogo == 2 && animacaoJogo jogo > 0 = 
                                 -- | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
                                 | otherwise = jogo {lostGame = 3}
 perdeVidaJogadorJogo :: Jogo -> Jogo
-perdeVidaJogadorJogo jogo = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (lostGame jogo) (jogador jogo) (inimigos jogo)}
+perdeVidaJogadorJogo jogo   | cheatsjogo jogo = jogo
+                            | otherwise = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (lostGame jogo) (jogador jogo) (inimigos jogo)}
 
 
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
@@ -288,7 +289,7 @@ ladderConditions :: Jogo -> Jogo
 ladderConditions jog = jog {
     jogador = (jogador jog) {
         velocidade = if (emEscada (jogador jog) &&
-            (snd $ velocidade $ jogador jog) < 0 && 
+            (snd $ velocidade $ jogador jog) < 0 &&
             (snd $ velocidade $ jogador jog) /= -ladderSpeed ) then
                 (0,0)
             else
@@ -405,16 +406,17 @@ animaMacacoMalvado tempo jogador macaco = enm{posicao = if fst (posicao enm) < f
                                         where enm = head macaco
 
 movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
-movimentaBarris mapa tempo macaco lista | snd(aplicaDano macaco) == 8 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}] 
+movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 8 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
                                         | null lista = [macaco]
-                                        | otherwise = macaco : foldl (\x y -> if sobreposicao ((a,b),(c,d)) (genHitbox y) then movimentaBarrisaux tempo y macaco : x else x) [] lista
+                                        | otherwise = macaco : foldl (\x y -> if sobreposicao ((a,b),(c,d)) (genHitbox y) then movimentaBarrisaux ((a,b),(c,d)) tempo y macaco ++ x else x) [] lista
                                         where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
 
 
-movimentaBarrisaux :: Tempo -> Personagem -> Personagem -> Personagem
-movimentaBarrisaux tempo barril macaco  | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}
-                                        | snd (aplicaDano macaco) == 8 = barril {posicao = posicao macaco,velocidade = (0,1)}
-                                        | otherwise = barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}
+movimentaBarrisaux :: Hitbox ->  Tempo -> Personagem -> Personagem -> [Personagem]
+movimentaBarrisaux map tempo barril macaco  | not (sobreposicao map (genHitbox barril)) = []
+                                        | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = [barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}]
+                                        | snd (aplicaDano macaco) == 8 = [barril {posicao = posicao macaco,velocidade = (0,1)}]
+                                        | otherwise = [barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}]
 --Macaco Malvado End
 
 --Boss AI START
@@ -433,7 +435,7 @@ movimentaBoss tempo bosses = boss {aplicaDano = (snd (aplicaDano boss) < 8 && sn
 ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
 ataqueDoBoss tempo jogador boss   | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
                             | tboss == 8-42*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                           
+
                             | otherwise = [boss]
                             where tboss = snd (aplicaDano boss)
                                   (bx,by) = posicao boss
@@ -457,7 +459,7 @@ cameraHitbox :: Tempo -> Jogo -> Jogo
 cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux tempo (jogador jogo) (cameraControl jogo) }
 
 cameraHitboxaux :: Tempo -> Personagem -> Hitbox -> Hitbox
-cameraHitboxaux tempo jog hit 
+cameraHitboxaux tempo jog hit
                         | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
 --                      esquerda
                         | ba < bx = ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
@@ -471,4 +473,6 @@ cameraHitboxaux tempo jog hit
                             ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
                             (z,w) = posicao jog
                             (vx,vy) = (if abs (fst (velocidade jog)) == 0 then 1 else abs (fst (velocidade jog)),if abs (snd (velocidade jog)) == 0 then 1 else abs (snd (velocidade jog)))
---Camera control end
+
+
+--Camera control end 

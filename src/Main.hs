@@ -46,7 +46,7 @@ eventHandler (EventKey (Char 'y') Down _ _) state = do
 eventHandler (EventKey (Char 'p') Down _ _) state = return $ state {levels = replace (levels state) (currentLevel state,(jogo {lostGame = if lostGame jogo == 3 then 5 else 3}, unlocked))}
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
     
-eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state)}
+eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state),levels = reverse (foldl (\x (a,b) -> if cheats state then (a{cheatsjogo = False},b) : x else (a{cheatsjogo = True},b) : x) [] (levels state))}
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
     | currentMenu state == LevelEditor = reactLevelEditor event state
@@ -111,7 +111,6 @@ loadImages state = do
     marioParado <- loadBMP "assets/MarioTexture/MarioParado.bmp"
     marioAndar1 <- loadBMP "assets/MarioTexture/MarioAni1.bmp"
     marioAndar2 <- loadBMP "assets/MarioTexture/MarioAni2.bmp"
-    mariosaltar <- loadBMP "assets/MarioTexture/Mariosaltar.bmp"
     plataforma <- loadBMP "assets/MarioTexture/Plataforma.bmp"
     escada <- loadBMP "assets/MarioTexture/ladder.bmp"
     alcapao <- loadBMP "assets/MarioTexture/Alcapao.bmp"
@@ -121,13 +120,23 @@ loadImages state = do
     inimigo2 <- loadBMP "assets/MarioTexture/Fantasma2.bmp"
     moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
     martelo <- loadBMP "assets/MarioTexture/Martelo.bmp"
-    mariocair <- loadBMP "assets/MarioTexture/Mariocair.bmp"
+    mariocair <- loadBMP "assets/MarioAnimations/MarioAr/MarioCair1.bmp"
+    mariosaltar1 <- loadBMP "assets/MarioAnimations/MarioAr/MarioSaltar1.bmp"
+    mariosaltar2 <- loadBMP "assets/MarioAnimations/MarioAr/MarioSaltar2.bmp"
     chavemario <- loadBMP "assets/MarioTexture/Key.bmp"
     portamario <- loadBMP "assets/MarioTexture/Porta.bmp"
     macacomalvado <- loadBMP "assets/MarioTexture/MacacoMalvado.bmp"
     barrilmario <- loadBMP "assets/MarioTexture/Barril.bmp"
     espinho <- loadBMP "assets/MarioTexture/Espinho.bmp"
     mortemario <- loadBMP "assets/Death.bmp"
+    --MARIO ANIMAÇOES
+        --MARIO CORRER
+    mariocorrer1 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar1.bmp"
+    mariocorrer2 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar2.bmp"
+    mariocorrer3 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar3.bmp"
+    marioolhos <- loadBMP "assets/MarioAnimations/MarioAndar/Olhos.bmp"
+    escada1 <- loadBMP "assets/MarioAnimations/MarioEscadas/Escadas1.bmp"
+    escada2 <- loadBMP "assets/MarioAnimations/MarioEscadas/Escadas2.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
     boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"
@@ -208,7 +217,8 @@ loadImages state = do
             [("marioParado", marioParado),
             ("marioAndar1", marioAndar1),
             ("marioAndar2", marioAndar2),
-            ("mariosaltar", mariosaltar),
+            ("mariosaltar1", mariosaltar1),
+            ("mariosaltar2", mariosaltar2),
             ("escada", escada),
             ("plataforma", plataforma),
             ("alcapao", alcapao),
@@ -235,6 +245,13 @@ loadImages state = do
             ("morreu",mortemario),
             ("cameraman", cameraman),
             ("espinho",espinho),
+            --ANIMATIONS MARIO
+            ("marioandar1",mariocorrer1),
+            ("marioandar2",mariocorrer2),
+            ("marioandar3",mariocorrer3),
+            ("marioolhos",marioolhos),
+            ("escada1",escada1),
+            ("escada2",escada2),
             -- Boss Mario
             ("boss1", boss1mario),
             ("boss2", boss2mario),

@@ -5,6 +5,8 @@ import Graphics.Gloss
 import Utilities
 import Tarefa1
 
+
+
 generateInicialHitbox :: Mapa -> Hitbox
 generateInicialHitbox (Mapa ((x,y),b) _ _) = ((x-4,y-3),(x+4,y+3))
 
@@ -177,7 +179,7 @@ jog = Personagem {  velocidade = (0,0),
                     pontos = 0, 
                     ressalta = False, 
                     posicao = (5.5,5.5), 
-                    tamanho = (0.8,1.0), 
+                    tamanho = (0.6,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
                     temChave = False}
@@ -189,7 +191,7 @@ colec :: [(Colecionavel, Posicao)]
 colec = [(Moeda,(2.5,13.5)),(Martelo,(7.5,9.5)),(Chave,(4.5,13.5)),(Estrela,(2.5,5.5))]
 
 jogoSamp ::Jogo
-jogoSamp = Jogo mapaTeste inm colec jog 3 (generateInicialHitbox mapaTeste) 0
+jogoSamp = Jogo mapaTeste inm colec jog 3 (generateInicialHitbox mapaTeste) 0 False
 
 emptyMap :: Mapa
 emptyMap = Mapa ((2,2),Norte) (0,0) [[]]
@@ -211,7 +213,7 @@ mapa1 = Mapa ((3, 3), Oeste) (0.5, 2.5)
     ]
 
 jogo1 ::Jogo
-jogo1 = Jogo mapa1 inm colec jog 3 (generateInicialHitbox mapa1) 0
+jogo1 = Jogo mapa1 inm colec jog 3 (generateInicialHitbox mapa1) 0 False
 
 
 
@@ -304,8 +306,9 @@ mapaDoBoss =    [
                 ]
                 
 jogo2 :: Jogo
-jogo2 = Jogo mapa inmjogo2 colecjogo2 jog 3 (generateInicialHitbox mapa) 0
+jogo2 = Jogo mapa inmjogo2 colecjogo2 jog 3 (generateInicialHitbox mapa) 0 False
         where mapa = Mapa ((3.0,3.5),Norte) (0,0) (mapaTradutor mapaDoBoss)
 
-jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog 3 (generateInicialHitbox mapa) 0
+jogoTurorial :: Jogo
+jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog 3 (generateInicialHitbox mapa) 0 False
             where mapa = Mapa ((3,3.5),Norte) (0,0) (mapaTradutor mapaTutorialLetras)

@@ -74,19 +74,28 @@ drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75
 -- ? Set a scale for drawng according to the size of the wind
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
-drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst (levels state !! currentLevel state))) (posicao jog)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
-    scale (if direcao jog == Este then 1 else -1) 1 $
+drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst (levels state !! currentLevel state))) (posicao jog)) $ Translate 0 7 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
+    scale (if direcao jog == Este then 2 else -2) 2 $
     if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
-        playAnim (time state) [texMarioandar, texMarioandar1]
+         playAnimAny (length marioCorrer+3) (time state) marioCorrer
     else if snd (velocidade jog) == 0 then
-        texMarioParado
-    else (if fst (velocidade jog) == 0 then texMariocair else texMariosaltar)
+         playAnimAny 2 (time state) [texandar3,texandar3,texandar3,texandar3,texandar3,texandar3,texolhos]
+    else if (direcao jog == Norte || direcao jog == Sul) && emEscada jog then playAnimAny 3 (time state) [texEscada1,texEscada2] else (if fst (velocidade jog) == 0 then texMariocair else playAnimAny 5 (time state) saltarmario)
     where texMariocair = fromJust (lookup "mariocair" imagesTheme)
           texMarioParado = fromJust (lookup "marioParado" imagesTheme)
           texMarioandar = fromJust (lookup "marioAndar1" imagesTheme)
           texMarioandar1 = fromJust (lookup "marioAndar2" imagesTheme)
-          texMariosaltar = fromJust (lookup "mariosaltar" imagesTheme)
+          marioCorrer = [texandar1,texandar2,texandar3,texandar2]
+          texandar1 = fromJust (lookup "marioandar1" imagesTheme)
+          texandar2 = fromJust (lookup "marioandar2" imagesTheme)
+          texandar3 = fromJust (lookup "marioandar3" imagesTheme)
+          texolhos = fromJust (lookup "marioolhos" imagesTheme)
+          texEscada1 = fromJust (lookup "escada1" imagesTheme)
+          texEscada2 = fromJust (lookup "escada2" imagesTheme)
+          saltarmario = [texsaltar1,texsaltar2]
+          texsaltar1 = fromJust (lookup "mariosaltar1" imagesTheme)
+          texsaltar2 = fromJust (lookup "mariosaltar2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           escala = realToFrac (snd (aplicaDano jog))
 
