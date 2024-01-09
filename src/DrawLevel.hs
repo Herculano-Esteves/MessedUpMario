@@ -18,12 +18,12 @@ import Graphics.Gloss.Interface.Environment (getScreenSize)
 
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
-sizeWin :: (Int, Int)
-sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
+-- sizeWin :: (Int, Int)
+-- sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
-posMapToGloss :: Posicao -> (Float,Float)
-posMapToGloss (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
+-- posMapToGloss :: Posicao -> (Float,Float)
+-- posMapToGloss (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
 
 posMapToGlossNivel :: Hitbox -> Posicao -> (Float,Float)
 posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
@@ -40,7 +40,7 @@ f2d = float2Double
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawPoints (pontos $ jogador jogo) state]
+                if fst $ aplicaDano (jogador jogo) then drawHammer jogo texMartelo (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texCuspo1,texCuspo2) (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawNum (pontos $ jogador jogo) (700,400) state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -234,8 +234,8 @@ eventHandlerInGame e jogo = jogo
 drawAlcapao :: Jogo -> Picture -> Picture
 drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
 
-drawPoints :: Int -> State -> Picture
-drawPoints n state = Pictures $ (foldl (\p c -> (Translate (700 + (60*(fromIntegral $ length p))) 400 $
+drawNum :: Int -> (Float, Float) -> State -> Picture
+drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $
     case c of
         '1' -> um
         '2' -> dois
