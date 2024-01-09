@@ -39,7 +39,8 @@ initialState = State {
         removingEnemies = False,
         savingGame = False
     },
-    cheats = False
+    cheats = False,
+    screenSize = (0,0)
 }
 
 data Letra
