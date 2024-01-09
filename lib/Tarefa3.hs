@@ -456,23 +456,29 @@ movimentaCuspoaux tempo fogo = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
 
 --Contrlo de Camera
 cameraHitbox :: Tempo -> Jogo -> Jogo
-cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux tempo (jogador jogo) (cameraControl jogo) }
+cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux (mapa jogo) tempo (jogador jogo) (cameraControl jogo) }
 
-cameraHitboxaux :: Tempo -> Personagem -> Hitbox -> Hitbox
-cameraHitboxaux tempo jog hit
-                        | ta > tx = ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
+cameraHitboxaux :: Mapa -> Tempo -> Personagem -> Hitbox -> Hitbox
+cameraHitboxaux mapa tempo jog hit
+                        | ta > tx = controlarCameraHitbox ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
 --                      esquerda
-                        | ba < bx = ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
+                        | ba < bx = controlarCameraHitbox ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
 --                      direita
-                        | tb > ty = ((ta,tb-vy*tempo),(ba,bb-vy*tempo))
+                        | tb > ty = controlarCameraHitbox ((ta,tb-vy*tempo),(ba,bb-vy*tempo))
                     --  cima
-                        | bb < by = ((ta,tb+vy*tempo),(ba,bb+vy*tempo))
+                        | bb < by = controlarCameraHitbox ((ta,tb+vy*tempo),(ba,bb+vy*tempo))
                     --  baixo
-                        | otherwise = hit
+                        | otherwise = controlarCameraHitbox hit
                      where  ((ta,tb),(ba,bb)) = hit
                             ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
                             (z,w) = posicao jog
                             (vx,vy) = (if abs (fst (velocidade jog)) == 0 then 1 else abs (fst (velocidade jog)),if abs (snd (velocidade jog)) == 0 then 1 else abs (snd (velocidade jog)))
+                            ((a,b),(c,d)) = getMapaDimensoes 1 mapa
+
+controlarCameraHitbox :: Hitbox -> Hitbox
+controlarCameraHitbox ((a,b),(c,d)) | a < 8.8 = controlarCameraHitbox ((8.8,b),(8.8+8,d))
+                                    | b < 4.25 = controlarCameraHitbox ((a,4.25),(c,4.25+6))
+                                    | otherwise = ((a,b),(c,d))
 
 
 --Camera control end 
