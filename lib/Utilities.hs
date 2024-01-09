@@ -18,7 +18,8 @@ data State = State {
     images :: Images,
     animTime :: Float,
     editorState :: EditorState,
-    cheats :: Bool
+    cheats :: Bool,
+    screenSize :: (Int, Int)
 }
 
 data Options = Options {
@@ -39,7 +40,7 @@ data MenuState = MenuState {
 }
 
 data Theme = Default | Minecraft deriving (Eq)
-data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor deriving (Eq)
+data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor | GameOver deriving (Eq)
 
 -- Constante referente à velocidade que as personagens se movem nas escadas
 ladderSpeed :: Double

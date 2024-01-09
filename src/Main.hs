@@ -8,7 +8,7 @@ import Tarefa1
 import Tarefa3
 import Tarefa4
 import Mapas
-import DrawLevel ( drawLevel, eventHandlerInGame, sizeWin )
+import DrawLevel ( drawLevel, eventHandlerInGame )
 
 import DrawMenu
 import GHC.Float (float2Double, double2Float)
@@ -20,13 +20,13 @@ import DrawLevelEditor (drawLevelEditor, reactLevelEditor)
 import Graphics.Gloss.Interface.Environment
 
 
-window :: Display
-window = InWindow
-    "Donkeykong"
-    sizeWin --(700,700)
-    (300,200)
 -- window :: Display
--- window = FullScreen
+-- window = InWindow
+    -- "Donkeykong"
+    -- sizeWin --(700,700)
+    -- (300,200)
+window :: Display
+window = FullScreen
 
 
 
@@ -56,8 +56,10 @@ eventHandler event state
 timeHandler :: Float -> State -> IO State
 timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state
-    | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
-        else return state {animTime = 0}
+    -- | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
+        -- else return state {animTime = 0}
+    | lostGame jogo == 0 = return state {
+        currentMenu = GameOver}
     | lostGame jogo == 4 = return state {
             levels = replace (levels state) ((currentLevel state),((initLevel state)
                 {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
@@ -80,7 +82,7 @@ timeHandler dTime state
 draw :: State -> IO Picture
 draw state = do
     putStrLn ("Posicao jog: " ++ (show (posicao $ jogador jogo)))
-    putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
+    -- putStrLn ("Posicao jog scaled: " ++ (show ((((double2Float $ fst $ posicao $ jogador jogo) * double2Float escalaGloss) - fromIntegral (fst sizeWin)/2), ((-(double2Float $ snd $ posicao $ jogador jogo) * double2Float escalaGloss) + fromIntegral (snd sizeWin)/2))))
     putStrLn ("Not on floor: " ++ show (gravidadeQuedaonoff (mapa (jogo)) (jogador jogo)))
     putStrLn ("Velocidade jogador: " ++ (show (velocidade $ jogador (jogo))))
     putStrLn ("Escada: " ++ show (emEscada $ jogador $ jogo))
@@ -306,6 +308,8 @@ loadImages state = do
 
 main :: IO ()
 main = do
-    putStrLn (show (fst sizeWin, snd sizeWin))
-    initState <- loadImages initialState
+    scrSize <- getScreenSize
+    initState <- loadImages initialState {
+        screenSize = scrSize
+    }
     playIO window bgColor fr initState draw eventHandler timeHandler
