@@ -316,7 +316,7 @@ inimigoMove :: Int -> Mapa -> Personagem -> Personagem
 inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 (show start)) >= 301 && (emEscada enm || canGoDown' enm mapa) = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
                             | inimigosubirdescerescadaBool mapa enm = enm
                             | otherwise = inimigoAndar start mapa enm
-                            where p = (any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
+                            where p = any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
 
 
 
