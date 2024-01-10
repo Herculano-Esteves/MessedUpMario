@@ -37,6 +37,9 @@ eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu 
 eventHandler (EventKey (Char 'u') Down _ _) state = do
     writeFile "game.txt" (show (tempGame $ editorState state))
     return $ state
+eventHandler (EventKey (Char 'w') Down _ _) state = do
+    writeFile "gameDebug.txt" (mapToFile (mapa (tempGame $ editorState state)))
+    return $ state
 eventHandler (EventKey (Char 'y') Down _ _) state = do
     gameFile <-readFile "game.txt"
     return $ state {
@@ -45,7 +48,7 @@ eventHandler (EventKey (Char 'y') Down _ _) state = do
         }}
 eventHandler (EventKey (Char 'p') Down _ _) state = return $ state {levels = replace (levels state) (currentLevel state,(jogo {lostGame = if lostGame jogo == 3 then 5 else 3}, unlocked))}
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
-    
+
 eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state),levels = reverse (foldl (\x (a,b) -> if cheats state then (a{cheatsjogo = False},b) : x else (a{cheatsjogo = True},b) : x) [] (levels state))}
 eventHandler event state
     | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
@@ -58,6 +61,10 @@ timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state
     -- | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         -- else return state {animTime = 0}
+    | (currentLevel state) == length (levels state) - 1 && lostGame jogo == 1 = return $ state {
+        currentMenu = MainMenu,
+        levels = replace (levels state) ((currentLevel state),(initLevel state, True))
+    }
     | lostGame jogo == 0 = return state {
         currentMenu = GameOver}
     | lostGame jogo == 4 = return state {
@@ -65,8 +72,9 @@ timeHandler dTime state
                 {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
         }
     | lostGame jogo == 1 = return state {
+            initLevel = jogo1,
             currentLevel = (currentLevel state) + 1,
-            levels = replace (levels state) (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1))
+            levels = replace restoredLevels (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1))
         }
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
@@ -78,6 +86,7 @@ timeHandler dTime state
           (jogo1, unlckd1) = (levels state) !! (currentLevel state + 1)
           (Mapa (pinit1, dir1) _ _) = mapa jogo1
           (Mapa (pinit, dir) _ _) = mapa $ initLevel state
+          restoredLevels = replace (levels state) ((currentLevel state), (initLevel state, True))
 
 draw :: State -> IO Picture
 draw state = do
@@ -90,7 +99,7 @@ draw state = do
     putStrLn ("Vida jog: " ++ show (vida $ jogador $ jogo))
     putStrLn ("Direcao jog: " ++ show (direcao $ jogador $ jogo))
     putStrLn ("Pressing button: " ++ show (pressingButton $ menuState state))
-    putStrLn  ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
+    putStrLn ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
     putStrLn ("selected Level: " ++ show (currentLevel state))
     putStrLn ("length Level: " ++ show (length $ levels state))
 
@@ -213,6 +222,8 @@ loadImages state = do
     zero <- loadBMP "assets/Numbers/Zero.bmp"
     -- Backgrounds
     bgMenu <- loadBMP "assets/Backgrounds/menubackgrounds.bmp"
+    -- Level editor
+    selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
         images = [
             (Default,
@@ -298,7 +309,9 @@ loadImages state = do
             ("nove", nove),
             ("zero", zero),
             -- Backgrounds
-            ("bgMenu", bgMenu)
+            ("bgMenu", bgMenu),
+            -- Level Editor
+            ("selector", selector)
             ]),
             (Minecraft,
             [("marioParado", steveandar),

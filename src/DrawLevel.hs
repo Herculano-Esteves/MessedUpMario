@@ -76,12 +76,17 @@ drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75
 drawPlayer :: State -> Personagem -> Picture
 drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst (levels state !! currentLevel state))) (posicao jog)) $ Translate 0 7 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 2 else -2) 2 $
-    if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then Rotate (360*escala) texMarioParado else
+    if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then
+        Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
          playAnimAny (length marioCorrer+3) (time state) marioCorrer
+    else if (direcao jog == Norte || direcao jog == Sul) && emEscada jog then
+        if (snd $ velocidade jog) /= 0 then playAnimAny 3 (time state) [texEscada1,texEscada2] else texEscada1
     else if snd (velocidade jog) == 0 then
          playAnimAny 2 (time state) [texandar3,texandar3,texandar3,texandar3,texandar3,texandar3,texolhos]
-    else if (direcao jog == Norte || direcao jog == Sul) && emEscada jog then playAnimAny 3 (time state) [texEscada1,texEscada2] else (if fst (velocidade jog) == 0 then texMariocair else playAnimAny 5 (time state) saltarmario)
+    else if fst (velocidade jog) == 0 then
+        texMariocair
+    else playAnimAny 5 (time state) saltarmario
     where texMariocair = fromJust (lookup "mariocair" imagesTheme)
           texMarioParado = fromJust (lookup "marioParado" imagesTheme)
           texMarioandar = fromJust (lookup "marioAndar1" imagesTheme)

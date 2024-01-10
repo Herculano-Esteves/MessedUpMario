@@ -32,15 +32,15 @@ drawMenu state
         --drawTitle,
         drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
         drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
-        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
-        drawButtonTextDebug (selectedButton (menuState state)) 3 "Editor",
+        drawButtonTextDebug (selectedButton (menuState state)) 2 "Editor",
+        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
         drawBanner (images state)
         ]
     | currentMenu state == OptionsMenu = Pictures [
         drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
     ]
     | currentMenu state == GameOver = Pictures [
-        scale 0.5 0.5 $ text "Game over!"
+        Color red $ scale 0.5 0.5 $ text "Game over!"
     ]
     | currentMenu state == LevelSelection = Pictures $ [drawBg state,
         scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,0) state] -- ++
@@ -63,10 +63,10 @@ buttonPress :: State -> State
 buttonPress state
     | selectedButton (menuState state) == 0 && currentMenu state == MainMenu = state { currentMenu = LevelSelection}
     | selectedButton (menuState state) == 1 && currentMenu state == MainMenu = state { currentMenu = OptionsMenu, menuState = (menuState state) {selectedButton = 0}}
-    | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state { exitGame = True}
-    | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state {
+    | selectedButton (menuState state) == 2 && currentMenu state == MainMenu = state {
         currentMenu = LevelEditor,
         editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
+    | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { exitGame = True}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
     | currentMenu state == LevelSelection = state { 
             currentMenu = InGame, 

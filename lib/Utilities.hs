@@ -68,3 +68,6 @@ getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)],
 
 getPosOfBlockMap :: Bloco -> Mapa -> [Posicao]
 getPosOfBlockMap bloco (Mapa _ _ blocos) = getPosOfBlock bloco blocos
+
+mapToFile :: Mapa -> String
+mapToFile (Mapa pi pf blocos) = "Mapa " ++ show pi ++ " " ++ show pf ++ "\n" ++ concat (map (\l -> show l ++ ",\n") blocos)

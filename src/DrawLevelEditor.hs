@@ -27,6 +27,7 @@ reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
                 init (levels state)
             else
                 (levels state),
+        initLevel = if valid then tempGame $ editorState state else (initLevel state),
         currentLevel = if not valid && (currentLevel state) == ((length $ levels state) -1) then
                 (currentLevel state) -1 
             else
@@ -46,9 +47,7 @@ eventHandlerEditor :: Event -> EditorState -> EditorState
 eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) estate = estate {
     tempGame = case (selectFunc estate) of
                     0 -> replaceBlock (tempGame estate)
-                    1 -> switchEnemy (tempGame estate)
                     2 -> switchJogPos (tempGame estate)
-                    3 -> switchColecs (tempGame estate)
 }
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) estate = estate {
         tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
@@ -67,10 +66,10 @@ eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) estate = estate {
     }
     where (px, py) = posicao $ jogador $ tempGame estate
 eventHandlerEditor (EventKey (Char 'a') Down _ _) estate = estate {
-        tempGame = case selectFunc estate of
-            1 -> addRemoveEnemy (tempGame estate)
-            3 -> addRemoveColecs (tempGame estate)
-            _ -> tempGame estate
+        tempGame = addRemoveEnemy (tempGame estate)
+    }
+eventHandlerEditor (EventKey (Char 'z') Down _ _) estate = estate {
+        tempGame = addRemoveColecs (tempGame estate)
     }
 eventHandlerEditor e s = s
 
@@ -116,8 +115,10 @@ drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGa
     0 -> Color green
     1 -> Color red
     2 -> Color blue
-    3 -> Color (dim cyan)) $ rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
+    3 -> Color (dim cyan)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ selectorTex--rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
     where (x,y) = posicao $ jogador $ tempGame $ editorState state
+          selectorTex = fromJust (lookup "selector" imagesTheme)
+          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 drawSpawnPoint :: EditorState -> Picture
 drawSpawnPoint estate = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame estate) pos) $ Color (dim magenta) $ circleSolid 10
@@ -174,9 +175,11 @@ genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
           aux2 (_,0) = []
           aux2 (x,y) = aux x : aux2 (x,y-1)
 
-switchEnemy ::  Jogo -> Jogo
-switchEnemy jog = jog {
-    inimigos = map (\enm -> if floorPos pos == floorPos (posicao enm) then
+addRemoveEnemy :: Jogo -> Jogo
+addRemoveEnemy jog = jog {
+        inimigos = 
+            if any (\enm -> (floorPos pos) == (floorPos $ posicao enm)) (inimigos jog) then
+                map (\enm -> if floorPos pos == floorPos (posicao enm) then
                     Personagem {velocidade = (0,0), 
                         tipo = case tipo enm of
                             Fantasma -> MacacoMalvado
@@ -190,15 +193,8 @@ switchEnemy jog = jog {
                         tamanho = (1,1), 
                         aplicaDano = (False, 0), 
                         direcao = Oeste,
-                        temChave = False} else enm) (inimigos jog)
-    }
-    where pos = posicao $ jogador jog
-
-addRemoveEnemy :: Jogo -> Jogo
-addRemoveEnemy jog = jog {
-        inimigos = 
-            if any (\enm -> (floorPos pos) == (floorPos $ posicao enm)) (inimigos jog) then
-                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm)) (inimigos jog)
+                        temChave = False} else enm) $
+                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= Boss) (inimigos jog)
             else
                 Personagem {velocidade = (0,0), 
                         tipo = Fantasma, 
@@ -225,23 +221,17 @@ switchJogPos jog = jog {
     where (Mapa (p,dir) p1 mat) = mapa jog
           pos = posicao $ jogador jog
 
-switchColecs :: Jogo -> Jogo
-switchColecs jog = jog {
+addRemoveColecs :: Jogo -> Jogo
+addRemoveColecs jog = jog {
     colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
-        map (\(col, pos) -> if floorPos pos == floorPos (posicao $ jogador jog) then
-            (case col of
+            map (\(col,pos) -> if floorPos pos == floorPos (posicao $ jogador jog) then
+                (case col of
                 Moeda -> Martelo
                 Martelo -> Chave
                 Chave -> Moeda
                 , pos)
-            else (col, pos)) (colecionaveis jog)
-        else (colecionaveis jog)
-}
-
-addRemoveColecs :: Jogo -> Jogo
-addRemoveColecs jog = jog {
-    colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
-            filter (\(col,pos) -> floorPos pos /= floorPos (posicao $ jogador jog)) (colecionaveis jog)
+                else (col,pos)) $
+            filter (\(col,pos) -> floorPos pos /= floorPos (posicao $ jogador jog) || col /= Chave) (colecionaveis jog)
         else
             (Moeda, posicao $ jogador jog) : colecionaveis jog
 }

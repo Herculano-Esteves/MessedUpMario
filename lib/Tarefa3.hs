@@ -129,6 +129,7 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
 -- JOGADOR LIFE START
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
 perdeVidaJogadorEnd tempo jogo  | lostGame jogo == 2 && animacaoJogo jogo > 0 = jogo {animacaoJogo = animarMorte tempo (animacaoJogo jogo)}
+                                | (vida $ jogador jogo) == 0 = jogo {lostGame = 0}
                                 | lostGame jogo == 2 && animacaoJogo jogo <= 0 = jogo {lostGame = 4}
                                 -- | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
                                 | otherwise = jogo {lostGame = 3}

@@ -17,8 +17,8 @@ initialState = State {
     levels = [
         (jogoSamp, True),
         (jogo1, False),
-        (jogo2,False),
-        (jogoTurorial,False)
+        (jogo2,False)--,
+        --(jogoTurorial,False)
         ],
     initLevel = jogoSamp,
     currentLevel = 0,
