@@ -28,7 +28,7 @@ cameraHitbox :: (Int,Int) -> Tempo -> Jogo -> Jogo
 cameraHitbox (a,b) tempo jogo = jogo {cameraControl = cameraHitboxaux (a,b) (mapa jogo) tempo (jogador jogo) (cameraControl jogo) }
 
 cameraHitboxaux :: (Int,Int) -> Mapa -> Tempo -> Personagem -> Hitbox -> Hitbox
-cameraHitboxaux (h,t) mapa tempo jog hit = controlarCameraHitbox (h,t) ((a,b),(c,d)) $ cameraHitboxaux4 tempo (cameraHitboxaux3 tempo (cameraHitboxaux2 tempo (cameraHitboxaux1 tempo hit ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)
+cameraHitboxaux (h,t) mapa tempo jog hit = controlarCameraHitbox mapa (h,t) ((a,b),(c,d)) $ cameraHitboxaux4 tempo (cameraHitboxaux3 tempo (cameraHitboxaux2 tempo (cameraHitboxaux1 tempo hit ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)) ((tx,ty),(bx,by)) (vx,vy)
                      where  ((ta,tb),(ba,bb)) = hit
                             ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
                             (z,w) = posicao jog
@@ -56,13 +56,14 @@ cameraHitboxaux4 tempo hit jog (vx,vy)  | bb < by = ((ta,tb+vy*tempo),(ba,bb+vy*
                             where   ((ta,tb),(ba,bb)) = hit
                                     ((tx,ty),(bx,by)) = jog
 
-controlarCameraHitbox :: (Int,Int) -> Hitbox -> Hitbox -> Hitbox
-controlarCameraHitbox (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d)) | c > 7.5+8 = controlarCameraHitbox (sizex,sizey) ((x,y),(z,w)) ((7.5,b),(7.5+8,d))
-                                    | d > 12 = controlarCameraHitbox (sizex,sizey) ((x,y),(z,w)) ((a,12-6),(c,12))
-                                    | a < 6.65 = controlarCameraHitbox (sizex,sizey) ((x,y),(z,w)) ((6.65,b),(6.65+8,d))
-                                    | b < 3 = controlarCameraHitbox (sizex,sizey) ((x,y),(z,w)) ((a,3),(c,3+6))
+controlarCameraHitbox :: Mapa -> (Int,Int) -> Hitbox -> Hitbox -> Hitbox
+controlarCameraHitbox mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d)) | c > limDIRx = controlarCameraHitbox mapa (sizex,sizey) ((x,y),(z,w)) ((limDIRx-8,b),(limDIRx,d))
+                                    | d > limDIRy = controlarCameraHitbox mapa (sizex,sizey) ((x,y),(z,w)) ((a,limDIRy-6),(c,limDIRy))
+                                    | a < limESQx = controlarCameraHitbox mapa (sizex,sizey) ((x,y),(z,w)) ((limESQx,b),(limESQx+8,d))
+                                    | b < limESQy = controlarCameraHitbox mapa (sizex,sizey) ((x,y),(z,w)) ((a,limESQy),(c,limESQy+6))
                                     | otherwise = ((a,b),(c,d))
-                                    where ((limESQx,limESQy),(limDIRx,limDIRy)) = undefined
+                                    where ((limESQx,limESQy),(limDIRx,limDIRy)) = ((dimx+((fromIntegral sizex/2)/escalaGloss)-4,(dimy+((fromIntegral sizey/2)/escalaGloss))-3),(dimw-((fromIntegral sizex/2)/escalaGloss)+4,dimz-((fromIntegral sizey/2)/escalaGloss)+3))
+                                          ((dimx,dimy),(dimz,dimw))= getMapaDimensoes 1 mapa
 
 
 --Camera control end 
