@@ -21,7 +21,7 @@ import Tarefa1
 import Tarefa2
 import Utilities
 
-
+-- | Função que executa a ação de cada personagem num dado jogo
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
 atualiza actions action jogo
     | length actions == length (inimigos jogo) = jogo {
@@ -31,13 +31,14 @@ atualiza actions action jogo
     | otherwise = jogo
 
 
-
+-- Função que aplica a atualizaPersonagem a cada inimigo com a ação respetiva
 atualizaInimigos :: Jogo -> [Maybe Acao] -> [Personagem] -> [Personagem]
 atualizaInimigos jogo actions inms = zipWith (atualizaPersonagem jogo) actions inms
 
 
 -- * Change the velocity
 -- TODO: Define how each character is going to jump
+-- | Função que para um dado jogo, ação e personagem, aplica a velocidade correspondente à ação recebida
 atualizaPersonagem :: Jogo -> Maybe Acao -> Personagem -> Personagem
 atualizaPersonagem jogo action inm = case action of
         Just Subir -> if emEscada inm then
@@ -67,6 +68,7 @@ atualizaPersonagem jogo action inm = case action of
           onTopLadder perso = floorPos (posicao perso) == head (agrupaEscadas (getPosOfBlock Escada mat))
           (Mapa _ _ mat) = mapa jogo-}
 
+-- | Função que para uma personagem e mapa, devolve um bool correspondente a se pode descer uma escada
 canGoDown :: Personagem -> Mapa -> Bool
 canGoDown jog (Mapa _ _ blocos)= emEscada jog ||
     (any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&

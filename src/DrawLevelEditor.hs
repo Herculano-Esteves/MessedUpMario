@@ -132,7 +132,7 @@ drawMapLimits estate = Color green $ uncurry Translate (posMapToGlossNivel (came
           (tx, ty) = sizeR
           jog = tempGame estate
           
-
+-- | Função que recebe um jogo e substitui um bloco na posição do jogador
 replaceBlock :: Jogo -> Jogo
 replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
     where currentBlock = blocos !! floor y !! floor x
@@ -146,6 +146,7 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
             Vazio -> Plataforma
           (x,y) = posicao $ jogador jog
 
+-- | Função que adiciona um novo nível a um dado state
 addNewLevel :: State -> State
 addNewLevel state = state {
     levels = levels state ++ [(emptyGame, True)],
@@ -167,6 +168,7 @@ addNewLevel state = state {
             cheatsjogo = False
           }
 
+-- | Função que gera um mapa vazio com uma dada dimensão
 genEmptyMap :: (Int, Int) -> Mapa
 genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
     where aux :: Int -> [Bloco]
@@ -176,6 +178,7 @@ genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
           aux2 (_,0) = []
           aux2 (x,y) = aux x : aux2 (x,y-1)
 
+-- | Função que adiciona/remove ou substitui um inimigo a um jogo, na posição do jogador
 addRemoveEnemy :: Jogo -> Jogo
 addRemoveEnemy jog = jog {
         inimigos = 
@@ -212,6 +215,7 @@ addRemoveEnemy jog = jog {
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
 
+-- | Função que altera a posição de spawn do jogador no mapa de um dado jogo, colocando-o na posição do jogador
 switchJogPos :: Jogo -> Jogo
 switchJogPos jog = jog {
     mapa = (Mapa (pos, Oeste) p1 mat),
@@ -222,6 +226,7 @@ switchJogPos jog = jog {
     where (Mapa (p,dir) p1 mat) = mapa jog
           pos = posicao $ jogador jog
 
+-- | Função que adiciona/remove ou substitui colecionaveis a um dado jogo, na posição do jogador
 addRemoveColecs :: Jogo -> Jogo
 addRemoveColecs jog = jog {
     colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
