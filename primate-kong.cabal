@@ -52,6 +52,7 @@ library
         Tarefa4
         Mapas
         Utilities
+    
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -80,6 +81,7 @@ executable primate-kong
         DrawMenu
         DrawLevel
         DrawLevelEditor
+        Extras
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

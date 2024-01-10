@@ -10,7 +10,7 @@ import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
 import Mapas (jogoSamp, jog)
 import Tarefa2 (floorPos, valida)
-import Tarefa3 (cameraHitbox)
+import Extras
 
 reactLevelEditor :: Event -> State -> IO State
 {-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {

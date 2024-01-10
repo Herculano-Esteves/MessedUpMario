@@ -21,7 +21,7 @@ import Text.Read (Lexeme(String))
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog    | lostGame jog == 5 = jog
                             | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
-                            | otherwise = cameraHitbox dtime $ ladderConditions $ bossMovimento dtime $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                            | otherwise = ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -419,66 +419,3 @@ movimentaBarrisaux map tempo barril macaco  | not (sobreposicao map (genHitbox b
                                         | otherwise = [barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}]
 --Macaco Malvado End
 
---Boss AI START
-bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = ataqueDoBoss tempo (jogador jogo) ( movimentaBoss tempo a) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
-                            | otherwise = jogo
-                            where   (a,b) = onlyOneTipo (inimigos jogo) Boss
-                                    (c,d) = onlyOneTipo b CuspoDeFogo
-
---Sabendo que so pode existir um boss
-movimentaBoss :: Tempo -> [Personagem] -> Personagem
-movimentaBoss tempo bosses = boss {aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss)}
-                    where   boss = head bosses
-                            tboss = snd (aplicaDano boss)-tempo
-
-ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
-ataqueDoBoss tempo jogador boss   | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                            | tboss == 8-42*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-
-                            | otherwise = [boss]
-                            where tboss = snd (aplicaDano boss)
-                                  (bx,by) = posicao boss
-                                  (jx,jy) = posicao jogador
-                                  (a,b) = (jx-bx,jy-by)
-                                  (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
-
-movimentaCuspo :: Mapa -> Tempo -> [Personagem] -> [Personagem]
-movimentaCuspo mapa tempo cuspos | null cuspos = cuspos
-                            | otherwise = foldl (\x y -> if sobreposicao ((a,b),(d,c)) (genHitbox y) then movimentaCuspoaux tempo y : x else x) [] cuspos
-                            where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
-
-movimentaCuspoaux :: Tempo -> Personagem -> Personagem
-movimentaCuspoaux tempo fogo = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
-                where   (fx,fy) = posicao fogo
-                        (vx,vy) = velocidade fogo
---Boss AI END
-
---Contrlo de Camera
-cameraHitbox :: Tempo -> Jogo -> Jogo
-cameraHitbox tempo jogo = jogo {cameraControl = cameraHitboxaux (mapa jogo) tempo (jogador jogo) (cameraControl jogo) }
-
-cameraHitboxaux :: Mapa -> Tempo -> Personagem -> Hitbox -> Hitbox
-cameraHitboxaux mapa tempo jog hit
-                        | ta > tx = controlarCameraHitbox ((ta-vx*tempo,tb),(ba-vx*tempo,bb))
---                      esquerda
-                        | ba < bx = controlarCameraHitbox ((ta+vx*tempo,tb),(ba+vx*tempo,bb))
---                      direita
-                        | tb > ty = controlarCameraHitbox ((ta,tb-vy*tempo),(ba,bb-vy*tempo))
-                    --  cima
-                        | bb < by = controlarCameraHitbox ((ta,tb+vy*tempo),(ba,bb+vy*tempo))
-                    --  baixo
-                        | otherwise = controlarCameraHitbox hit
-                     where  ((ta,tb),(ba,bb)) = hit
-                            ((tx,ty),(bx,by)) = ((z-1,w-1),(z+1,w+1))
-                            (z,w) = posicao jog
-                            (vx,vy) = (if abs (fst (velocidade jog)) == 0 then 1 else abs (fst (velocidade jog)),if abs (snd (velocidade jog)) == 0 then 1 else abs (snd (velocidade jog)))
-                            ((a,b),(c,d)) = getMapaDimensoes 1 mapa
-
-controlarCameraHitbox :: Hitbox -> Hitbox
-controlarCameraHitbox ((a,b),(c,d)) | a < 8.8 = controlarCameraHitbox ((8.8,b),(8.8+8,d))
-                                    | b < 4.25 = controlarCameraHitbox ((a,4.25),(c,4.25+6))
-                                    | otherwise = ((a,b),(c,d))
-
-
---Camera control end 
