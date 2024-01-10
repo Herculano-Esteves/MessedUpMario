@@ -30,8 +30,8 @@ dimensaobloco = 1
 
 --dimensao de cada bloco é 1x1 por
 colisoesParede :: Mapa -> Personagem -> Bool
-colisoesParede mapa perso = not (sobreposicao (genHitbox perso) (getMapaDimensoes dimensaobloco mapa)) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
-
+colisoesParede mapa perso = not (sobreposicao (genHitbox perso) ((a,b),(d,c))) || not (all (==False) (map (sobreposicao (genHitbox perso)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)))
+                            where ((a,b),(c,d)) = getMapaDimensoes dimensaobloco mapa
 
 
 
