@@ -120,10 +120,10 @@ data Jogo =
     , inimigos      :: [Personagem] -- ^ lista de inimigos no mapa
     , colecionaveis :: [(Colecionavel, Posicao)] -- ^ lista de colecionaveis espalhados pelo mapa
     , jogador       :: Personagem -- ^ o jogador
-    , lostGame      :: Int, -- 0 -> Perdeu, 1 -> Ganhou, 2 -> perdeu uma vida, 3 -> Normal, 4 -> Recomeçar por morte, 5 -> Pausa
-    cameraControl   :: Hitbox,
-    animacaoJogo    :: Float,
-    cheatsjogo      :: Bool
+    , lostGame      :: Int -- 0 -> Perdeu, 1 -> Ganhou, 2 -> perdeu uma vida, 3 -> Normal, 4 -> Recomeçar por morte, 5 -> Pausa
+    , cameraControl   :: Hitbox
+    , animacaoJogo    :: Float
+    , cheatsjogo      :: Bool
     }
   deriving (Eq, Read, Show)
 

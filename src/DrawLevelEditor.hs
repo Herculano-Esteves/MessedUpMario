@@ -10,7 +10,7 @@ import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
 import Mapas (jogoSamp, jog)
 import Tarefa2 (floorPos, valida)
-import Tarefa3 (cameraHitbox)
+import Extras
 
 reactLevelEditor :: Event -> State -> IO State
 {-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
@@ -41,37 +41,38 @@ reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
 reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
     editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 3) then 0 else (selectFunc $ editorState state) + 1}}
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
-reactLevelEditor e state = return state {editorState = eventHandlerEditor e (editorState state)}
+reactLevelEditor e state = return state {editorState = eventHandlerEditor e (screenSize state) (editorState state)}
+          
 
-eventHandlerEditor :: Event -> EditorState -> EditorState
-eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) estate = estate {
+eventHandlerEditor :: Event -> (Int, Int) -> EditorState -> EditorState
+eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = estate {
     tempGame = case (selectFunc estate) of
                     0 -> replaceBlock (tempGame estate)
                     2 -> switchJogPos (tempGame estate)
 }
-eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) estate = estate {
-        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
+eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) screen estate = estate {
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate 
-eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) estate = estate {
-        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py+1)}}
+eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) screen estate = estate {
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py+1)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate
-eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) estate = estate {
-        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px-1, py)}}
+eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) screen estate = estate {
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px-1, py)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate
-eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) estate = estate {
-        tempGame = cameraHitbox (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px+1, py)}}
+eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) screen estate = estate {
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px+1, py)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate
-eventHandlerEditor (EventKey (Char 'a') Down _ _) estate = estate {
+eventHandlerEditor (EventKey (Char 'a') Down _ _) screen estate = estate {
         tempGame = addRemoveEnemy (tempGame estate)
     }
-eventHandlerEditor (EventKey (Char 'z') Down _ _) estate = estate {
+eventHandlerEditor (EventKey (Char 'z') Down _ _) screen estate = estate {
         tempGame = addRemoveColecs (tempGame estate)
     }
-eventHandlerEditor e s = s
+eventHandlerEditor e screen s = s
 
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 

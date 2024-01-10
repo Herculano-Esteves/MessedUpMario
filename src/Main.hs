@@ -9,6 +9,7 @@ import Tarefa3
 import Tarefa4
 import Mapas
 import DrawLevel ( drawLevel, eventHandlerInGame )
+import Extras
 
 import DrawMenu
 import GHC.Float (float2Double, double2Float)
@@ -78,7 +79,7 @@ timeHandler dTime state
         }
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
-    return $ state {
+    return $ extrasFuncao generateRandomNumber (float2Double dTime) state {
         levels = replace (levels state) ((currentLevel state),(movimenta generateRandomNumber (float2Double dTime) jogo, unlocked)),
         time = (time state) + dTime}
     | otherwise = return state
