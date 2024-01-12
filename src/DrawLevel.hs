@@ -13,7 +13,7 @@ import GHC.Float (float2Double, double2Float, int2Float)
 import Mapas
 import Data.Maybe (fromJust)
 import Utilities
-import Data.Fixed (mod')
+import Data.Fixed (mod', Pico)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
 
 
@@ -115,7 +115,8 @@ drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] ->
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
-                                                            if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else drawEnemy controlo jogo texBarril x (jogador jogo))
+                                                            if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else 
+                                                            if tipo x == EyeBoss then drawMoreComplex state jogo controlo x else drawEnemy controlo jogo texBarril x (jogador jogo))
                                                             (inimigos jogo)
                                                             where   ataqueboss = [texataque1,texataque2,texataque3,texataque4,texataque5,texataque6,texataque7,texataque8,texataque9,texataque10]
                                                                     texataque1 = fromJust (lookup "ataqueboss1" imagesTheme)
@@ -132,11 +133,21 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
                                                                     texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
                                                                     texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
                                                                     texCuspo3 = fromJust (lookup "cuspo3" imagesTheme)
+                                                                    texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
+                                                                    texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
                                                                     imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                                     escala = realToFrac (snd (aplicaDano jog))
                                                                     controlo = cheats state
 
 
+drawMoreComplex :: State -> Jogo -> Bool -> Personagem -> Picture
+drawMoreComplex state jogo controlo inim | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, drawHitbox controlo jogo (jogador jogo) inim]
+                                         | otherwise = rectangleSolid 10 10
+                                        where   texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
+                                                texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
+                                                imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+                                                starttranslate x = Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) x
+                                                (mx,my) = mira inim
 
 drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture
 drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
