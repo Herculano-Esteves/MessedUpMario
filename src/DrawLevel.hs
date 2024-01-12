@@ -141,12 +141,13 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
 
 
 drawMoreComplex :: State -> Jogo -> Bool -> Personagem -> Picture
-drawMoreComplex state jogo controlo inim | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, drawHitbox controlo jogo (jogador jogo) inim]
+drawMoreComplex state jogo controlo inim | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, desenhahit]
                                          | otherwise = rectangleSolid 10 10
                                         where   texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
                                                 texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
                                                 imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                 starttranslate x = Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) x
+                                                desenhahit = drawHitbox controlo jogo (jogador jogo) inim
                                                 (mx,my) = mira inim
 
 drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture

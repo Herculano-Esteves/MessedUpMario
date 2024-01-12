@@ -68,6 +68,7 @@ data Entidade
   | Boss
   | CuspoDeFogo
   | EyeBoss
+  | EyeEntidade
   deriving (Ord, Eq, Read, Show)
 
 -- | Tipos de items passiveis de ser colecionaveis por um 'Personagem'.

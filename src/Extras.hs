@@ -62,8 +62,8 @@ cameraHitboxaux4 tempo hit jog (vx,vy)  | bb < by = ((ta,tb+vy*tempo),(ba,bb+vy*
                                     ((tx,ty),(bx,by)) = jog
 
 controlarCameraHitbox :: Int -> Mapa -> (Int,Int) -> Hitbox -> Hitbox -> Hitbox
-controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d)) 
-                                    | control == 0 = ((a,b),(c,d))  
+controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
+                                    | control == 0 = ((a,b),(c,d))
                                     | c > limDIRx = controlarCameraHitbox (control-1) mapa (sizex,sizey) ((x,y),(z,w)) ((limDIRx-8,b),(limDIRx,d))
                                     | d > limDIRy = controlarCameraHitbox (control-1) mapa (sizex,sizey) ((x,y),(z,w)) ((a,limDIRy-6),(c,limDIRy))
                                     | a < limESQx = controlarCameraHitbox (control-1) mapa (sizex,sizey) ((x,y),(z,w)) ((limESQx,b),(limESQx+8,d))
@@ -78,14 +78,14 @@ controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
 
 --Boss AI START
 bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = ataqueDoBoss tempo (jogador jogo) ( movimentaBoss tempo a) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x) [] ( movimentaBoss tempo a) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
                             | otherwise = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) Boss
                                     (c,d) = onlyOneTipo b CuspoDeFogo
 
 --Sabendo que so pode existir um boss
-movimentaBoss :: Tempo -> [Personagem] -> Personagem
-movimentaBoss tempo bosses = boss {aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss)}
+movimentaBoss :: Tempo -> [Personagem] -> [Personagem]
+movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss)}) bosses
                     where   boss = head bosses
                             tboss = snd (aplicaDano boss)-tempo
 
@@ -129,3 +129,7 @@ eyemovimentaBoss tempo bosses jogador = boss {aplicaDano = (snd (aplicaDano boss
                             (a,b) = (jx-bx,jy-by)
 
 --EYEBOSS END
+
+--EyeEntity START
+
+--EyeEntity END
