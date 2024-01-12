@@ -1,6 +1,7 @@
 module Utilities where
 import Graphics.Gloss
 import LI12324
+import Data.Maybe (fromJust)
 
 type Images = [(Theme, [(String,Picture)])]
 
@@ -73,3 +74,28 @@ getPosOfBlockMap bloco (Mapa _ _ blocos) = getPosOfBlock bloco blocos
 
 mapToFile :: Mapa -> String
 mapToFile (Mapa pi pf blocos) = "Mapa " ++ show pi ++ " " ++ show pf ++ "\n" ++ concat (map (\l -> show l ++ ",\n") blocos)
+
+drawNum :: Int -> (Float, Float) -> State -> Picture
+drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $
+    case c of
+        '1' -> um
+        '2' -> dois
+        '3' -> tres
+        '4' -> quatro
+        '5' -> cinco
+        '6' -> seis
+        '7' -> sete
+        '8' -> oito
+        '9' -> nove
+        _ -> zero) : p) [] (show n))
+    where um = fromJust (lookup "um" imagesTheme)
+          dois = fromJust (lookup "dois" imagesTheme)
+          tres = fromJust (lookup "tres" imagesTheme)
+          quatro = fromJust (lookup "quatro" imagesTheme)
+          cinco = fromJust (lookup "cinco" imagesTheme)
+          seis = fromJust (lookup "seis" imagesTheme)
+          sete = fromJust (lookup "sete" imagesTheme)
+          oito = fromJust (lookup "oito" imagesTheme)
+          nove = fromJust (lookup "nove" imagesTheme)
+          zero = fromJust (lookup "zero" imagesTheme)
+          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))

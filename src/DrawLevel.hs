@@ -15,6 +15,7 @@ import Data.Maybe (fromJust)
 import Utilities
 import Data.Fixed (mod', Pico)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
+import DrawMenu (drawButtonTextDebug)
 
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
@@ -39,8 +40,29 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer jogo (playAnimAny 4 (time state) martelos) (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawNum (pontos $ jogador jogo) (700,400) state]
+drawLevel state = Pictures [
+        drawEspinho jogo texEspinho,
+        drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo),
+        drawHud jogo texPlataforma,
+        drawBackground jogo texPlataforma,drawLadder jogo texEscada,
+        drawPorta jogo texPorta,
+        drawMap jogo texPlataforma,
+        drawColecs state texMoeda texmartelo2 texChave jogo,
+        drawAlcapao jogo texAlcapao,
+        drawTunel jogo texTunel,
+        if fst $ aplicaDano (jogador jogo) then
+            drawHammer jogo (playAnimAny 4 (time state) martelos) (jogador jogo)
+        else
+            blank,
+        drawPlayer state (jogador jogo),
+        drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,
+        drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo,
+        drawNum (pontos $ jogador jogo) (700,400) state,
+        if lostGame jogo == 5 then
+            drawPause state
+        else
+            blank
+    ]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -251,15 +273,15 @@ playAnimAny x time texs = texs !! frame
     frame = floor (time * n) `mod` length texs
 
 eventHandlerInGame :: Event -> Jogo -> Jogo
-eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyRight) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyLeft) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarEsquerda) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyLeft) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyUp) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Subir) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyUp) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyDown) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Descer) jogo
-eventHandlerInGame (EventKey (SpecialKey KeyDown) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
-eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Saltar) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyRight) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyLeft) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarEsquerda) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyLeft) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyUp) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Subir) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyUp) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyDown) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Descer) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeyDown) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
+-- eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Saltar) jogo
 --eventHandlInGameer (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
 eventHandlerInGame (EventKey (Char 'd') Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
 eventHandlerInGame (EventKey (Char 'd') Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
@@ -271,33 +293,17 @@ eventHandlerInGame (EventKey (Char 's') Down _ _) jogo = atualiza (replicate (le
 eventHandlerInGame (EventKey (Char 's') Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
 eventHandlerInGame e jogo = jogo
 
-
+drawPause :: State -> Picture
+drawPause state = Pictures [
+        Translate 0 0 $ scale (4 * d2f escalaGloss/50) (4 * d2f escalaGloss/50) pauseTex,
+        drawButtonTextDebug (selectedButton (menuState state)) 0 "Resume",
+        drawButtonTextDebug (selectedButton (menuState state)) 1 "Restart",
+        drawButtonTextDebug (selectedButton (menuState state)) 2 "Menu"
+    ]
+    where imagesTheme = fromJust (lookup Default (images state))
+          pauseTex = fromJust (lookup "pauseScreen" imagesTheme)
 
 drawAlcapao :: Jogo -> Picture -> Picture
 drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
 
-drawNum :: Int -> (Float, Float) -> State -> Picture
-drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $
-    case c of
-        '1' -> um
-        '2' -> dois
-        '3' -> tres
-        '4' -> quatro
-        '5' -> cinco
-        '6' -> seis
-        '7' -> sete
-        '8' -> oito
-        '9' -> nove
-        _ -> zero) : p) [] (show n))
-    where um = fromJust (lookup "um" imagesTheme)
-          dois = fromJust (lookup "dois" imagesTheme)
-          tres = fromJust (lookup "tres" imagesTheme)
-          quatro = fromJust (lookup "quatro" imagesTheme)
-          cinco = fromJust (lookup "cinco" imagesTheme)
-          seis = fromJust (lookup "seis" imagesTheme)
-          sete = fromJust (lookup "sete" imagesTheme)
-          oito = fromJust (lookup "oito" imagesTheme)
-          nove = fromJust (lookup "nove" imagesTheme)
-          zero = fromJust (lookup "zero" imagesTheme)
-          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           

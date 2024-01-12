@@ -33,7 +33,7 @@ window = FullScreen
 
 eventHandler :: Event -> State -> IO State
 eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
-eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu,levels = replace (levels state) (currentLevel state,(jogo {lostGame = 4}, unlocked))}
+eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu,levels = replace (levels state) (currentLevel state,(initLevel state, unlocked))}
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 eventHandler (EventKey (Char 'u') Down _ _) state = do
     writeFile "game.txt" (show (tempGame $ editorState state))
@@ -52,7 +52,7 @@ eventHandler (EventKey (Char 'p') Down _ _) state = return $ state {levels = rep
 
 eventHandler (EventKey (Char 'c') Down _ _) state = return $ state {cheats = not (cheats state)}
 eventHandler event state
-    | currentMenu state == InGame = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
+    | currentMenu state == InGame  && lostGame jogo /= 5 = return state {levels = replace (levels state) (currentLevel state,(eventHandlerInGame event jogo, unlocked))}
     | currentMenu state == LevelEditor = reactLevelEditor event state
     | otherwise = eventHandlerInMenu event state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
@@ -103,6 +103,8 @@ draw state = do
     putStrLn ("velocidade enm: " ++ show (map velocidade (inimigos jogo)))
     putStrLn ("selected Level: " ++ show (currentLevel state))
     putStrLn ("length Level: " ++ show (length $ levels state))
+    putStrLn ("lostGame jog: " ++ show (lostGame $ jogo))
+    putStrLn ("lostGame initState: " ++ show (lostGame $ initLevel state))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
@@ -234,6 +236,7 @@ loadImages state = do
     zero <- loadBMP "assets/Numbers/Zero.bmp"
     -- Backgrounds
     bgMenu <- loadBMP "assets/Backgrounds/menubackgrounds.bmp"
+    pauseScreen <- loadBMP "assets/Backgrounds/pause.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -332,6 +335,7 @@ loadImages state = do
             ("zero", zero),
             -- Backgrounds
             ("bgMenu", bgMenu),
+            ("pauseScreen", pauseScreen),
             -- Level Editor
             ("selector", selector)
             ]),

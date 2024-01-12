@@ -6,7 +6,6 @@ import Graphics.Gloss.Interface.IO.Game
 import Mapas
 import Data.Maybe (fromJust)
 import Utilities
-import DrawLevel (drawNum)
 
 -- | Faz o tratamento do input quando o utilizador se encontra no menu
 eventHandlerInMenu :: Event -> State -> IO State
@@ -83,6 +82,19 @@ buttonPress state
             initLevel = jog',
             levels = replace (levels state) (selectedButton (menuState state), (jog', unlocked))
         }
+    -- InGame pause menu
+    | selectedButton (menuState state) == 0 && currentMenu state == InGame = state {
+        levels = replace (levels state) (currentLevel state, (jogo {lostGame = 3}, unlocked)),
+        menuState = (menuState state) {selectedButton = 0}
+    }
+    | selectedButton (menuState state) == 1 && currentMenu state == InGame = state {
+        levels = replace (levels state) (currentLevel state, (jogo {lostGame = 4}, unlocked)),
+        menuState = (menuState state) {selectedButton = 0}
+    }
+    | selectedButton (menuState state) == 2 && currentMenu state == InGame = state {
+        levels = replace (levels state) (currentLevel state,(initLevel state, unlocked)),
+        currentMenu = MainMenu
+    }
     | otherwise = state
     where (jogo, unlocked) = (levels state) !! (selectedButton (menuState state))
           jogo' = initLevel state--(levels state) !! (currentLevel state)
