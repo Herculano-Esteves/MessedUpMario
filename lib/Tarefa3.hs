@@ -13,7 +13,6 @@ import Tarefa1
 import Tarefa2
 import GHC.Float (float2Double, double2Float)
 import Utilities
-import Tarefa4 (atualizaPersonagem, canGoDown)
 import Data.Fixed (mod')
 import Mapas
 import Text.Read (Lexeme(String))
@@ -134,7 +133,7 @@ perdeVidaJogadorJogo :: Jogo -> Jogo
 perdeVidaJogadorJogo jogo   | cheatsjogo jogo = jogo
                             | otherwise = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (lostGame jogo) (jogador jogo) (inimigos jogo)}
 
-
+-- | Função que verifica se o jogador colide com algum inimigo
 perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
 perdeVidaJogador jog inm
     | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
@@ -295,15 +294,22 @@ checkEscadaAux (Mapa _ _ mat) perso = perso {emEscada = any (\pos -> floorPos (p
 
 ladderConditions :: Jogo -> Jogo
 ladderConditions jog = jog {
-    jogador = (jogador jog) {
-        velocidade = if (emEscada (jogador jog) &&
-            (snd $ velocidade $ jogador jog) < 0 &&
-            (snd $ velocidade $ jogador jog) /= -ladderSpeed ) then
-                (0,0)
+    jogador =
+            if (emEscada (jogador jog) &&
+                (fst $ velocidade $ jogador jog) == 0 &&
+                (snd $ velocidade $ jogador jog) /= 0 &&
+                abs (snd $ velocidade $ jogador jog) /= ladderSpeed ) then
+                (jogador jog) { 
+                    velocidade = (0,0),
+                    posicao = (fromIntegral (floor (fst (posicao (jogador jog)))) + 0.5, fromIntegral (floor (snd (posicao (jogador jog)))) +0.5),
+                    direcao = Norte
+                }
             else
-                velocidade $ jogador jog
+                (jogador jog) {
+                    velocidade = velocidade $ jogador jog
+                }
     }
-}
+
 
 --INICIO DE AI
 
@@ -326,7 +332,7 @@ inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 
                             where p = any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Escada] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
 
 
-
+-- | Função que faz com que o inimigo ande
 inimigoAndar :: Int -> Mapa -> Personagem -> Personagem
 inimigoAndar start mapa enm     | posicao enm == (-20,-20) = enm
                                 | (fst (velocidade enm) == 0) = if start > 0 then enm {velocidade = (1.5,snd (velocidade enm))} else enm {velocidade = (-1.5,snd (velocidade enm))}
@@ -338,6 +344,7 @@ inimigoAndar start mapa enm     | posicao enm == (-20,-20) = enm
                                 where ((p1,p2),(p3,p4)) = genHitbox enm
                                       p = (any (sobreposicao (genHitbox enm)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta,Espinho] (dimensaobloco*0.5,dimensaobloco*0.5) mapa))
 
+-- | Função que faz com que o inimigo suba ou desça a escada
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
 inimigosubirdescerescada start mapa enm --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
                                             --then enm {velocidade = (if fst (velocidade enm) == 0 then 1.5 else fst (velocidade enm),0), posicao = (fst (posicao enm),fromInteger (floor (snd (posicao enm)))+0.5)}
@@ -353,6 +360,7 @@ inimigosubirdescerescada start mapa enm --if any (sobreposicao ((p1+0.3,p4),(p3-
 inimigosubirdescerescadaBool :: Mapa -> Personagem -> Bool
 inimigosubirdescerescadaBool mapa enm = fst (velocidade enm) == 0 && (snd (velocidade enm) == -ladderSpeed || snd (velocidade enm) == ladderSpeed) -- && (emEscada enm || canGoDown' enm mapa))
 
+-- | Função que verifica se o inimigo está em cima de uma escada
 onFstLadder :: Personagem -> Mapa -> Bool
 onFstLadder jog (Mapa _ _ blocos) = any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos) &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Escada blocos)

@@ -12,6 +12,12 @@ import DrawLevel (drawNum)
 eventHandlerInMenu :: Event -> State -> IO State
 eventHandlerInMenu (EventKey (SpecialKey KeyDown) Down _ _) state = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)< menuArrowsLimit state then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
 eventHandlerInMenu (EventKey (SpecialKey KeyUp) Down _ _) state = return state {menuState = (menuState state) {selectedButton = if selectedButton (menuState state)>0 then selectedButton (menuState state) - 1 else selectedButton (menuState state)}}
+eventHandlerInMenu (EventKey (SpecialKey KeyLeft) Down _ _) state 
+    | currentMenu state == LevelSelection = return state {menuState = (menuState state) {selectedButton = if selectedButton (menuState state)>0 then selectedButton (menuState state) - 1 else selectedButton (menuState state)}}
+    | otherwise = return state
+eventHandlerInMenu (EventKey (SpecialKey KeyRight) Down _ _) state
+    | currentMenu state == LevelSelection = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)< menuArrowsLimit state then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
+    | otherwise = return state
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {menuState = (menuState state) {pressingButton = True}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return $ if pressingButton $ menuState state then
         (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
@@ -43,7 +49,9 @@ drawMenu state
         Color red $ scale 0.5 0.5 $ text "Game over!"
     ]
     | currentMenu state == LevelSelection = Pictures $ [drawBg state,
-        scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,0) state] -- ++
+        scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,25) state,
+        drawArrow state
+        ] -- ++
         -- map (\((level2, unlocked1), n) -> Pictures $
             -- [drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n),
             -- drawLock unlocked1 n ]
@@ -53,6 +61,7 @@ drawMenu state
 drawTitle :: Picture
 drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong"
 
+-- | Desenha o fundo do menu
 drawBg :: State -> Picture
 drawBg state = scale (5*ratio) (5*ratio) $ img
     where img = fromJust $ lookup "bgMenu" (fromJust $ lookup Default (images state))
@@ -98,7 +107,19 @@ drawButton tex buttonType (currentIndex, index) pressed
           bTexPressed = fromJust $ lookup (buttonType ++ "Pressed") (fromJust $ lookup Default tex)
 
 drawBanner :: Images -> Picture
-drawBanner tex = scale 0.85 0.85 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
+drawBanner tex = scale 1 1 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
+
+drawArrow :: State -> Picture
+drawArrow state = Pictures [
+        if (selectedButton $ menuState state) > 0 then
+            Translate (-200) 50 $ scale 2.5 2.5 $ fromJust $ lookup "arrow" (fromJust $ lookup Default (images state))
+        else
+            blank,
+        if (selectedButton $ menuState state) < (menuArrowsLimit state) then
+            Translate 200 50 $ scale (-2.5) 2.5 $ fromJust $ lookup "arrow" (fromJust $ lookup Default (images state))
+        else
+            blank
+    ]
 
 drawLock :: Bool -> Int -> Picture
 drawLock unlocked n = Translate 90 (-10 + (-60 * fromIntegral n)) $ (if unlocked then Color green else Color red)

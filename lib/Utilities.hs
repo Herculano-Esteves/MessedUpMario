@@ -7,19 +7,19 @@ type Images = [(Theme, [(String,Picture)])]
 type Levels = [(Jogo, Bool)]
 
 data State = State {
-    levels :: Levels,
-    initLevel :: Jogo,
-    currentLevel :: Int,
+    levels      :: Levels,
+    initLevel   :: Jogo,
+    currentLevel:: Int,
     menuState :: MenuState,
     currentMenu :: Menu,
-    time :: Float,
+    time  :: Float,
     options :: Options,
-    exitGame :: Bool,
-    images :: Images,
-    animTime :: Float,
-    editorState :: EditorState,
-    cheats :: Bool,
-    screenSize :: (Int, Int)
+    exitGame  :: Bool,
+    images:: Images,
+    animTime  :: Float,
+    editorState      :: EditorState,
+    cheats          :: Bool,
+    screenSize      :: (Int, Int)
 }
 
 data Options = Options {
@@ -52,6 +52,7 @@ replace xs (i, e) = before ++ [e] ++ after
   where
     (before, _:after) = splitAt i xs
 
+-- | Função que substitui o valor de um determinado indíce de uma matriz
 replaceMat :: [[a]] -> (Int, Int, a) -> [[a]]
 replaceMat mat (x,y,a) = replace mat (y,replace (mat !! y) (x, a))
 
@@ -62,10 +63,11 @@ replaceMapGame (x,y) bloco jog = jog {
     where (Mapa a b mat) = mapa jog
           mat' = replaceMat mat (floor x,floor y,bloco)
 
--- | Retorna as posições de todosos blocos de um certo tipo num dado mapa
+-- | Retorna as posições de todos os blocos de um certo tipo numa matriz
 getPosOfBlock :: Bloco -> [[Bloco]] -> [Posicao]
 getPosOfBlock bloco mat = [(x,y) | x <- [0..fromIntegral (length (head mat)-1)], y <- [0..fromIntegral (length mat)-1], mat !! round y !! round x == bloco]
 
+-- | Retorna as posições de todos os blocos de um certo tipo num dado mapa
 getPosOfBlockMap :: Bloco -> Mapa -> [Posicao]
 getPosOfBlockMap bloco (Mapa _ _ blocos) = getPosOfBlock bloco blocos
 

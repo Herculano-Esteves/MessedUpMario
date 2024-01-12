@@ -51,21 +51,37 @@ eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = est
                     2 -> switchJogPos (tempGame estate)
 }
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (px, if floor py > 0 then py-1 else py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate 
 eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py+1)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (px, if floor py < (length mat - 1) then py+1 else py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate
+          (Mapa (pos,dir) p1 mat) = mapa $ tempGame estate
 eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px-1, py)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (if floor px > 0 then px-1 else px, py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate
 eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px+1, py)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (if floor px < (length (head mat) -1) then px+1 else px, py)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate
+          (Mapa (pos,dir) p1 mat) = mapa $ tempGame estate
 eventHandlerEditor (EventKey (Char 'a') Down _ _) screen estate = estate {
         tempGame = addRemoveEnemy (tempGame estate)
     }
@@ -77,7 +93,7 @@ eventHandlerEditor e screen s = s
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
     | savingGame $ editorState state = Color red $ scale 0.2 0.2 $ if valida (tempGame $ editorState state) then Text "Saved" else Text "Not saved! Invalid map"
-    | otherwise = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+    | otherwise = Pictures [drawEspinho jogo texEspinho, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
                 drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
@@ -86,7 +102,6 @@ drawLevelEditor state
           texInimigo1 = fromJust (lookup "inimigo1" imagesTheme)
           texInimigo2 = fromJust (lookup "inimigo2" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
-          texMartelo = fromJust (lookup "martelo" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
           texPorta = fromJust (lookup "portaMario" imagesTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
@@ -98,8 +113,11 @@ drawLevelEditor state
           texBoss4 = fromJust (lookup "boss4" imagesTheme)
           texBoss5 = fromJust (lookup "boss5" imagesTheme)
           texBoss6 = fromJust (lookup "boss6" imagesTheme)
-          texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
-          texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
+          texcamera = fromJust (lookup "cameraman" imagesTheme)
+          texEspinho = fromJust (lookup "espinho" imagesTheme)
+          martelos = [texmartelo1,texmartelo2]
+          texmartelo1 = fromJust (lookup "martelo1" imagesTheme)
+          texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           jogo = tempGame $ editorState state
 
@@ -132,7 +150,7 @@ drawMapLimits estate = Color green $ uncurry Translate (posMapToGlossNivel (came
           (tx, ty) = sizeR
           jog = tempGame estate
           
-
+-- | Função que recebe um jogo e substitui um bloco na posição do jogador
 replaceBlock :: Jogo -> Jogo
 replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
     where currentBlock = blocos !! floor y !! floor x
@@ -146,6 +164,7 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
             Vazio -> Plataforma
           (x,y) = posicao $ jogador jog
 
+-- | Função que adiciona um novo nível a um dado state
 addNewLevel :: State -> State
 addNewLevel state = state {
     levels = levels state ++ [(emptyGame, True)],
@@ -167,6 +186,7 @@ addNewLevel state = state {
             cheatsjogo = False
           }
 
+-- | Função que gera um mapa vazio com uma dada dimensão
 genEmptyMap :: (Int, Int) -> Mapa
 genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
     where aux :: Int -> [Bloco]
@@ -176,6 +196,7 @@ genEmptyMap dim = Mapa ((0.5, 2.5), Oeste) (0.5, 5.5) (aux2 dim)
           aux2 (_,0) = []
           aux2 (x,y) = aux x : aux2 (x,y-1)
 
+-- | Função que adiciona/remove ou substitui um inimigo a um jogo, na posição do jogador
 addRemoveEnemy :: Jogo -> Jogo
 addRemoveEnemy jog = jog {
         inimigos = 
@@ -214,6 +235,7 @@ addRemoveEnemy jog = jog {
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
 
+-- | Função que altera a posição de spawn do jogador no mapa de um dado jogo, colocando-o na posição do jogador
 switchJogPos :: Jogo -> Jogo
 switchJogPos jog = jog {
     mapa = (Mapa (pos, Oeste) p1 mat),
@@ -224,6 +246,7 @@ switchJogPos jog = jog {
     where (Mapa (p,dir) p1 mat) = mapa jog
           pos = posicao $ jogador jog
 
+-- | Função que adiciona/remove ou substitui colecionaveis a um dado jogo, na posição do jogador
 addRemoveColecs :: Jogo -> Jogo
 addRemoveColecs jog = jog {
     colecionaveis = if (any (\(col,pos) -> floorPos pos == floorPos (posicao $ jogador jog)) (colecionaveis jog)) then
