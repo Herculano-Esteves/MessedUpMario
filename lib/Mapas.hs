@@ -44,6 +44,91 @@ initialState = State {
     cheats = False,
     screenSize = (0,0)
 }
+--PERSONAGENS START
+
+fantasma :: Personagem
+fantasma = Personagem {velocidade = (0,0), 
+                    tipo = Fantasma, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (0,0), 
+                    tamanho = (0.5,0.7), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
+
+macacomalvado :: Personagem
+macacomalvado = Personagem {velocidade = (0,0), 
+                    tipo = MacacoMalvado, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (0,0), 
+                    tamanho = (1,1), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
+
+eyeentidade :: Personagem
+eyeentidade = Personagem {velocidade = (0,0), 
+                    tipo = EyeEntidade, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (0,0), 
+                    tamanho = (0.5,0.7), 
+                    aplicaDano = (False, 4), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
+
+eyeboss :: Personagem
+eyeboss = Personagem {velocidade = (0,0), 
+                    tipo = EyeBoss, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (0,0), 
+                    tamanho = (3,3), 
+                    aplicaDano = (False, 4), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
+
+cuspopersonagem :: Personagem
+cuspopersonagem = Personagem {velocidade = (0,0), 
+                    tipo = CuspoDeFogo, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (-100.5,-100.5), 
+                    tamanho = (0.35,0.35), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
+
+barrilpersonagem :: Personagem
+barrilpersonagem = Personagem {velocidade = (0,0), 
+                    tipo = Barril, 
+                    emEscada = False, 
+                    vida = 1, 
+                    pontos = 0, 
+                    ressalta = True, 
+                    posicao = (-5,0), 
+                    tamanho = (0.9,0.9), 
+                    aplicaDano = (False, 0), 
+                    direcao = Oeste,
+                    temChave = False,
+                    mira= (0,0)}
 
 data Letra
     = P
@@ -102,31 +187,6 @@ mapaTeste = Mapa ((6.0,5.5), Oeste) (0.5, 5.5)
     ,[Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma,Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma,Plataforma]
     ]
 
-cuspopersonagem = Personagem {velocidade = (0,0), 
-                    tipo = CuspoDeFogo, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (-100.5,-100.5), 
-                    tamanho = (0.35,0.35), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste,
-                    temChave = False,
-                    mira= (0,0)}
-
-barrilpersonagem =Personagem {velocidade = (0,0), 
-                    tipo = Barril, 
-                    emEscada = False, 
-                    vida = 1, 
-                    pontos = 0, 
-                    ressalta = True, 
-                    posicao = (-5,0), 
-                    tamanho = (0.9,0.9), 
-                    aplicaDano = (False, 0), 
-                    direcao = Oeste,
-                    temChave = False,
-                    mira= (0,0)}
 
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
@@ -265,7 +325,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     temChave = False,
                     mira= (0,0)},
         Personagem {velocidade = (0,0), 
-                    tipo = Fantasma, 
+                    tipo = EyeEntidade, 
                     emEscada = False, 
                     vida = 1, 
                     pontos = 0, 
@@ -283,7 +343,7 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     pontos = 0, 
                     ressalta = True, 
                     posicao = (10.5,10.5), 
-                    tamanho = (1,1), 
+                    tamanho = (3,3), 
                     aplicaDano = (False, 6), 
                     direcao = Oeste,
                     temChave = False,
