@@ -207,7 +207,12 @@ drawBackground :: Jogo -> Picture -> Picture
 drawBackground jogo tex = pictures []
 
 drawHud :: Jogo -> Picture -> Picture
-drawHud jogo tex1 = pictures []
+drawHud jogo tex = pictures (genPics (vida $ jogador jogo))
+    where genPics :: Int -> [Picture]
+          genPics n
+            | n == 0 = []
+            | otherwise = (Translate (d2f (-850 + (fromIntegral n*50))) 400 tex1) : genPics (n-1)
+          tex1 = color red $ rectangleSolid 25 25
 
 
 

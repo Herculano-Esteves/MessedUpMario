@@ -36,14 +36,15 @@ inimigoParado =
       vida = 1,
       pontos = 0,
       aplicaDano = (False, 0),
-      temChave = False
+      temChave = False,
+      mira = (0,0)
     }
 
 jogadorParado =
   Personagem
     { velocidade = (0.0, 0.0),
       tipo = Jogador,
-      posicao = (8.5, 7),
+      posicao = (7.5, 7.5),
       direcao = Oeste,
       tamanho = (0.8, 0.8),
       emEscada = False,
@@ -51,7 +52,8 @@ jogadorParado =
       vida = 10,
       pontos = 0,
       aplicaDano = (False, 0),
-      temChave = False
+      temChave = False,
+      mira = (0,0)
     }
 
 jogo01 :: Jogo
@@ -98,7 +100,7 @@ jogadorEmFrenteEscada =
   Personagem
     { velocidade = (0.0, 0.0),
       tipo = Jogador,
-      posicao = (7.5, 7),
+      posicao = (7.5, 7.5),
       direcao = Oeste,
       tamanho = (0.8, 0.8),
       emEscada = False,
@@ -106,7 +108,8 @@ jogadorEmFrenteEscada =
       vida = 10,
       pontos = 0,
       aplicaDano = (False, 0),
-      temChave = False
+      temChave = False,
+      mira = (0,0)
     }
 
 jogo02 :: Jogo
@@ -127,7 +130,7 @@ teste05 = TestLabel "T05" $ test [testeA, testeB]
   where
     testeA = "A: Quando a acção é Subir, o vetor velocidade do jogador é negativo na componente do Y" ~: True ~=? (snd . velocidade . jogador $ resultadoSubir) < 0
     testeB = "B: Quando a acção é Saltar, o jogador passa a estar em escada" ~: True ~=? (emEscada . jogador $ resultadoSubir)
-    resultadoSubir = atualiza [Nothing] (Just Subir) jogo01
+    resultadoSubir = movimenta 100 (1/60) $ atualiza [Nothing] (Just Subir) $ movimenta 100 (1/60) jogo01
 
 jogadorEmEscada =
   Personagem
@@ -141,7 +144,8 @@ jogadorEmEscada =
       vida = 10,
       pontos = 0,
       aplicaDano = (False, 0),
-      temChave = False
+      temChave = False,
+      mira = (0,0)
     }
 
 teste06 :: Test

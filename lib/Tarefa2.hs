@@ -84,11 +84,13 @@ validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jo
 
 -- | Verifica se os colecionávei se encontram em espaços vazios do mapa
 validaColecs :: [(Colecionavel,Posicao)] -> Mapa -> Bool
-validaColecs colecs (Mapa _ _ mat) = all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Vazio mat) colecs
+validaColecs colecs (Mapa _ _ mat)
+    | null colecs = True
+    | otherwise = all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Vazio mat) colecs
 
 -- | Verifica se as personagens (jogador e inimigos) se encontram em espaços vazios do mapa
 validaPosPers :: Personagem -> [Personagem] -> Mapa -> Bool
-validaPosPers player inms (Mapa (pos, dir) _ mat) = floorPos pos `elem` getPosOfBlock Vazio mat && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
+validaPosPers player inms (Mapa (pos, dir) _ mat) = floorPos pos `elem` getPosOfBlock Vazio mat -- && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
 
 floorPos :: Posicao -> Posicao
 floorPos (x,y) = (fromIntegral $ floor x, fromIntegral $ floor y)

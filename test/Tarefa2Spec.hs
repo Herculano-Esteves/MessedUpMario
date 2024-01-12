@@ -17,7 +17,7 @@ mapa01 =
       [Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio],
       [Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Escada, Vazio, Vazio],
       [Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Escada, Vazio, Vazio],
-      [Vazio, Plataforma, Plataforma, Plataforma, Alcapao, Plataforma, Plataforma, Plataforma, Plataforma, Vazio],
+      [Vazio, Plataforma, Plataforma, Plataforma, Alcapao, Alcapao, Plataforma, Plataforma, Plataforma, Vazio],
       [Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio],
       [Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio],
       [Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
@@ -27,37 +27,45 @@ inimigoModelo =
   Personagem
     { velocidade = (0.0, 0.0),
       tipo = Fantasma,
-      posicao = (2.5, 7.6),
+      posicao = (3.5, 7.5),
       direcao = Este,
       tamanho = (1, 1),
       emEscada = False,
       ressalta = True,
       vida = 1,
       pontos = 0,
-      aplicaDano = (False, 0)
+      aplicaDano = (False, 0),
+      temChave = False,
+      mira = (0,0)
     }
 
 jogadorParado =
   Personagem
     { velocidade = (0.0, 0.0),
       tipo = Jogador,
-      posicao = (8.5, 6.5),
+      posicao = (8.5, 7.5),
       direcao = Oeste,
       tamanho = (0.8, 0.8),
       emEscada = False,
       ressalta = False,
       vida = 10,
       pontos = 0,
-      aplicaDano = (False, 0)
+      aplicaDano = (False, 0),
+      temChave = False,
+      mira = (0,0)
     }
 
 jogo01 :: Jogo
 jogo01 =
   Jogo
     { mapa = mapa01,
-      inimigos = [inimigoModelo, inimigoModelo],
+      inimigos = [inimigoModelo, inimigoModelo {posicao = (3.5, 7.6)}],
       colecionaveis = [],
-      jogador = jogadorParado
+      jogador = jogadorParado,
+      lostGame = 3,
+      cameraControl = ((0,0),(0,0)),
+      animacaoJogo = 0,
+      cheatsjogo = False
     }
 
 teste01 :: Test
@@ -76,7 +84,7 @@ mapa02 =
       [Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio],
       [Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Escada, Vazio, Vazio],
       [Vazio, Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Escada, Vazio, Vazio],
-      [Vazio, Plataforma, Plataforma, Plataforma, Alcapao, Plataforma, Plataforma, Plataforma, Plataforma, Vazio],
+      [Vazio, Plataforma, Plataforma, Plataforma, Alcapao, Alcapao, Plataforma, Plataforma, Plataforma, Vazio],
       [Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio],
       [Vazio, Escada, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Escada, Vazio],
       [Plataforma, Plataforma, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma]
@@ -107,7 +115,7 @@ mapa03 =
     (5, 1.5)
     [ [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio],
       [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio],
-      [Vazio, Vazio, Vazio, Alcapao, Plataforma, Plataforma, Plataforma, Vazio, Vazio, Vazio],
+      [Vazio, Vazio, Vazio, Alcapao, Alcapao, Plataforma, Plataforma, Vazio, Vazio, Vazio],
       [Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Escada, Vazio, Vazio, Vazio],
       [Vazio, Vazio, Vazio, Escada, Vazio, Vazio, Escada, Vazio, Vazio, Vazio],
       [Vazio, Vazio, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Plataforma, Vazio, Vazio],
