@@ -215,7 +215,8 @@ addRemoveEnemy jog = jog {
                         tamanho = (1,1), 
                         aplicaDano = (False, 0), 
                         direcao = Oeste,
-                        temChave = False} else enm) $
+                        temChave = False,
+                        mira= (0,0)} else enm) $
                 filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= Boss) (inimigos jog)
             else
                 Personagem {velocidade = (0,0), 
@@ -228,7 +229,8 @@ addRemoveEnemy jog = jog {
                         tamanho = (1,1), 
                         aplicaDano = (False, 0), 
                         direcao = Oeste,
-                        temChave = False} : inimigos jog
+                        temChave = False,
+                        mira= (0,0)} : inimigos jog
     }
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog

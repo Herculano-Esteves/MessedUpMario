@@ -17,7 +17,7 @@ extrasFuncao random tempo state = state{levels = replace (levels state) (current
 movimentaExtras :: State -> Tempo -> Semente -> (Int,Int) -> Jogo -> Jogo
 movimentaExtras state dtime random screen jogo  | lostGame jogo == 5 = jogo
                                                 | lostGame jogo == 2 = perdeVidaJogadorEnd dtime jogo
-                                                | otherwise =cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
+                                                | otherwise = eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
 
 --Cheats START
 cheatModeAtualiza :: Bool -> Jogo -> Jogo
@@ -110,3 +110,22 @@ movimentaCuspoaux tempo fogo = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
                 where   (fx,fy) = posicao fogo
                         (vx,vy) = velocidade fogo
 --Boss AI END
+
+--EYEBOSS START
+
+eyebossMovimento :: Tempo -> Jogo -> Jogo
+eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo {inimigos = ataqueDoBoss tempo (jogador jogo) ( eyemovimentaBoss tempo a (jogador jogo)) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
+                                | otherwise = jogo
+                            where   (a,b) = onlyOneTipo (inimigos jogo) EyeBoss
+                                    (c,d) = onlyOneTipo b CuspoDeFogo
+
+--Sabendo que so pode existir um boss
+eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> Personagem
+eyemovimentaBoss tempo bosses jogador = boss {aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss),mira = (a,b)}
+                    where   boss = head bosses
+                            tboss = snd (aplicaDano boss)-tempo
+                            (bx,by) = posicao boss
+                            (jx,jy) = posicao jogador
+                            (a,b) = (jx-bx,jy-by)
+
+--EYEBOSS END

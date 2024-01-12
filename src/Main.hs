@@ -175,6 +175,9 @@ loadImages state = do
     ataque8 <- loadBMP "assets/Bosses/ataque/ataque8.bmp"
     ataque9 <- loadBMP "assets/Bosses/ataque/ataque9.bmp"
     ataque10 <- loadBMP "assets/Bosses/ataque/ataque10.bmp"
+    --EYE BOSS
+    olhobranco <- loadBMP "assets/Bosses/EyeBoss/EyeWhite.bmp"
+    olhoazul <- loadBMP "assets/Bosses/EyeBoss/EyeBlue.bmp"
     -- Estrela mario
     estrela1 <- loadBMP "assets/Estrela/Estrela1.bmp"
     estrela2 <- loadBMP "assets/Estrela/Estrela2.bmp"
@@ -300,6 +303,9 @@ loadImages state = do
             ("ataqueboss8",ataque8),
             ("ataqueboss9",ataque9),
             ("ataqueboss10",ataque10),
+            --Boss EYE
+            ("olhobranco",olhobranco),
+            ("olhoazul",olhoazul),
             -- Estrela Mario
             ("estrela1",estrela1),
             ("estrela2",estrela2),

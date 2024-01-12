@@ -67,6 +67,7 @@ data Entidade
   | Barril
   | Boss
   | CuspoDeFogo
+  | EyeBoss
   deriving (Ord, Eq, Read, Show)
 
 -- | Tipos de items passiveis de ser colecionaveis por um 'Personagem'.
@@ -89,8 +90,9 @@ data Personagem =
     , ressalta   :: Bool
     , vida       :: Int -- ^ não negativo
     , pontos     :: Int
-    , aplicaDano :: (Bool, Double)
-    , temChave   :: Bool -- ^ se está armado e por quanto tempo ainda
+    , aplicaDano :: (Bool, Double)-- ^ se está armado e por quanto tempo ainda
+    , temChave   :: Bool  -- se pode abrir uma porta ou nao
+    , mira       :: (Double, Double) -- onde está a apontar
     }
   deriving (Eq, Read, Show)
 

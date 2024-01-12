@@ -112,7 +112,8 @@ cuspopersonagem = Personagem {velocidade = (0,0),
                     tamanho = (0.35,0.35), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
 
 barrilpersonagem =Personagem {velocidade = (0,0), 
                     tipo = Barril, 
@@ -124,7 +125,8 @@ barrilpersonagem =Personagem {velocidade = (0,0),
                     tamanho = (0.9,0.9), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
 
 inm :: [Personagem]
 inm = [Personagem {velocidade = (0,0), 
@@ -137,7 +139,8 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -148,7 +151,8 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -159,7 +163,8 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
                     tipo = MacacoMalvado, 
                     emEscada = False, 
@@ -170,7 +175,8 @@ inm = [Personagem {velocidade = (0,0),
                     tamanho = (1,1), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
                     ]
 jog :: Personagem
 jog = Personagem {  velocidade = (0,0),
@@ -183,7 +189,8 @@ jog = Personagem {  velocidade = (0,0),
                     tamanho = (0.6,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
 
 
 -- TESTE DATA END
@@ -230,7 +237,8 @@ jog2 = Personagem {  velocidade = (0,0),
                     tamanho = (0.8,1.0), 
                     aplicaDano = (False, 0), 
                     direcao = Este,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
 inmjogo2 :: [Personagem]
 inmjogo2 = [Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
@@ -242,7 +250,8 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -253,7 +262,8 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
                     tipo = Fantasma, 
                     emEscada = False, 
@@ -264,9 +274,10 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     tamanho = (0.5,0.7), 
                     aplicaDano = (False, 0), 
                     direcao = Oeste,
-                    temChave = False},
+                    temChave = False,
+                    mira= (0,0)},
         Personagem {velocidade = (0,0), 
-                    tipo = Boss, 
+                    tipo = EyeBoss, 
                     emEscada = False, 
                     vida = 1, 
                     pontos = 0, 
@@ -275,7 +286,8 @@ inmjogo2 = [Personagem {velocidade = (0,0),
                     tamanho = (1,1), 
                     aplicaDano = (False, 6), 
                     direcao = Oeste,
-                    temChave = False}
+                    temChave = False,
+                    mira= (0,0)}
                     ]
 
 colecjogo2 :: [(Colecionavel, Posicao)]
