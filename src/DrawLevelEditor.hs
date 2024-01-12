@@ -93,7 +93,7 @@ eventHandlerEditor e screen s = s
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
     | savingGame $ editorState state = Color red $ scale 0.2 0.2 $ if valida (tempGame $ editorState state) then Text "Saved" else Text "Not saved! Invalid map"
-    | otherwise = Pictures [drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texMartelo texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+    | otherwise = Pictures [drawEspinho jogo texEspinho, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
                 drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
@@ -102,7 +102,6 @@ drawLevelEditor state
           texInimigo1 = fromJust (lookup "inimigo1" imagesTheme)
           texInimigo2 = fromJust (lookup "inimigo2" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
-          texMartelo = fromJust (lookup "martelo" imagesTheme)
           texChave = fromJust (lookup "chavemario" imagesTheme)
           texPorta = fromJust (lookup "portaMario" imagesTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
@@ -114,8 +113,11 @@ drawLevelEditor state
           texBoss4 = fromJust (lookup "boss4" imagesTheme)
           texBoss5 = fromJust (lookup "boss5" imagesTheme)
           texBoss6 = fromJust (lookup "boss6" imagesTheme)
-          texCuspo1 = fromJust (lookup "cuspo1" imagesTheme)
-          texCuspo2 = fromJust (lookup "cuspo2" imagesTheme)
+          texcamera = fromJust (lookup "cameraman" imagesTheme)
+          texEspinho = fromJust (lookup "espinho" imagesTheme)
+          martelos = [texmartelo1,texmartelo2]
+          texmartelo1 = fromJust (lookup "martelo1" imagesTheme)
+          texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           jogo = tempGame $ editorState state
 

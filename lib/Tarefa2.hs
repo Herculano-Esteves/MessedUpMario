@@ -57,7 +57,7 @@ validaEscadas (Mapa _ _ mat) = all validateEachOne (agrupaEscadas (getPosOfBlock
             where (x1,y1) = head ls
                   (x2,y2) = last ls
 
-
+-- | Agrupa as escadas em grupos de 2
 agrupaEscadas :: [Posicao] -> [[Posicao]]
 agrupaEscadas pos = map (\p-> [head p] ++ [last p]) $ agrupaEscadasAux (groupEscadasAux pos)
 

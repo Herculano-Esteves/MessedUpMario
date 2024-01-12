@@ -61,6 +61,7 @@ drawMenu state
 drawTitle :: Picture
 drawTitle = Color blue $ Translate (-75) 100 $ Scale 0.3 0.3 $ text "Donkey kong"
 
+-- | Desenha o fundo do menu
 drawBg :: State -> Picture
 drawBg state = scale (5*ratio) (5*ratio) $ img
     where img = fromJust $ lookup "bgMenu" (fromJust $ lookup Default (images state))
