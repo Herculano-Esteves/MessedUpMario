@@ -20,6 +20,7 @@ import LI12324
 import Tarefa1
 import Tarefa2
 import Utilities
+import Tarefa3 (onFstLadder)
 
 -- | Função que executa a ação de cada personagem num dado jogo
 atualiza :: [Maybe Acao] -> Maybe Acao -> Jogo -> Jogo
@@ -55,12 +56,12 @@ atualizaPersonagem jogo action inm = case action of
                     direcao = Sul}
             else
                 inm
-        Just AndarEsquerda -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
+        Just AndarEsquerda -> if snd (velocidade inm) /= 0 || (emEscada inm && not (onFstLadder inm (mapa jogo))) then inm else inm {velocidade = (-4,snd (velocidade inm)), direcao = Oeste}
         Just Saltar -> if (snd (velocidade inm) == 0 ) && not (emEscada inm) || canJump inm (mapa jogo) then
                 inm {velocidade = (fst $ (velocidade inm),-5)}
             else
                 inm
-        Just AndarDireita -> if not (snd (velocidade inm) == 0) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
+        Just AndarDireita -> if snd (velocidade inm) /= 0 || (emEscada inm && not (onFstLadder inm (mapa jogo))) then inm else inm {velocidade = (4,snd (velocidade inm)), direcao = Este}
         -- Just Parar -> inm {velocidade = (0,if (emEscada inm) then 0 else snd (velocidade inm))} -- TODO: Make the player stop after releasing key when on ladder
         Just Parar -> if (not $ emEscada inm) then inm {velocidade = (0, snd (velocidade inm))} else inm {velocidade = (0,0)}
         Nothing -> inm
@@ -74,7 +75,9 @@ canGoDown jog (Mapa _ _ blocos)= emEscada jog ||
     (any (\(x,y) -> floorPos (posicao jog) == (x,y-2)) (getPosOfBlock Escada blocos) &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos))
 
+-- | Função que para uma personagem e mapa, devolve um bool correspondente a se pode saltar
 canJump :: Personagem -> Mapa -> Bool
 canJump jog (Mapa _ _ blocos) = fst (velocidade jog) /= 0 &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Escada blocos) &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Plataforma blocos)
+

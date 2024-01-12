@@ -313,3 +313,5 @@ jogo2 = Jogo mapa inmjogo2 colecjogo2 jog 3 (generateInicialHitbox mapa) 0 False
 jogoTurorial :: Jogo
 jogoTurorial = Jogo mapa [cuspopersonagem] colecjogo2 jog 3 (generateInicialHitbox mapa) 0 False
             where mapa = Mapa ((3,3.5),Norte) (0,0) (mapaTradutor mapaTutorialLetras)
+
+-- Level that makes use of all blocks

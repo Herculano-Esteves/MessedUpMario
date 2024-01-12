@@ -51,21 +51,37 @@ eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = est
                     2 -> switchJogPos (tempGame estate)
 }
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py-1)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (px, if floor py > 0 then py-1 else py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate 
 eventHandlerEditor (EventKey (SpecialKey KeyDown) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px, py+1)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (px, if floor py < (length mat - 1) then py+1 else py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate
+          (Mapa (pos,dir) p1 mat) = mapa $ tempGame estate
 eventHandlerEditor (EventKey (SpecialKey KeyLeft) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px-1, py)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (if floor px > 0 then px-1 else px, py)
+            }
+        }
     }
     where (px, py) = posicao $ jogador $ tempGame estate
 eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) screen estate = estate {
-        tempGame = cameraHitbox screen (1) $ (tempGame estate) {jogador = (jogador $ tempGame estate) {posicao = (px+1, py)}}
+        tempGame = cameraHitbox screen (1) $ (tempGame estate) {
+            jogador = (jogador $ tempGame estate) {
+                posicao = (if floor px < (length (head mat) -1) then px+1 else px, py)}}
     }
     where (px, py) = posicao $ jogador $ tempGame estate
+          (Mapa (pos,dir) p1 mat) = mapa $ tempGame estate
 eventHandlerEditor (EventKey (Char 'a') Down _ _) screen estate = estate {
         tempGame = addRemoveEnemy (tempGame estate)
     }

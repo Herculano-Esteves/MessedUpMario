@@ -210,6 +210,7 @@ loadImages state = do
     botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
     botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
     botaoQuitPressed <- loadBMP "assets/Buttons/BotaoQuitPressed.bmp"
+    arrow <- loadBMP "assets/Buttons/arrow.bmp"
     -- Numbers
     um <- loadBMP "assets/Numbers/Um.bmp"
     dois <- loadBMP "assets/Numbers/Dois.bmp"
@@ -252,6 +253,7 @@ loadImages state = do
             ("botaoQuit", botaoQuit),
             ("botaoQuitHover", botaoQuitHover),
             ("botaoQuitPressed", botaoQuitPressed),
+            ("arrow", arrow),
             ("menuBanner", menuBanner),
             ("portaMario",portamario),
             ("macacoMalvado", macacomalvado),
