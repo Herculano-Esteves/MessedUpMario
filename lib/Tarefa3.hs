@@ -21,7 +21,7 @@ import Text.Read (Lexeme(String))
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog    | lostGame jog == 5 = jog
                             | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
-                            | otherwise = ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                            | otherwise = naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -48,20 +48,17 @@ hitboxDanoJogador x y
 hitboxDanoJogadoraux :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogadoraux _ [] = []
 hitboxDanoJogadoraux player (h:t)
+    | aux dir == 3 = h:t
     | sobreposicao ((p2-tam1*aux dir,p1),(p4-tam2*aux dir,p3)) (genHitbox h) = h {vida = vida h -1 }: hitboxDanoJogadoraux player t
     | otherwise = h: hitboxDanoJogadoraux player t
-    where p1 = snd (fst (genHitbox player))
-          p2 = fst (fst (genHitbox player))
-          p3 = snd (snd (genHitbox player))
-          p4 = fst (snd (genHitbox player))
-          tam1 = fst (tamanho player)
-          tam2 = snd (tamanho player)
+    where ((p2,p1),(p4,p3)) = genHitbox player
+          (tam1,tam2) = tamanho player
           dir = direcao player
           aux :: Direcao -> Double
           aux x
             | x == Este = -1
             | x == Oeste = 1
-            | otherwise = 1
+            | otherwise = 3
 --Dano Jogador END
 
 
@@ -241,8 +238,18 @@ removerUmAlcapao y x l jog bloco  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0
 
 
 --Logistica de movimento Start
+naoPassaPeloTetoFinal :: Tempo -> Jogo -> Jogo
+naoPassaPeloTetoFinal tempo jogo = jogo {jogador = naoPassaPeloTeto tempo (mapa jogo) (jogador jogo)}
+
+naoPassaPeloTeto :: Tempo -> Mapa -> Personagem -> Personagem
+naoPassaPeloTeto tempo mapa jogador   | emEscada jogador = jogador
+                                | elem True (foldl (\x y -> sobreposicao ((p1,p2),(p3,p2-0.1)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) = jogador {velocidade = (fst (velocidade jogador),0),posicao = (fst (posicao jogador),snd (posicao jogador)+2*tempo)}
+                                | otherwise = jogador
+                    where ((p1,p2),(p3,p4)) = genHitbox jogador
+
+
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
