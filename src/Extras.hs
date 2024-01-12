@@ -17,7 +17,7 @@ extrasFuncao random tempo state = state{levels = replace (levels state) (current
 movimentaExtras :: State -> Tempo -> Semente -> (Int,Int) -> Jogo -> Jogo
 movimentaExtras state dtime random screen jogo  | lostGame jogo == 5 = jogo
                                                 | lostGame jogo == 2 = perdeVidaJogadorEnd dtime jogo
-                                                | otherwise = eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
+                                                | otherwise = movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
 
 --Cheats START
 cheatModeAtualiza :: Bool -> Jogo -> Jogo
@@ -78,20 +78,20 @@ controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
 
 --Boss AI START
 bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x) [] ( movimentaBoss tempo a) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x ++ y) [] ( movimentaBoss tempo a) ++ c ++ d}
                             | otherwise = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) Boss
                                     (c,d) = onlyOneTipo b CuspoDeFogo
 
 --Sabendo que so pode existir um boss
 movimentaBoss :: Tempo -> [Personagem] -> [Personagem]
-movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss)}) bosses
+movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo)}) bosses
                     where   boss = head bosses
                             tboss = snd (aplicaDano boss)-tempo
 
 ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
-ataqueDoBoss tempo jogador boss   | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                            | tboss == 8-42*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+ataqueDoBoss tempo jogador boss | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                                | tboss == 8-42*tempo && tipo boss /= EyeEntidade = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
 
                             | otherwise = [boss]
                             where tboss = snd (aplicaDano boss)
@@ -99,6 +99,11 @@ ataqueDoBoss tempo jogador boss   | tboss == 8-10*tempo = [cuspopersonagem{posic
                                   (jx,jy) = posicao jogador
                                   (a,b) = (jx-bx,jy-by)
                                   (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
+
+movimentaCuspoJogo :: Tempo -> Jogo -> Jogo
+movimentaCuspoJogo tempo jogo   | CuspoDeFogo `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaCuspo (mapa jogo) tempo c ++ d}
+                                | otherwise = jogo
+                            where   (c,d) = onlyOneTipo (inimigos jogo) CuspoDeFogo
 
 movimentaCuspo :: Mapa -> Tempo -> [Personagem] -> [Personagem]
 movimentaCuspo mapa tempo cuspos | null cuspos = cuspos
@@ -114,22 +119,36 @@ movimentaCuspoaux tempo fogo = fogo {posicao = (fx+vx*tempo,fy+vy*tempo)}
 --EYEBOSS START
 
 eyebossMovimento :: Tempo -> Jogo -> Jogo
-eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo {inimigos = ataqueDoBoss tempo (jogador jogo) ( eyemovimentaBoss tempo a (jogador jogo)) ++ movimentaCuspo (mapa jogo) tempo c ++ d}
+eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x ++ y) [] ( eyemovimentaBoss tempo a (jogador jogo)) ++ c ++ d}
                                 | otherwise = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) EyeBoss
                                     (c,d) = onlyOneTipo b CuspoDeFogo
 
 --Sabendo que so pode existir um boss
-eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> Personagem
-eyemovimentaBoss tempo bosses jogador = boss {aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if tboss <= 0 then 8 else tboss),mira = (a,b)}
+eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> [Personagem]
+eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (a,b)}) bosses
                     where   boss = head bosses
                             tboss = snd (aplicaDano boss)-tempo
                             (bx,by) = posicao boss
                             (jx,jy) = posicao jogador
                             (a,b) = (jx-bx,jy-by)
+                            
 
 --EYEBOSS END
 
 --EyeEntity START
+eyeentityMovimento :: Tempo -> Jogo -> Jogo
+eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x ++ y) [] ( eyemovimentaEntity tempo a (jogador jogo)) ++ c ++ d}
+                                | otherwise = jogo
+                            where   (a,b) = onlyOneTipo (inimigos jogo) EyeEntidade
+                                    (c,d) = onlyOneTipo b CuspoDeFogo
 
+--Sabendo que so pode existir um boss
+eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (a,b)}) bosses
+                    where   boss = head bosses
+                            tboss = snd (aplicaDano boss)-tempo
+                            (bx,by) = posicao boss
+                            (jx,jy) = posicao jogador
+                            (a,b) = (jx-bx,jy-by)
 --EyeEntity END

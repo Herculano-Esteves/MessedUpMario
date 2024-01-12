@@ -29,7 +29,7 @@ distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
 firstDecimal :: Double -> Int
 firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
-
+-- esquerda pertence, direita nao
 onlyOneTipo :: [Personagem] -> Entidade -> ([Personagem],[Personagem])
 onlyOneTipo lista ent = foldl (\(a,b) y -> if tipo y == ent then (y : a,b) else (a,y : b)) ([],[]) lista
 
@@ -73,8 +73,12 @@ inimigoMorto enm    | null enm = enm
 
 -- GRAVIDADE START
 gravidadeQuedaEnd :: Double -> Jogo -> Jogo
-gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) (foldl (\x y -> if tipo y == Fantasma || tipo y == MacacoMalvado || tipo y == Barril then y : x else x) [] (inimigos jogo))) ++ (foldl (\x y -> if tipo y /= Fantasma && tipo y /= MacacoMalvado && tipo y /= Barril then y : x else x) [] (inimigos jogo)), jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
-
+gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) inimigosgravidade) ++ i, jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
+                            where   inimigosgravidade = a++c++e++h
+                                    (a,b) = onlyOneTipo (inimigos jogo) EyeEntidade
+                                    (c,d) = onlyOneTipo b Fantasma
+                                    (e,f) = onlyOneTipo d Barril
+                                    (h,i) = onlyOneTipo f MacacoMalvado
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
@@ -299,7 +303,7 @@ ladderConditions jog = jog {
                 (fst $ velocidade $ jogador jog) == 0 &&
                 (snd $ velocidade $ jogador jog) /= 0 &&
                 abs (snd $ velocidade $ jogador jog) /= ladderSpeed ) then
-                (jogador jog) { 
+                (jogador jog) {
                     velocidade = (0,0),
                     posicao = (fromIntegral (floor (fst (posicao (jogador jog)))) + 0.5, fromIntegral (floor (snd (posicao (jogador jog)))) +0.5),
                     direcao = Norte
@@ -323,7 +327,7 @@ movimentoInimigos sem jogo = jogo {inimigos = movimentoInimigoscontrolo (geraAle
 -- movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = if tipo a == Fantasma then inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo else a : movimentoInimigoscontrolo t mapa b jogo
 
 movimentoInimigoscontrolo :: [Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
-movimentoInimigoscontrolo seeds mapa enms jogo = zipWith (\h a -> if tipo a == Fantasma then inimigoMove h mapa a else a) seeds enms
+movimentoInimigoscontrolo seeds mapa enms jogo = zipWith (\h a -> if tipo a == Fantasma || tipo a == EyeEntidade then inimigoMove h mapa a else a) seeds enms
 
 inimigoMove :: Int -> Mapa -> Personagem -> Personagem
 inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 (show start)) >= 301 && (emEscada enm || canGoDown' enm mapa) = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)

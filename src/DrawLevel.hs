@@ -116,7 +116,7 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
                                                             if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else 
-                                                            if tipo x == EyeBoss then drawMoreComplex state jogo controlo x else drawEnemy controlo jogo texBarril x (jogador jogo))
+                                                            drawMoreComplex state jogo controlo x)
                                                             (inimigos jogo)
                                                             where   ataqueboss = [texataque1,texataque2,texataque3,texataque4,texataque5,texataque6,texataque7,texataque8,texataque9,texataque10]
                                                                     texataque1 = fromJust (lookup "ataqueboss1" imagesTheme)
@@ -141,8 +141,9 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
 
 
 drawMoreComplex :: State -> Jogo -> Bool -> Personagem -> Picture
-drawMoreComplex state jogo controlo inim | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, desenhahit]
-                                         | otherwise = rectangleSolid 10 10
+drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, desenhahit]
+                                            | tipo inim == EyeEntidade = Pictures [starttranslate $ Scale (0.25) (0.25) texOlhobranco, starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) $ Scale (1/3) (1/3) texOlhoazul, desenhahit]
+                                            | otherwise = rectangleSolid 10 10
                                         where   texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
                                                 texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
                                                 imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
