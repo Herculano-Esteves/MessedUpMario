@@ -31,6 +31,7 @@ eventHandlerInMenu e state = return state
 menuArrowsLimit :: State -> Int
 menuArrowsLimit state
     | currentMenu state == LevelSelection = length (levels state) - 1
+    | currentMenu state == InGame = 2
     | otherwise = 3
 -- | Função que deseha todos os elementos  visuais do menu
 drawMenu :: State -> Picture
@@ -83,12 +84,13 @@ buttonPress state
         currentMenu = LevelEditor,
         editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
     | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { exitGame = True}
-    | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
+    | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {marioTheme = switchTheme (marioTheme $ options state)} }
     | currentMenu state == LevelSelection && unlocked = state { 
             currentMenu = InGame, 
             currentLevel = selectedButton (menuState state), 
             initLevel = jog',
-            levels = replace (levels state) (selectedButton (menuState state), (jog', unlocked))
+            levels = replace (levels state) (selectedButton (menuState state), (jog', unlocked)),
+            menuState = (menuState state) {selectedButton = 0}
         }
     | currentMenu state == LevelSelection = state
     -- InGame pause menu
@@ -165,9 +167,18 @@ drawEndScreen state = Pictures [
     where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))
           pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
 
+switchTheme :: Theme -> Theme
+switchTheme current = case current of
+    Default -> Quadradinho
+    Quadradinho -> Default
+
 drawMarioThemeSel :: State -> Picture
 drawMarioThemeSel state = Pictures [
-    currentMario,
-    drawArrow state
+    scale 5 5 currentMario,
+    Translate 0 (-100) $ scale 5 5 currentMario,
+    -- drawArrow state
+    Translate (-100) (-100 * (fromIntegral $ selectedButton $ menuState state)) $ scale (-1) 1 $ arrowTex
     ]
     where currentMario = fromJust $ lookup "marioandar1" (fromJust $ lookup (marioTheme $ options state) (images state))
+          currentPlatform = fromJust $ lookup "plataforma" (fromJust $ lookup (platformTheme $ options state) (images state))
+          arrowTex = fromJust $ lookup "arrow" (fromJust $ lookup Default (images state))
