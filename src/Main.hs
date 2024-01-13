@@ -148,7 +148,6 @@ loadImages state = do
     espinho <- loadBMP "assets/MarioTexture/Espinho.bmp"
     mortemario <- loadBMP "assets/Death.bmp"
     --MARIO ANIMAÇOES
-        --MARIO CORRER
     mariocorrer1 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar1.bmp"
     mariocorrer2 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar2.bmp"
     mariocorrer3 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar3.bmp"
@@ -162,7 +161,20 @@ loadImages state = do
     mariomartelo1 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo1.bmp"
     mariomartelo2 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo2.bmp"
     mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo3.bmp"
-    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo3.bmp"
+    --QUADRADOMARIO ANIMAÇOES
+    quadradomariocorrer1 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Andar1.bmp"
+    quadradomariocorrer2 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Andar2.bmp"
+    quadradomariocorrer3 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Andar3.bmp"
+    quadradomarioolhos <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Olhos.bmp"
+    quadradoescada1 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Escadas1.bmp"
+    quadradoescada2 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/Escadas2.bmp"
+    quadradomorreumario <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/MorteMario.bmp"
+    quadradomariocair <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/MarioCair1.bmp"
+    quadradomariosaltar1 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/MarioSaltar1.bmp"
+    quadradomariosaltar2 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/MarioSaltar2.bmp"
+    quadradomariomartelo1 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo1.bmp"
+    quadradomariomartelo2 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo2.bmp"
+    quadradomariomartelo3 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo3.bmp"
     --Hud
     hearts <- loadBMP "assets/hud/Heart.bmp"
     marioface <- loadBMP "assets/hud/MarioFace.bmp"
@@ -264,11 +276,7 @@ loadImages state = do
     return  state {
         images = [
             (Default,
-            [("mariosaltar1", mariosaltar1),
-            ("mariosaltar2", mariosaltar2),
-            ("mariomartelo1", mariomartelo1),
-            ("mariomartelo2", mariomartelo2),
-            ("mariomartelo3", mariomartelo3),
+            [
             ("escada", escada),
             ("plataforma", plataforma),
             ("alcapao", alcapao),
@@ -280,7 +288,6 @@ loadImages state = do
             ("moeda3", moeda3),
             ("martelo1", martelo1),
             ("martelo2", martelo2),
-            ("mariocair", mariocair),
             ("chavemario", chavemario),
             ("botaostart", botaostart),
             ("botaostartHover", botaostartHover),
@@ -299,7 +306,6 @@ loadImages state = do
             ("portaMario",portamario),
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
-            ("morreu",mortemario),
             ("cameraman", cameraman),
             ("espinho",espinho),
             --ANIMATIONS MARIO
@@ -310,12 +316,19 @@ loadImages state = do
             ("escada1",escada1),
             ("escada2",escada2),
             ("morreumario",morreumario),
+            ("mariosaltar1", mariosaltar1),
+            ("mariosaltar2", mariosaltar2),
+            ("mariomartelo1", mariomartelo1),
+            ("mariomartelo2", mariomartelo2),
+            ("mariomartelo3", mariomartelo3),
+            ("mariocair", mariocair),
             --HUD jogo
             ("hearts",hearts),
             ("marioface",marioface),
             ("igual",igual),
             ("lockClosed",lockClosed),
             ("lockOpen",lockOpen),
+            ("morreu",mortemario),
             -- Boss Mario
             ("boss1", boss1mario),
             ("boss2", boss2mario),
@@ -395,7 +408,23 @@ loadImages state = do
             ("portaMario",portaminecraft),
             ("macacoMalvado", macacomalvado),
             ("barril",barrilmario),
-            ("morreu",mortemario)])
+            ("morreu",mortemario)]),
+            (Quadradinho,
+            [
+            ("marioandar1",quadradomariocorrer1),
+            ("marioandar2",quadradomariocorrer2),
+            ("marioandar3",quadradomariocorrer3),
+            ("marioolhos",quadradomarioolhos),
+            ("escada1",quadradoescada1),
+            ("escada2",quadradoescada2),
+            ("morreumario",quadradomorreumario),
+            ("mariosaltar1", quadradomariosaltar1),
+            ("mariosaltar2", quadradomariosaltar2),
+            ("mariomartelo1", quadradomariomartelo1),
+            ("mariomartelo2", quadradomariomartelo2),
+            ("mariomartelo3", quadradomariomartelo3),
+            ("mariocair", quadradomariocair)
+            ])
             ]
         }
 
