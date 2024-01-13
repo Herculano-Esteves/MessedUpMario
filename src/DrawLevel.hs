@@ -22,9 +22,9 @@ import Graphics.Gloss.Interface.Environment (getScreenSize)
 -- sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
--- posMapToGloss :: Posicao -> (Float,Float)
--- posMapToGloss (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
-
+posMapToGloss :: State -> Posicao -> (Float,Float)
+posMapToGloss state (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
+                            where sizeWin = screenSize state
 posMapToGlossNivel :: Hitbox -> Posicao -> (Float,Float)
 posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
                                 where   (a,b) =(d2f x*d2f escalaGloss - d2f (escalaGloss*fst jogador),- d2f y * d2f escalaGloss+ d2f (escalaGloss*snd jogador))
@@ -39,8 +39,8 @@ d2f = double2Float
 f2d = float2Double
 
 drawLevel :: State -> Picture
-drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawHud jogo texPlataforma, drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                if fst $ aplicaDano (jogador jogo) then drawHammer jogo (playAnimAny 4 (time state) martelos) (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawNum (pontos $ jogador jogo) (700,400) state]
+drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo), drawBackground jogo texPlataforma,drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
+                if fst $ aplicaDano (jogador jogo) then drawHammer jogo (playAnimAny 4 (time state) martelos) (jogador jogo) else blank, drawPlayer state (jogador jogo),drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo, drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo, drawNum (pontos $ jogador jogo) posPontuacao state, drawHud jogo state]
     where texEscada = fromJust (lookup "escada" imagesTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesTheme)
@@ -66,6 +66,7 @@ drawLevel state = Pictures [drawEspinho jogo texEspinho,drawHitbox (cheats state
           texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           (jogo, unlocked) = levels state !! currentLevel state
+          posPontuacao = posMapToGloss state (1,0.5)
 
 drawCameracontrol :: Bool ->Picture -> Jogo -> Picture
 drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75*7) (75 * 5)
@@ -75,7 +76,7 @@ drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75
 -- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
 drawPlayer :: State -> Personagem -> Picture
 drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst (levels state !! currentLevel state))) (posicao jog)) $ Translate 0 7 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
-    scale (if direcao jog == Este then 2 else -2) 2 $ if animacaoJogo jogo > 0 || lostGame jogo == 4 || lostGame jogo == 0 then texMorreuMario else 
+    scale (if direcao jog == Este then 2 else -2) 2 $ if animacaoJogo jogo > 0 || lostGame jogo == 4 || lostGame jogo == 0 then texMorreuMario else
     if snd (aplicaDano jog) > 0 && not (fst (aplicaDano jog)) then
         Rotate (360*escala) texMarioParado else
     if (fst (velocidade jog) == 4 || fst (velocidade jog) == (-4)) && snd (velocidade jog) >= 0 && snd (velocidade jog) <= 1 then
@@ -115,7 +116,7 @@ drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] ->
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
-                                                            if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else 
+                                                            if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else
                                                             drawMoreComplex state jogo controlo x)
                                                             (inimigos jogo)
                                                             where   ataqueboss = [texataque1,texataque2,texataque3,texataque4,texataque5,texataque6,texataque7,texataque8,texataque9,texataque10]
@@ -170,7 +171,7 @@ drawHitbox controlo jogo jogador inm    | controlo = (Color green $ uncurry Tran
           aux (p1,p2) = (posMapToGlossNivel (cameraControl jogo) p1, posMapToGlossNivel (cameraControl jogo) p2)
 
 drawColecs :: State -> Picture -> Picture -> Picture -> Jogo -> Picture
-drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (Scale 0.7 0.7 moeda) else
+drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (Scale 2 2 (playAnimAny (length moedaanim) (time state) moedaanim)) else
                                                      if colec == Martelo then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale 2 2 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo else
                                                      if colec == Chave then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) chave else
                                                      if colec == Estrela then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (playAnimAny (length estrelaAnim -3) (time state) estrelaAnim) else
@@ -189,6 +190,11 @@ drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if c
                                                             estrela10 = fromJust (lookup "estrela10" imagesTheme)
                                                             estrela11 = fromJust (lookup "estrela11" imagesTheme)
                                                             estrela12 = fromJust (lookup "estrela12" imagesTheme)
+                                                            moedaanim = [moeda1,moeda2,moeda3,moeda2]
+                                                            moeda1 = fromJust (lookup "moeda1" imagesTheme)
+                                                            moeda2 = fromJust (lookup "moeda2" imagesTheme)
+                                                            moeda3 = fromJust (lookup "moeda3" imagesTheme)
+
                                                             imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 drawHammer :: Jogo -> Picture -> Personagem -> Picture
@@ -208,13 +214,25 @@ drawBackground jogo img = Pictures $ foldl (\guarda (a,b)-> map (\(xx,yy) -> unc
 drawBackground :: Jogo -> Picture -> Picture
 drawBackground jogo tex = pictures []
 
-drawHud :: Jogo -> Picture -> Picture
-drawHud jogo tex = pictures (genPics (vida $ jogador jogo))
-    where genPics :: Int -> [Picture]
-          genPics n
+drawHud :: Jogo -> State -> Picture
+drawHud jogo state = Pictures $ (genPics posmaphearts (vida $ jogador jogo) ++ [Translate posx posy $ scale 2 2 texMarioface] ++ [Translate posmoedax posmoeday $ scale 2 2 $ playAnimAny (length moedaanim) (time state) moedaanim] ++ [Translate igualx igualy $ scale 2 2 igual])
+    where genPics :: (Float, Float) -> Int -> [Picture]
+          genPics (px,py) n
             | n == 0 = []
-            | otherwise = (Translate (d2f (-850 + (fromIntegral n*50))) 400 tex1) : genPics (n-1)
-          tex1 = color red $ rectangleSolid 25 25
+            | otherwise = Translate (px + (fromIntegral n*40)) py (scale 0.8 0.8 texHearts) : genPics (px,py) (n-1)
+          posmaphearts = posMapToGloss state (0.6,1.5)
+          (posx,posy) = posMapToGloss state (0.5,1.5)
+          (posmoedax,posmoeday) = posMapToGloss state (0.3,0.5)
+          (igualx,igualy) = posMapToGloss state (0.67,0.5)
+          --Texturas
+          texHearts = fromJust (lookup "hearts" imagesTheme)
+          texMarioface = fromJust (lookup "marioface" imagesTheme)
+          moedaanim = [moeda1,moeda2,moeda3,moeda2]
+          moeda1 = fromJust (lookup "moeda1" imagesTheme)
+          moeda2 = fromJust (lookup "moeda2" imagesTheme)
+          moeda3 = fromJust (lookup "moeda3" imagesTheme)
+          igual = fromJust (lookup "igual" imagesTheme)
+          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 
 
@@ -277,7 +295,7 @@ drawAlcapao :: Jogo -> Picture -> Picture
 drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
 
 drawNum :: Int -> (Float, Float) -> State -> Picture
-drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $
+drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $ scale 0.6 0.6 $
     case c of
         '1' -> um
         '2' -> dois
@@ -300,4 +318,4 @@ drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromInte
           nove = fromJust (lookup "nove" imagesTheme)
           zero = fromJust (lookup "zero" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          
+
