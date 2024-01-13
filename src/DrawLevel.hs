@@ -124,7 +124,7 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
           texMarioMartelo2 = fromJust (lookup "mariomartelo2" imagesTheme)
           texMarioMartelo3 = fromJust (lookup "mariomartelo3" imagesTheme)
           texMorreuMario = fromJust (lookup "morreumario" imagesTheme)
-          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+          imagesTheme = fromJust (lookup (marioTheme (options state)) (images state))
           escala = realToFrac (snd (aplicaDano jog))
           (jogo, unlocked) = levels state !! currentLevel state
 

@@ -42,7 +42,7 @@ data MenuState = MenuState {
     pressingButton :: Bool
 }
 
-data Theme = Default | Minecraft deriving (Eq)
+data Theme = Default | Minecraft | Quadradinho deriving (Eq)
 data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor | GameOver | EndScreen deriving (Eq)
 
 -- Constante referente à velocidade que as personagens se movem nas escadas
