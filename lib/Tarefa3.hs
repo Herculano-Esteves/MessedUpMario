@@ -424,8 +424,8 @@ animaMacacoMalvado :: Mapa -> Tempo -> Personagem -> [Personagem] -> Personagem
 animaMacacoMalvado mapa tempo jogador macaco = enm{posicao = 
      if fst(posicao jogador) > fst(posicao enm)+0.2 && podeAndarParaEsquerdaBool mapa enm  then (fst(posicao enm)+(tempo*1.5),snd(posicao enm))
      else if fst(posicao jogador)+0.2 < fst(posicao enm) && podeAndarParaDireitaBool mapa enm then (fst(posicao enm)-(tempo*1.5),snd(posicao enm)) else posicao enm
-                                                ,velocidade = if fst(posicao jogador) > fst(posicao enm)-0.2 then (1,0) else if fst(posicao jogador) < fst(posicao enm)+0.2 then (-1,0) else (0,0)
-                                             ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,15) else (snd (aplicaDano enm) == 15, snd (aplicaDano enm)-tempo)}
+                                            ,direcao = if fst(posicao jogador) < fst(posicao enm)-0.3 then Este else if fst(posicao jogador) > fst(posicao enm)+0.3 then Oeste else Norte
+                                            ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,15) else (snd (aplicaDano enm) == 15, snd (aplicaDano enm)-tempo)}
                                         where enm = head macaco
 
 movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
