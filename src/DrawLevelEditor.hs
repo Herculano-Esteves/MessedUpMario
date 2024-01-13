@@ -3,7 +3,7 @@ import Utilities
 import Graphics.Gloss
 import LI12324
 import DrawLevel
-import Tarefa1 (escalaGloss, getMapaDimensoes)
+import Tarefa1 ( getMapaDimensoes)
 import Data.Maybe (fromJust)
 import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
@@ -183,7 +183,7 @@ addNewLevel state = state {
             colecionaveis = [
                 (Estrela, (0.5,2.5))
             ],
-            mapa = genEmptyMap (22,15),
+            mapa = genEmptyMap (50,60),
             lostGame = 3,
             cameraControl = ((0,0),(0,0)),
             animacaoJogo = 0,

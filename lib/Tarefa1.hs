@@ -11,13 +11,15 @@ IMPORTANTE -> Tudo com IMPORTANTE tem dimensoes do bloco do mapa, possivel alter
 module Tarefa1 where
 
 import LI12324
+    ( Personagem(posicao, tamanho),
+      Posicao,
+      Hitbox,
+      Mapa(..),
+      Bloco(Porta, Plataforma, Tunel, Alcapao) )
 import Graphics.Gloss.Data.Point (pointInBox)
 import GHC.Float (double2Float, double2Int, int2Double)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
-
-
-escalaGloss :: Double
-escalaGloss = 90
+import Utilities
 
 dimensaobloco :: Double
 dimensaobloco = 1

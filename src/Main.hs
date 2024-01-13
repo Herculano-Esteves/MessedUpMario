@@ -250,6 +250,7 @@ loadImages state = do
     pauseScreen <- loadBMP "assets/Backgrounds/pause.bmp"
     gameOver <- loadBMP "assets/Backgrounds/gameOver.bmp"
     end <- loadBMP "assets/Backgrounds/end.bmp"
+    pressEnterText <- loadBMP "assets/Backgrounds/PressEnterText.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -357,6 +358,7 @@ loadImages state = do
             ("pauseScreen", pauseScreen),
             ("gameOver", gameOver),
             ("endScreen", end),
+            ("pressEnterText", pressEnterText),
             -- Level Editor
             ("selector", selector)
             ]),

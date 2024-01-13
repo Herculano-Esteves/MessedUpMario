@@ -2,6 +2,7 @@ module Utilities where
 import Graphics.Gloss
 import LI12324
 import Data.Maybe (fromJust)
+import GHC.Float (double2Float, float2Double)
 
 type Images = [(Theme, [(String,Picture)])]
 
@@ -46,6 +47,10 @@ data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor | Gam
 -- Constante referente à velocidade que as personagens se movem nas escadas
 ladderSpeed :: Double
 ladderSpeed = 2.4
+
+-- | Função que retorna o tamanho de um bloco no gloss
+escalaGloss :: Double
+escalaGloss = 90
 
 -- | Função que substitui o valor de um determinado indíce de uma lista
 replace :: [a] -> (Int, a) -> [a]
@@ -106,3 +111,12 @@ drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromInte
           nove = fromJust (lookup "nove" imagesTheme)
           zero = fromJust (lookup "zero" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+
+
+d2f = double2Float
+f2d = float2Double
+
+-- | Converte as posicoes do mapa para as posicoes do gloss
+posMapToGloss :: State -> Posicao -> (Float,Float)
+posMapToGloss state (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
+                            where sizeWin = screenSize state

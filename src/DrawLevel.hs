@@ -23,9 +23,6 @@ import DrawMenu (drawButtonTextDebug)
 -- sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
-posMapToGloss :: State -> Posicao -> (Float,Float)
-posMapToGloss state (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
-                            where sizeWin = screenSize state
 posMapToGlossNivel :: Hitbox -> Posicao -> (Float,Float)
 posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
                                 where   (a,b) =(d2f x*d2f escalaGloss - d2f (escalaGloss*fst jogador),- d2f y * d2f escalaGloss+ d2f (escalaGloss*snd jogador))
@@ -36,8 +33,6 @@ posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
 
 
 
-d2f = double2Float
-f2d = float2Double
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures [

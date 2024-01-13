@@ -144,9 +144,17 @@ drawLock unlocked n = Translate 90 (-10 + (-60 * fromIntegral n)) $ (if unlocked
     $ circleSolid 18 --map (\(game, unlocked) -> )
 
 drawGameover :: State -> Picture
-drawGameover state = scale 7.5 7.5 $ tex
+drawGameover state = Pictures [
+        scale 7.5 7.5 $ tex,
+        Translate 0 (snd $ posMapToGloss state (0,10)) $ scale 1.5 1.5 $ pressEnterTex
+    ]
     where tex = fromJust $ lookup "gameOver" (fromJust $ lookup Default (images state))
+          pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
 
 drawEndScreen :: State -> Picture
-drawEndScreen state = scale 10 10 $ tex
+drawEndScreen state = Pictures [
+        scale 10 10 $ tex,
+        Translate 0 (snd $ posMapToGloss state (0,10)) $ scale 1.5 1.5 $ pressEnterTex
+    ]
     where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))
+          pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
