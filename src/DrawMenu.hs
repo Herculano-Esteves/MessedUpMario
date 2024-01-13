@@ -175,8 +175,10 @@ switchTheme current = case current of
 drawMarioThemeSel :: State -> Picture
 drawMarioThemeSel state = Pictures [
     scale 5 5 currentMario,
+    Translate 0 (-100) $ scale 5 5 currentMario,
     -- drawArrow state
     Translate (-100) (-100 * (fromIntegral $ selectedButton $ menuState state)) $ scale (-1) 1 $ arrowTex
     ]
     where currentMario = fromJust $ lookup "marioandar1" (fromJust $ lookup (marioTheme $ options state) (images state))
+          currentPlatform = fromJust $ lookup "plataforma" (fromJust $ lookup (platformTheme $ options state) (images state))
           arrowTex = fromJust $ lookup "arrow" (fromJust $ lookup Default (images state))

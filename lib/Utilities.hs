@@ -26,7 +26,8 @@ data State = State {
 
 data Options = Options {
     currentTheme :: Theme,
-    marioTheme :: Theme
+    marioTheme :: Theme,
+    platformTheme :: Theme
 }
 
 data EditorState = EditorState {
