@@ -131,7 +131,7 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
 -- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
-                                                            if tipo x == MacacoMalvado then drawEnemy controlo jogo texMacaco x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
+                                                            if tipo x == MacacoMalvado then drawEnemy controlo jogo (if direcao x == Norte then texmacaco4 else (playAnimAny (length macacoAndar) (time state) macacoAndar)) x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
                                                             if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
                                                             if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else
                                                             drawMoreComplex state jogo controlo x)
@@ -153,6 +153,11 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
                                                                     texCuspo3 = fromJust (lookup "cuspo3" imagesTheme)
                                                                     texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
                                                                     texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
+                                                                    macacoAndar = [texmacaco1,texmacaco2,texmacaco3,texmacaco2]
+                                                                    texmacaco1 = fromJust (lookup "macacomalvado1" imagesTheme)
+                                                                    texmacaco2 = fromJust (lookup "macacomalvado2" imagesTheme)
+                                                                    texmacaco3 = fromJust (lookup "macacomalvado3" imagesTheme)
+                                                                    texmacaco4 = fromJust (lookup "macacomalvado4" imagesTheme)
                                                                     imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                                     escala = realToFrac (snd (aplicaDano jog))
                                                                     controlo = cheats state
@@ -171,10 +176,11 @@ drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [s
 
 drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture
 drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
-                                if tipo inim == Barril then Rotate (fromInteger (floor (snd (posicao inim)))*90) $ Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex else
+                                if tipo inim == Barril then Rotate (fromInteger (floor (snd (posicao inim)))*90) $ Scale (if fst (velocidade inim) > 0 then 0.7 else -0.7) 0.7 tex else
                                 if tipo inim == Boss then Scale (if fst (posicao jogador) > fst (posicao inim) then -2.2 else 2.2) 2.2 tex else
                                 if tipo inim == CuspoDeFogo then Scale 2 2 $ Rotate (-atan2 (d2f vx) (d2f vy) * 180 / pi) tex else
-                                if tipo inim == Fantasma then Scale (if fst (velocidade inim) > 0 then 1.2 else -1.2) 1.2 tex else
+                                if tipo inim == Fantasma then Scale (if fst (velocidade inim) > 0 then 2.1 else -2.1) 2.1 tex else
+                                if tipo inim == MacacoMalvado then scale (if direcao inim == Este then -1.7 else 1.7 ) 1.7 tex else -- se a direcao for norte está parado
                                 Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex
                                 , drawHitbox controlo jogo jogador inim]
                                 where (vx,vy) = velocidade inim

@@ -148,23 +148,20 @@ loadImages state = do
     mortemario <- loadBMP "assets/Death.bmp"
     --MARIO ANIMAÇOES
         --MARIO CORRER
-    mariocorrer1 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar1.bmp"
-    mariocorrer2 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar2.bmp"
-    mariocorrer3 <- loadBMP "assets/MarioAnimations/MarioAndar/Andar3.bmp"
-    marioolhos <- loadBMP "assets/MarioAnimations/MarioAndar/Olhos.bmp"
-    escada1 <- loadBMP "assets/MarioAnimations/MarioEscadas/Escadas1.bmp"
-    escada2 <- loadBMP "assets/MarioAnimations/MarioEscadas/Escadas2.bmp"
-    morreumario <- loadBMP "assets/MarioAnimations/MorteMario.bmp"
-    mariocair <- loadBMP "assets/MarioAnimations/MarioAr/MarioCair1.bmp"
-    mariosaltar1 <- loadBMP "assets/MarioAnimations/MarioAr/MarioSaltar1.bmp"
-    mariosaltar2 <- loadBMP "assets/MarioAnimations/MarioAr/MarioSaltar2.bmp"
-    mariomartelo1 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo1.bmp"
-    mariomartelo2 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo2.bmp"
-    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo3.bmp"
-    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo3.bmp"
-    marioParado <- loadBMP "assets/MarioTexture/MarioParado.bmp"
-    marioAndar1 <- loadBMP "assets/MarioTexture/MarioAni1.bmp"
-    marioAndar2 <- loadBMP "assets/MarioTexture/MarioAni2.bmp"
+    mariocorrer1 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar1.bmp"
+    mariocorrer2 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar2.bmp"
+    mariocorrer3 <- loadBMP "assets/MarioAnimations/MarioTexturas/Andar3.bmp"
+    marioolhos <- loadBMP "assets/MarioAnimations/MarioTexturas/Olhos.bmp"
+    escada1 <- loadBMP "assets/MarioAnimations/MarioTexturas/Escadas1.bmp"
+    escada2 <- loadBMP "assets/MarioAnimations/MarioTexturas/Escadas2.bmp"
+    morreumario <- loadBMP "assets/MarioAnimations/MarioTexturas/MorteMario.bmp"
+    mariocair <- loadBMP "assets/MarioAnimations/MarioTexturas/MarioCair1.bmp"
+    mariosaltar1 <- loadBMP "assets/MarioAnimations/MarioTexturas/MarioSaltar1.bmp"
+    mariosaltar2 <- loadBMP "assets/MarioAnimations/MarioTexturas/MarioSaltar2.bmp"
+    mariomartelo1 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo1.bmp"
+    mariomartelo2 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo2.bmp"
+    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo3.bmp"
+    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioTexturas/AndarMartelo3.bmp"
     --Hud
     hearts <- loadBMP "assets/hud/Heart.bmp"
     marioface <- loadBMP "assets/hud/MarioFace.bmp"
@@ -193,6 +190,11 @@ loadImages state = do
     --EYE BOSS
     olhobranco <- loadBMP "assets/Bosses/EyeBoss/EyeWhite.bmp"
     olhoazul <- loadBMP "assets/Bosses/EyeBoss/EyeBlue.bmp"
+    --MacacoMalvado
+    macacomalvado1 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado1.bmp"
+    macacomalvado2 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado2.bmp"
+    macacomalvado3 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado3.bmp"
+    macacomalvado4 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado4.bmp"
     -- Estrela mario
     estrela1 <- loadBMP "assets/Estrela/Estrela1.bmp"
     estrela2 <- loadBMP "assets/Estrela/Estrela2.bmp"
@@ -261,10 +263,7 @@ loadImages state = do
     return  state {
         images = [
             (Default,
-            [("marioParado", marioParado),
-            ("marioAndar1", marioAndar1),
-            ("marioAndar2", marioAndar2),
-            ("mariosaltar1", mariosaltar1),
+            [("mariosaltar1", mariosaltar1),
             ("mariosaltar2", mariosaltar2),
             ("mariomartelo1", mariomartelo1),
             ("mariomartelo2", mariomartelo2),
@@ -339,6 +338,11 @@ loadImages state = do
             --Boss EYE
             ("olhobranco",olhobranco),
             ("olhoazul",olhoazul),
+            --MacacoMalvado
+            ("macacomalvado1",macacomalvado1),
+            ("macacomalvado2",macacomalvado2),
+            ("macacomalvado3",macacomalvado3),
+            ("macacomalvado4",macacomalvado4),
             -- Estrela Mario
             ("estrela1",estrela1),
             ("estrela2",estrela2),
