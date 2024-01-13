@@ -252,13 +252,13 @@ naoPassaPeloTeto tempo mapa jogador   | emEscada jogador = jogador
 
 
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2-0.1),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2+0.2),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2+0.2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
@@ -412,21 +412,24 @@ removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p
 --Portas End
 
 --Macaco Malvado Start
+-- Só pode existir um macacomalvado por mapa
 movimentoMacacoMalvado :: Tempo -> Jogo -> Jogo
-movimentoMacacoMalvado tempo jogo   | MacacoMalvado `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaBarris (mapa jogo) tempo (animaMacacoMalvado tempo (jogador jogo) a) c ++ d}
+movimentoMacacoMalvado tempo jogo   | MacacoMalvado `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaBarris (mapa jogo) tempo (animaMacacoMalvado (mapa jogo) tempo (jogador jogo) a) c ++ d}
                                     | otherwise = jogo
                                     where   (a,b) = onlyOneTipo (inimigos jogo) MacacoMalvado
                                             (c,d) = onlyOneTipo b Barril
 
 --sabendo que só pode existir um macaco malvado no mapa
-animaMacacoMalvado :: Tempo -> Personagem -> [Personagem] -> Personagem
-animaMacacoMalvado tempo jogador macaco = enm{posicao = if fst (posicao enm) < fst (posicao jogador)+0.2 && fst (posicao enm) > fst (posicao jogador)-0.2 then posicao enm else (if fst (posicao enm) > fst (posicao jogador) then fst (posicao enm)-2*tempo else fst (posicao enm)+2*tempo,snd (posicao enm)) ,
-                                             velocidade = if fst (posicao enm) > fst (posicao jogador) then (-2,snd (velocidade enm)) else (2,snd (velocidade enm)),
-                                             aplicaDano = if snd (aplicaDano enm) <= 0 then (True,8) else (snd (aplicaDano enm) > 7, snd (aplicaDano enm)-tempo)}
+animaMacacoMalvado :: Mapa -> Tempo -> Personagem -> [Personagem] -> Personagem
+animaMacacoMalvado mapa tempo jogador macaco = enm{posicao = 
+     if fst(posicao jogador) > fst(posicao enm)+0.2 && podeAndarParaEsquerdaBool mapa enm  then (fst(posicao enm)+(tempo*1.5),snd(posicao enm))
+     else if fst(posicao jogador)+0.2 < fst(posicao enm) && podeAndarParaDireitaBool mapa enm then (fst(posicao enm)-(tempo*1.5),snd(posicao enm)) else posicao enm
+                                                ,velocidade = if fst(posicao jogador) > fst(posicao enm)-0.2 then (1,0) else if fst(posicao jogador) < fst(posicao enm)+0.2 then (-1,0) else (0,0)
+                                             ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,15) else (snd (aplicaDano enm) == 15, snd (aplicaDano enm)-tempo)}
                                         where enm = head macaco
 
 movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
-movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 8 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
+movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 15 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
                                         | null lista = [macaco]
                                         | otherwise = macaco : foldl (\x y -> if sobreposicao ((a,b),(c,d)) (genHitbox y) then movimentaBarrisaux ((a,b),(c,d)) tempo y macaco ++ x else x) [] lista
                                         where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
@@ -435,7 +438,7 @@ movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 8 = macaco 
 movimentaBarrisaux :: Hitbox ->  Tempo -> Personagem -> Personagem -> [Personagem]
 movimentaBarrisaux map tempo barril macaco  | not (sobreposicao map (genHitbox barril)) = []
                                         | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = [barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}]
-                                        | snd (aplicaDano macaco) == 8 = [barril {posicao = posicao macaco,velocidade = (0,1)}]
+                                        | snd (aplicaDano macaco) == 15 = [barril {posicao = posicao macaco,velocidade = (0,1)}]
                                         | otherwise = [barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}]
 --Macaco Malvado End
 

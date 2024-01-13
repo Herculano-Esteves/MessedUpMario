@@ -166,8 +166,8 @@ loadImages state = do
     marioAndar1 <- loadBMP "assets/MarioTexture/MarioAni1.bmp"
     marioAndar2 <- loadBMP "assets/MarioTexture/MarioAni2.bmp"
     --Hud
-    hearts <- loadBMP "assets/MarioAnimations/hud/Heart.bmp"
-    marioface <- loadBMP "assets/MarioAnimations/hud/MarioFace.bmp"
+    hearts <- loadBMP "assets/hud/Heart.bmp"
+    marioface <- loadBMP "assets/hud/MarioFace.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
     boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"

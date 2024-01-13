@@ -90,7 +90,8 @@ movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 
                             tboss = snd (aplicaDano boss)-tempo
 
 ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
-ataqueDoBoss tempo jogador boss | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+ataqueDoBoss tempo jogador boss | mira boss == (-100,-100) = [boss]
+                                | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
                                 | tboss == 8-42*tempo && tipo boss /= EyeEntidade = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
 
                             | otherwise = [boss]
@@ -124,14 +125,10 @@ eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) EyeBoss
                                     (c,d) = onlyOneTipo b CuspoDeFogo
 
---Sabendo que so pode existir um boss
+
 eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (a,b)}) bosses
-                    where   boss = head bosses
-                            tboss = snd (aplicaDano boss)-tempo
-                            (bx,by) = posicao boss
-                            (jx,jy) = posicao jogador
-                            (a,b) = (jx-bx,jy-by)
+eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (fst(posicao jogador)-fst(posicao x),snd(posicao jogador)-snd(posicao x))}) bosses
+                   
                             
 
 --EYEBOSS END
@@ -143,12 +140,8 @@ eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) 
                             where   (a,b) = onlyOneTipo (inimigos jogo) EyeEntidade
                                     (c,d) = onlyOneTipo b CuspoDeFogo
 
---Sabendo que so pode existir um boss
+
 eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (a,b)}) bosses
-                    where   boss = head bosses
-                            tboss = snd (aplicaDano boss)-tempo
-                            (bx,by) = posicao boss
-                            (jx,jy) = posicao jogador
-                            (a,b) = (jx-bx,jy-by)
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = if distancia (posicao x) (posicao jogador) > 12 then (-100,-100) else (fst(posicao jogador)-fst(posicao x),snd(posicao jogador)-snd(posicao x))}) bosses
+                   
 --EyeEntity END
