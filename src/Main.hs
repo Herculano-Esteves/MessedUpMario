@@ -40,6 +40,8 @@ eventHandler (EventKey (Char 'u') Down _ _) state = do
     return $ state
 eventHandler (EventKey (Char 'l') Down _ _) state = do
     writeFile "gameDebug.txt" (mapToFile (mapa (tempGame $ editorState state)))
+    writeFile "enemiesDebug.txt" (enemiesToFile (inimigos (tempGame $ editorState state)))
+    writeFile "colectablesDebug.txt" (colecionaveisToFile (colecionaveis (tempGame $ editorState state)))
     return $ state
 eventHandler (EventKey (Char 'y') Down _ _) state = do
     gameFile <-readFile "game.txt"
@@ -63,11 +65,13 @@ timeHandler dTime state
     -- | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         -- else return state {animTime = 0}
     | (currentLevel state) == length (levels state) - 1 && lostGame jogo == 1 = return $ state {
-        currentMenu = MainMenu,
+        currentMenu = EndScreen,
         levels = replace (levels state) ((currentLevel state),(initLevel state, True))
     }
-    | lostGame jogo == 0 = return state {
-        currentMenu = GameOver}
+    | currentMenu state == InGame && lostGame jogo == 0 = return state {
+        currentMenu = GameOver,
+        levels = restoredLevels
+    }
     | lostGame jogo == 4 = return state {
             levels = replace (levels state) ((currentLevel state),((initLevel state)
                 {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
@@ -237,6 +241,8 @@ loadImages state = do
     -- Backgrounds
     bgMenu <- loadBMP "assets/Backgrounds/menubackgrounds.bmp"
     pauseScreen <- loadBMP "assets/Backgrounds/pause.bmp"
+    gameOver <- loadBMP "assets/Backgrounds/gameOver.bmp"
+    end <- loadBMP "assets/Backgrounds/end.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -336,6 +342,8 @@ loadImages state = do
             -- Backgrounds
             ("bgMenu", bgMenu),
             ("pauseScreen", pauseScreen),
+            ("gameOver", gameOver),
+            ("endScreen", end),
             -- Level Editor
             ("selector", selector)
             ]),

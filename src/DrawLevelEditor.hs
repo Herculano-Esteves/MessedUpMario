@@ -8,7 +8,7 @@ import Data.Maybe (fromJust)
 import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
-import Mapas (jogoSamp, jog)
+import Mapas (jogoSamp, jog, macacomalvado, eyeentidade, eyeboss, fantasma)
 import Tarefa2 (floorPos, valida)
 import Extras
 
@@ -46,9 +46,7 @@ reactLevelEditor e state = return state {editorState = eventHandlerEditor e (scr
 
 eventHandlerEditor :: Event -> (Int, Int) -> EditorState -> EditorState
 eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = estate {
-    tempGame = case (selectFunc estate) of
-                    0 -> replaceBlock (tempGame estate)
-                    2 -> switchJogPos (tempGame estate)
+    tempGame = replaceBlock (tempGame estate)
 }
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) screen estate = estate {
         tempGame = cameraHitbox screen (1) $ (tempGame estate) {
@@ -87,6 +85,12 @@ eventHandlerEditor (EventKey (Char 'a') Down _ _) screen estate = estate {
     }
 eventHandlerEditor (EventKey (Char 'z') Down _ _) screen estate = estate {
         tempGame = addRemoveColecs (tempGame estate)
+    }
+eventHandlerEditor (EventKey (Char '1') Down _ _) screen estate = estate {
+        tempGame = switchJogPos (tempGame estate)
+    }
+eventHandlerEditor (EventKey (Char '2') Down _ _) screen estate = estate {
+        tempGame = switchEndJogPos (tempGame estate)
     }
 eventHandlerEditor e screen s = s
 
@@ -202,22 +206,13 @@ addRemoveEnemy jog = jog {
         inimigos = 
             if any (\enm -> (floorPos pos) == (floorPos $ posicao enm)) (inimigos jog) then
                 map (\enm -> if floorPos pos == floorPos (posicao enm) then
-                    Personagem {velocidade = (0,0), 
-                        tipo = case tipo enm of
-                            Fantasma -> MacacoMalvado
-                            MacacoMalvado -> Boss
-                            Boss -> Fantasma, 
-                        emEscada = False,
-                        vida = 1, 
-                        pontos = 0, 
-                        ressalta = True, 
-                        posicao = pos, 
-                        tamanho = if tipo enm == Fantasma || tipo enm == EyeEntidade then (0.5,0.7) else if tipo enm == MacacoMalvado then (1,1) else (3,3), 
-                        aplicaDano = if tipo enm == Boss || tipo enm == EyeBoss || tipo enm == EyeEntidade then (True, 4) else (False,0), 
-                        direcao = Oeste,
-                        temChave = False,
-                        mira= (0,0)} else enm) $
-                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= Boss) (inimigos jog)
+                    case tipo enm of
+                        Fantasma -> macacomalvado {posicao = pos}
+                        MacacoMalvado -> eyeentidade {posicao = pos}
+                        EyeEntidade -> eyeboss {posicao = pos}
+                        EyeBoss -> fantasma {posicao = pos}
+                     else enm) $
+                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= EyeBoss) (inimigos jog)
             else
                 Personagem {velocidade = (0,0), 
                         tipo = Fantasma, 
@@ -235,13 +230,36 @@ addRemoveEnemy jog = jog {
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
 
+{-
+Personagem {velocidade = (0,0), 
+                        tipo = case tipo enm of
+                            Fantasma -> MacacoMalvado
+                            MacacoMalvado -> Boss
+                            Boss -> Fantasma, 
+                        emEscada = False,
+                        vida = 1, 
+                        pontos = 0, 
+                        ressalta = True, 
+                        posicao = pos, 
+                        tamanho = if tipo enm == Fantasma || tipo enm == EyeEntidade then (0.5,0.7) else if tipo enm == MacacoMalvado then (1,1) else (3,3), 
+                        aplicaDano = if tipo enm == Boss || tipo enm == EyeBoss || tipo enm == EyeEntidade then (True, 4) else (False,0), 
+                        direcao = Oeste,
+                        temChave = False,
+                        mira= (0,0)}
+-}
+
 -- | Função que altera a posição de spawn do jogador no mapa de um dado jogo, colocando-o na posição do jogador
 switchJogPos :: Jogo -> Jogo
 switchJogPos jog = jog {
-    mapa = (Mapa (pos, Oeste) p1 mat),
-    jogador = (jogador jog) {
-        posicao = pos
-    }
+    mapa = (Mapa (pos, Oeste) p1 mat)
+}
+    where (Mapa (p,dir) p1 mat) = mapa jog
+          pos = posicao $ jogador jog
+
+switchEndJogPos :: Jogo -> Jogo
+switchEndJogPos jog = jog {
+    mapa = (Mapa (p, dir) pos mat),
+    colecionaveis = map (\(col,p) -> if col == Estrela then (col, pos) else (col,p)) (colecionaveis jog)
 }
     where (Mapa (p,dir) p1 mat) = mapa jog
           pos = posicao $ jogador jog

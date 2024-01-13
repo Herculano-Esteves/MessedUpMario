@@ -17,7 +17,9 @@ eventHandlerInMenu (EventKey (SpecialKey KeyLeft) Down _ _) state
 eventHandlerInMenu (EventKey (SpecialKey KeyRight) Down _ _) state
     | currentMenu state == LevelSelection = return state { menuState = (menuState state) {selectedButton = if selectedButton (menuState state)< menuArrowsLimit state then selectedButton (menuState state) + 1 else selectedButton (menuState state)}}
     | otherwise = return state
-eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {menuState = (menuState state) {pressingButton = True}}
+eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Down _ _) state
+    | currentMenu state == GameOver || currentMenu state == EndScreen = return state {currentMenu = MainMenu}
+    | otherwise = return state {menuState = (menuState state) {pressingButton = True}}
 eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return $ if pressingButton $ menuState state then
         (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
     else
@@ -45,7 +47,11 @@ drawMenu state
         drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
     ]
     | currentMenu state == GameOver = Pictures [
-        Color red $ scale 0.5 0.5 $ text "Game over!"
+        -- Color red $ scale 0.5 0.5 $ text "Game over!"
+        drawGameover state
+    ]
+    | currentMenu state == EndScreen = Pictures [
+        drawEndScreen state
     ]
     | currentMenu state == LevelSelection = Pictures $ [drawBg state,
         scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,25) state,
@@ -136,3 +142,11 @@ drawArrow state = Pictures [
 drawLock :: Bool -> Int -> Picture
 drawLock unlocked n = Translate 90 (-10 + (-60 * fromIntegral n)) $ (if unlocked then Color green else Color red)
     $ circleSolid 18 --map (\(game, unlocked) -> )
+
+drawGameover :: State -> Picture
+drawGameover state = scale 7.5 7.5 $ tex
+    where tex = fromJust $ lookup "gameOver" (fromJust $ lookup Default (images state))
+
+drawEndScreen :: State -> Picture
+drawEndScreen state = scale 10 10 $ tex
+    where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))

@@ -41,7 +41,7 @@ data MenuState = MenuState {
 }
 
 data Theme = Default | Minecraft deriving (Eq)
-data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor | GameOver deriving (Eq)
+data Menu = InGame | MainMenu | OptionsMenu | LevelSelection | LevelEditor | GameOver | EndScreen deriving (Eq)
 
 -- Constante referente à velocidade que as personagens se movem nas escadas
 ladderSpeed :: Double
@@ -73,7 +73,14 @@ getPosOfBlockMap :: Bloco -> Mapa -> [Posicao]
 getPosOfBlockMap bloco (Mapa _ _ blocos) = getPosOfBlock bloco blocos
 
 mapToFile :: Mapa -> String
-mapToFile (Mapa pi pf blocos) = "Mapa " ++ show pi ++ " " ++ show pf ++ "\n" ++ concat (map (\l -> show l ++ ",\n") blocos)
+mapToFile (Mapa pi pf blocos) = "Mapa " ++ show pi ++ " " ++ show pf ++ " [\n" ++
+    (reverse $ drop 2 $ reverse $ unlines (map (\l -> show l ++ ",") blocos)) ++ "\n]"
+
+enemiesToFile :: [Personagem] -> String
+enemiesToFile enms = unlines $ map (\e -> "Tipo: " ++ show (tipo e) ++ " Pos: " ++ show (posicao e)) enms
+
+colecionaveisToFile :: [(Colecionavel, Posicao)] -> String
+colecionaveisToFile col = "[\n" ++ (reverse $ drop 2 $ reverse (unlines $ map (\c -> show c ++ ",") col)) ++ "\n]"
 
 drawNum :: Int -> (Float, Float) -> State -> Picture
 drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $

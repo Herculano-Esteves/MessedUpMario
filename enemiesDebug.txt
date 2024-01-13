@@ -1,0 +1,4 @@
+Tipo: Fantasma Pos: (13.5,13.5)
+Tipo: Fantasma Pos: (19.5,5.5)
+Tipo: Fantasma Pos: (9.5,9.5)
+Tipo: MacacoMalvado Pos: (1.5,1.5)

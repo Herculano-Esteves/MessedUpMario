@@ -20,7 +20,7 @@ import Text.Read (Lexeme(String))
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog    | lostGame jog == 5 = jog
                             | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
-                            | otherwise = naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                            | otherwise = setStarPos $ naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -439,3 +439,8 @@ movimentaBarrisaux map tempo barril macaco  | not (sobreposicao map (genHitbox b
                                         | otherwise = [barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}]
 --Macaco Malvado End
 
+setStarPos :: Jogo -> Jogo
+setStarPos jog = jog {
+    colecionaveis = map (\(a,b) -> if a == Estrela then (a, posf) else (a,b)) (colecionaveis jog)
+}
+    where (Mapa _ posf _) = mapa jog
