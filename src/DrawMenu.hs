@@ -39,7 +39,7 @@ drawMenu state
         --drawTitle,
         drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
         drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
-        drawButtonTextDebug (selectedButton (menuState state)) 2 "Editor",
+        drawButton (images state) "botaoEdit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
         drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
         drawBanner (images state)
         ]
@@ -55,7 +55,8 @@ drawMenu state
     ]
     | currentMenu state == LevelSelection = Pictures $ [drawBg state,
         scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,25) state,
-        drawArrow state
+        drawArrow state,
+        drawLock state
         ] -- ++
         -- map (\((level2, unlocked1), n) -> Pictures $
             -- [drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n),
@@ -117,9 +118,9 @@ drawButtonTextDebug isEnabled n textButton = Pictures [
 
 drawButton :: Images -> String -> (Int, Int) -> Bool -> Picture
 drawButton tex buttonType (currentIndex, index) pressed
-    | currentIndex == index && pressed = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTexPressed
-    | currentIndex == index = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTexHover
-    | otherwise = Translate 0 (-70 + (-60 * fromIntegral index)) $ bTex
+    | currentIndex == index && pressed = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexPressed
+    | currentIndex == index = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexHover
+    | otherwise = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTex
     where bTex = fromJust $ lookup buttonType (fromJust $ lookup Default tex)
           bTexHover = fromJust $ lookup (buttonType ++ "Hover") (fromJust $ lookup Default tex)
           bTexPressed = fromJust $ lookup (buttonType ++ "Pressed") (fromJust $ lookup Default tex)
@@ -139,9 +140,11 @@ drawArrow state = Pictures [
             blank
     ]
 
-drawLock :: Bool -> Int -> Picture
-drawLock unlocked n = Translate 90 (-10 + (-60 * fromIntegral n)) $ (if unlocked then Color green else Color red)
-    $ circleSolid 18 --map (\(game, unlocked) -> )
+drawLock :: State -> Picture
+drawLock state = Translate 35 (-100) $ (if unlocked then lockOpen else lockClosed)
+    where lockOpen = fromJust $ lookup "lockOpen" (fromJust $ lookup Default (images state))
+          lockClosed = fromJust $ lookup "lockClosed" (fromJust $ lookup Default (images state))
+          unlocked = snd $ (levels state) !! (selectedButton $ menuState state)
 
 drawGameover :: State -> Picture
 drawGameover state = Pictures [

@@ -168,6 +168,8 @@ loadImages state = do
     --Hud
     hearts <- loadBMP "assets/MarioAnimations/hud/Heart.bmp"
     marioface <- loadBMP "assets/MarioAnimations/hud/MarioFace.bmp"
+    lockClosed <- loadBMP "assets/MarioAnimations/hud/lock1.bmp"
+    lockOpen <- loadBMP "assets/MarioAnimations/hud/lock2.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
     boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"
@@ -233,6 +235,9 @@ loadImages state = do
     botaoQuit <- loadBMP "assets/Buttons/BotaoQuit.bmp"
     botaoQuitHover <- loadBMP "assets/Buttons/BotaoQuitHover.bmp"
     botaoQuitPressed <- loadBMP "assets/Buttons/BotaoQuitPressed.bmp"
+    botaoEdit <- loadBMP "assets/Buttons/BotaoEdit.bmp"
+    botaoEditHover <- loadBMP "assets/Buttons/BotaoEditHover.bmp"
+    botaoEditPressed <- loadBMP "assets/Buttons/BotaoEditPressed.bmp"
     arrow <- loadBMP "assets/Buttons/arrow.bmp"
     -- Numbers
     um <- loadBMP "assets/Numbers/Um.bmp"
@@ -286,6 +291,9 @@ loadImages state = do
             ("botaoQuit", botaoQuit),
             ("botaoQuitHover", botaoQuitHover),
             ("botaoQuitPressed", botaoQuitPressed),
+            ("botaoEdit", botaoEdit),
+            ("botaoEditHover", botaoEditHover),
+            ("botaoEditPressed", botaoEditPressed),
             ("arrow", arrow),
             ("menuBanner", menuBanner),
             ("portaMario",portamario),
@@ -306,6 +314,8 @@ loadImages state = do
             ("hearts",hearts),
             ("marioface",marioface),
             ("igual",igual),
+            ("lockClosed",lockClosed),
+            ("lockOpen",lockOpen),
             -- Boss Mario
             ("boss1", boss1mario),
             ("boss2", boss2mario),

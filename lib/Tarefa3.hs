@@ -192,7 +192,7 @@ aplicaDanoFuncao (h:t) player (v,i) | estaTocarObjeto player (snd h) = (True,10)
                                     | otherwise = aplicaDanoFuncao t player (v,i)
 
 isMoedaApanhada :: [(Colecionavel,Posicao)] -> Personagem -> Int -> Int
-isMoedaApanhada obj player ponto = ponto + length (filter id (map (estaTocarObjeto player . snd) obj))
+isMoedaApanhada obj player ponto = ponto + length (filter id (map (estaTocarObjeto player . snd) obj)) * 10
 
 colecionarIndividualBool :: (Colecionavel,Posicao) -> Personagem -> Bool
 colecionarIndividualBool (c,p) player   | estaTocarObjeto player p = True

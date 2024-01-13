@@ -88,7 +88,7 @@ colecionaveisToFile :: [(Colecionavel, Posicao)] -> String
 colecionaveisToFile col = "[\n" ++ (reverse $ drop 2 $ reverse (unlines $ map (\c -> show c ++ ",") col)) ++ "\n]"
 
 drawNum :: Int -> (Float, Float) -> State -> Picture
-drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (60*(fromIntegral $ length p))) y $ scale 0.6 0.6 $
+drawNum n (x,y) state = Pictures $ (foldl (\p c -> (Translate (x + (40*(fromIntegral $ length p))) y $ scale 0.6 0.6 $
     case c of
         '1' -> um
         '2' -> dois

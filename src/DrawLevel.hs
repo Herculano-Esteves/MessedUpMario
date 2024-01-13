@@ -83,7 +83,7 @@ drawLevel state = Pictures [
           texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           (jogo, unlocked) = levels state !! currentLevel state
-          posPontuacao = posMapToGloss state (1,0.5)
+          posPontuacao = posMapToGloss state (1.4,0.5)
 
 drawCameracontrol :: Bool ->Picture -> Jogo -> Picture
 drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75*7) (75 * 5)
@@ -232,15 +232,19 @@ drawBackground :: Jogo -> Picture -> Picture
 drawBackground jogo tex = pictures []
 
 drawHud :: Jogo -> State -> Picture
-drawHud jogo state = Pictures $ (genPics posmaphearts (vida $ jogador jogo) ++ [Translate posx posy $ scale 2 2 texMarioface] ++ [Translate posmoedax posmoeday $ scale 2 2 $ playAnimAny (length moedaanim) (time state) moedaanim] ++ [Translate igualx igualy $ scale 2 2 igual])
+drawHud jogo state = Pictures $ (genPics posmaphearts (vida $ jogador jogo) ++ [
+        Translate posx posy $ scale 2.5 2.5 texMarioface,
+        Translate posmoedax posmoeday $ scale 2.5 2.5 $ playAnimAny (length moedaanim) (time state) moedaanim,
+        Translate igualx igualy $ scale 2.5 2.5 igual
+    ])
     where genPics :: (Float, Float) -> Int -> [Picture]
           genPics (px,py) n
             | n == 0 = []
             | otherwise = Translate (px + (fromIntegral n*40)) py (scale 0.8 0.8 texHearts) : genPics (px,py) (n-1)
-          posmaphearts = posMapToGloss state (0.6,1.5)
+          posmaphearts = posMapToGloss state (0.8,1.5)
           (posx,posy) = posMapToGloss state (0.5,1.5)
           (posmoedax,posmoeday) = posMapToGloss state (0.3,0.5)
-          (igualx,igualy) = posMapToGloss state (0.67,0.5)
+          (igualx,igualy) = posMapToGloss state (0.77,0.5)
           --Texturas
           texHearts = fromJust (lookup "hearts" imagesTheme)
           texMarioface = fromJust (lookup "marioface" imagesTheme)
