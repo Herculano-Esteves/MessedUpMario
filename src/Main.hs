@@ -168,8 +168,8 @@ loadImages state = do
     --Hud
     hearts <- loadBMP "assets/hud/Heart.bmp"
     marioface <- loadBMP "assets/hud/MarioFace.bmp"
-    lockClosed <- loadBMP "assets/MarioAnimations/hud/lock1.bmp"
-    lockOpen <- loadBMP "assets/MarioAnimations/hud/lock2.bmp"
+    lockClosed <- loadBMP "assets/hud/lock1.bmp"
+    lockOpen <- loadBMP "assets/hud/lock2.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
     boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"
