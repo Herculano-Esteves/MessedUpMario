@@ -109,6 +109,7 @@ draw state = do
     putStrLn ("length Level: " ++ show (length $ levels state))
     putStrLn ("lostGame jog: " ++ show (lostGame $ jogo))
     putStrLn ("lostGame initState: " ++ show (lostGame $ initLevel state))
+    putStrLn ("unlocked jog: " ++ show (unlocked))
 
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)

@@ -15,7 +15,7 @@ import Data.Maybe (fromJust)
 import Utilities
 import Data.Fixed (mod', Pico)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
-import DrawMenu (drawButtonTextDebug)
+import DrawMenu (drawButtonTextDebug, drawButton)
 
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
@@ -313,9 +313,9 @@ eventHandlerInGame e jogo = jogo
 drawPause :: State -> Picture
 drawPause state = Pictures [
         Translate 0 0 $ scale (4 * d2f escalaGloss/50) (4 * d2f escalaGloss/50) pauseTex,
-        drawButtonTextDebug (selectedButton (menuState state)) 0 "Resume",
+        drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
         drawButtonTextDebug (selectedButton (menuState state)) 1 "Restart",
-        drawButtonTextDebug (selectedButton (menuState state)) 2 "Menu"
+        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state))
     ]
     where imagesTheme = fromJust (lookup Default (images state))
           pauseTex = fromJust (lookup "pauseScreen" imagesTheme)

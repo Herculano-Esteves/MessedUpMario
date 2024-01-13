@@ -44,7 +44,8 @@ drawMenu state
         drawBanner (images state)
         ]
     | currentMenu state == OptionsMenu = Pictures [
-        drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme"
+        drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme",
+        drawMarioThemeSel state
     ]
     | currentMenu state == GameOver = Pictures [
         -- Color red $ scale 0.5 0.5 $ text "Game over!"
@@ -83,27 +84,29 @@ buttonPress state
         editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
     | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { exitGame = True}
     | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {currentTheme = Minecraft} }
-    | currentMenu state == LevelSelection = state { 
+    | currentMenu state == LevelSelection && unlocked = state { 
             currentMenu = InGame, 
             currentLevel = selectedButton (menuState state), 
             initLevel = jog',
             levels = replace (levels state) (selectedButton (menuState state), (jog', unlocked))
         }
+    | currentMenu state == LevelSelection = state
     -- InGame pause menu
     | selectedButton (menuState state) == 0 && currentMenu state == InGame = state {
-        levels = replace (levels state) (currentLevel state, (jogo {lostGame = 3}, unlocked)),
+        levels = replace (levels state) (currentLevel state, (jogoCurrent {lostGame = 3}, unlockedCurrent)),
         menuState = (menuState state) {selectedButton = 0}
     }
     | selectedButton (menuState state) == 1 && currentMenu state == InGame = state {
-        levels = replace (levels state) (currentLevel state, (jogo {lostGame = 4}, unlocked)),
+        levels = replace (levels state) (currentLevel state, (jogoCurrent {lostGame = 4}, unlockedCurrent)),
         menuState = (menuState state) {selectedButton = 0}
     }
     | selectedButton (menuState state) == 2 && currentMenu state == InGame = state {
-        levels = replace (levels state) (currentLevel state,(initLevel state, unlocked)),
+        levels = replace (levels state) (currentLevel state,(initLevel state, unlockedCurrent)),
         currentMenu = MainMenu
     }
     | otherwise = state
     where (jogo, unlocked) = (levels state) !! (selectedButton (menuState state))
+          (jogoCurrent, unlockedCurrent) = (levels state) !! (currentLevel state)
           jogo' = initLevel state--(levels state) !! (currentLevel state)
           (Mapa (pos, dir) pos1 mat) = mapa jogo
           jog' = jogo {jogador = jog {posicao = pos}}
@@ -141,7 +144,7 @@ drawArrow state = Pictures [
     ]
 
 drawLock :: State -> Picture
-drawLock state = Translate 35 (-100) $ (if unlocked then lockOpen else lockClosed)
+drawLock state = Translate 20 (-100) $ (if unlocked then lockOpen else lockClosed)
     where lockOpen = fromJust $ lookup "lockOpen" (fromJust $ lookup Default (images state))
           lockClosed = fromJust $ lookup "lockClosed" (fromJust $ lookup Default (images state))
           unlocked = snd $ (levels state) !! (selectedButton $ menuState state)
@@ -161,3 +164,10 @@ drawEndScreen state = Pictures [
     ]
     where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))
           pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
+
+drawMarioThemeSel :: State -> Picture
+drawMarioThemeSel state = Pictures [
+    currentMario,
+    drawArrow state
+    ]
+    where currentMario = fromJust $ lookup "marioandar1" (fromJust $ lookup (marioTheme $ options state) (images state))
