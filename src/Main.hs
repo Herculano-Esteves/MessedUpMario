@@ -134,7 +134,10 @@ loadImages state = do
     cameraman <- loadBMP "assets/MarioTexture/CameraMan.bmp"
     inimigo1 <- loadBMP "assets/MarioTexture/Fantasma1.bmp"
     inimigo2 <- loadBMP "assets/MarioTexture/Fantasma2.bmp"
-    moeda <- loadBMP "assets/MarioTexture/Moeda.bmp"
+    moeda1 <- loadBMP "assets/MarioTexture/Moeda1.bmp"
+    moeda2 <- loadBMP "assets/MarioTexture/Moeda2.bmp"
+    moeda3 <- loadBMP "assets/MarioTexture/Moeda3.bmp"
+    igual <- loadBMP "assets/MarioTexture/Igual.bmp"
     martelo1 <- loadBMP "assets/MarioTexture/Martelo1.bmp"
     martelo2 <- loadBMP "assets/MarioTexture/Martelo2.bmp"
     chavemario <- loadBMP "assets/MarioTexture/Key.bmp"
@@ -158,9 +161,13 @@ loadImages state = do
     mariomartelo1 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo1.bmp"
     mariomartelo2 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo2.bmp"
     mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo3.bmp"
+    mariomartelo3 <- loadBMP "assets/MarioAnimations/MarioAndar/AndarMartelo3.bmp"
     marioParado <- loadBMP "assets/MarioTexture/MarioParado.bmp"
     marioAndar1 <- loadBMP "assets/MarioTexture/MarioAni1.bmp"
     marioAndar2 <- loadBMP "assets/MarioTexture/MarioAni2.bmp"
+    --Hud
+    hearts <- loadBMP "assets/MarioAnimations/hud/Heart.bmp"
+    marioface <- loadBMP "assets/MarioAnimations/hud/MarioFace.bmp"
     --Boss Mario
     boss1mario <- loadBMP "assets/Bosses/Boss1.bmp"
     boss2mario <- loadBMP "assets/Bosses/Boss2.bmp"
@@ -262,7 +269,9 @@ loadImages state = do
             ("tunel", tunel),
             ("inimigo1", inimigo1),
             ("inimigo2", inimigo2),
-            ("moeda", moeda),
+            ("moeda1", moeda1),
+            ("moeda2", moeda2),
+            ("moeda3", moeda3),
             ("martelo1", martelo1),
             ("martelo2", martelo2),
             ("mariocair", mariocair),
@@ -292,6 +301,10 @@ loadImages state = do
             ("escada1",escada1),
             ("escada2",escada2),
             ("morreumario",morreumario),
+            --HUD jogo
+            ("hearts",hearts),
+            ("marioface",marioface),
+            ("igual",igual),
             -- Boss Mario
             ("boss1", boss1mario),
             ("boss2", boss2mario),
