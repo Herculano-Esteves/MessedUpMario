@@ -175,7 +175,8 @@ switchTheme n current
     | n == 0 = case current of
         Default -> Quadradinho
         Quadradinho -> Caverna
-        Caverna -> Default
+        Caverna -> Gold
+        Gold -> Default
     | n == 1 = case current of
         Default -> Minecraft
         Minecraft -> Default
