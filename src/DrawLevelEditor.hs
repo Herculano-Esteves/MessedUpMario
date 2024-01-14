@@ -83,6 +83,7 @@ eventHandlerEditor (EventKey (SpecialKey KeyRight) Down _ _) screen estate = est
 eventHandlerEditor (EventKey (Char 'a') Down _ _) screen estate = estate {
         tempGame = addRemoveEnemy (tempGame estate)
     }
+
 eventHandlerEditor (EventKey (Char 'z') Down _ _) screen estate = estate {
         tempGame = addRemoveColecs (tempGame estate)
     }
@@ -163,7 +164,7 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
     where currentBlock = blocos !! floor y !! floor x
           (Mapa _ _ blocos) = mapa jog
           newBlock c = case c of
-            Plataforma -> Alcapao
+            Plataforma -> Vazio
             Alcapao -> Escada
             Escada -> Porta
             Porta -> Tunel
@@ -187,7 +188,7 @@ addNewLevel state = state {
             colecionaveis = [
                 (Estrela, (0.5,2.5))
             ],
-            mapa = genEmptyMap (25,16),
+            mapa = genEmptyMap (24,20),
             lostGame = 3,
             cameraControl = ((0,0),(0,0)),
             animacaoJogo = 0,
@@ -216,7 +217,8 @@ addRemoveEnemy jog = jog {
                         EyeEntidade -> eyeboss {posicao = pos}
                         EyeBoss -> canhao {posicao = pos}
                         Canhao -> caoinimigo {posicao = pos}
-                        CaoEnemy -> atiradorbase {posicao = pos}
+                        CaoEnemy -> bowser {posicao = pos}
+                        Boss -> atiradorbase {posicao = pos}
                         AtiradorBase -> fantasma {posicao = pos}
                      else enm) $
                 filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= AtiradorBase) (inimigos jog)

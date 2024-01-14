@@ -143,7 +143,7 @@ eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) 
 
 
 eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 12,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 10 && snd (aplicaDano x) > 9,if snd (aplicaDano x)-tempo <= 0 then 10 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 8,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
 
 --EyeEntity END
 
