@@ -60,7 +60,8 @@ drawMenu state
     | currentMenu state == LevelSelection = Pictures $ [drawBg state,
         scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,25) state,
         drawArrow state,
-        drawLock state
+        drawLock state,
+        drawHighscore state
         ] 
     where temasText = fromJust $ lookup "temasText" (fromJust $ lookup Default (images state))
           
@@ -192,3 +193,10 @@ drawMarioThemeSel state = Pictures [
           index
             | (selectedButton $ menuState state) > 1 = 1
             | otherwise = (fromIntegral $ selectedButton $ menuState state)
+
+drawHighscore :: State -> Picture
+drawHighscore state = Pictures [
+    Translate 0 (-450) $ scale 2.5 2.5 $ highscoreTex,
+    scale 1 1 $ drawNum (highscore state) (25,-450) state
+    ]
+    where highscoreTex = fromJust $ lookup "highscoreText" (fromJust $ lookup Default (images state))

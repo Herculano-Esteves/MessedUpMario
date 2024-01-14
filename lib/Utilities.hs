@@ -21,7 +21,9 @@ data State = State {
     animTime  :: Float,
     editorState      :: EditorState,
     cheats          :: Bool,
-    screenSize      :: (Int, Int)
+    screenSize      :: (Int, Int),
+    highscore       :: Int,
+    currentScore    :: Int
 }
 
 data Options = Options {
@@ -122,3 +124,10 @@ f2d = float2Double
 posMapToGloss :: State -> Posicao -> (Float,Float)
 posMapToGloss state (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
                             where sizeWin = screenSize state
+
+filterColecs :: [(Colecionavel, Posicao)] -> [(Colecionavel, Posicao)] -> [(Colecionavel, Posicao)]
+filterColecs [] _ = []
+filterColecs _ [] = []
+filterColecs ((c,p):t) col
+    | ((c,p) `elem` col) || c /= Moeda = (c,p) : filterColecs t col
+    | otherwise = filterColecs t col

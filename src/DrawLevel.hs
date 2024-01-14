@@ -18,21 +18,11 @@ import Graphics.Gloss.Interface.Environment (getScreenSize)
 import DrawMenu (drawButtonTextDebug, drawButton)
 
 
--- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos
--- sizeWin :: (Int, Int)
--- sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
-
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
 posMapToGlossNivel :: Hitbox -> Posicao -> (Float,Float)
 posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
                                 where   (a,b) =(d2f x*d2f escalaGloss - d2f (escalaGloss*fst jogador),- d2f y * d2f escalaGloss+ d2f (escalaGloss*snd jogador))
                                         jogador = head (getcenterofhitbox 1 [hit])
-
-
-
-
-
-
 
 drawLevel :: State -> Picture
 drawLevel state = Pictures [
@@ -52,7 +42,7 @@ drawLevel state = Pictures [
         drawPlayer state (jogador jogo),
         drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,
         drawMorte jogo texMorte,drawCameracontrol (cheats state) texcamera jogo,
-        drawNum (pontos $ jogador jogo) posPontuacao state, drawHud jogo state,
+        drawNum ((currentScore state) + (pontos $ jogador jogo)) posPontuacao state, drawHud jogo state,
         if lostGame jogo == 5 then
             drawPause state
         else
@@ -129,7 +119,6 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
           escala = realToFrac (snd (aplicaDano jog))
           (jogo, unlocked) = levels state !! currentLevel state
 
--- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
 drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo (if direcao x == Norte then texmacaco4 else (playAnimAny (length macacoAndar) (time state) macacoAndar)) x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else

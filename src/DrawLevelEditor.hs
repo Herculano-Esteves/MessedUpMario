@@ -12,14 +12,8 @@ import Mapas
 import Tarefa2 (floorPos, valida)
 import Extras
 
+-- | Função que recebe um estado e um evento e reage a esse evento no editor de níveis
 reactLevelEditor :: Event -> State -> IO State
-{-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
-        levels = case (selectFunc $ editorState state) of
-                    0 -> replace (levels state) ((currentLevel state),(replaceBlock jogo, unlocked))
-                    1 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-                    2 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-    }
-    where (jogo, unlocked) = (levels state) !! (currentLevel state)-}
 reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
         levels = if valid then
                 replace (levels state) ((currentLevel state),( tempGame $ editorState state, unlocked))
@@ -43,7 +37,7 @@ reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
 reactLevelEditor e state = return state {editorState = eventHandlerEditor e (screenSize state) (editorState state)}
           
-
+-- | Função que trata de todos os eventos do editor de níveis
 eventHandlerEditor :: Event -> (Int, Int) -> EditorState -> EditorState
 eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = estate {
     tempGame = replaceBlock (tempGame estate)
@@ -95,6 +89,7 @@ eventHandlerEditor (EventKey (Char '2') Down _ _) screen estate = estate {
     }
 eventHandlerEditor e screen s = s
 
+-- | Função global que desenha tudo o que é necessário no editor de níveis
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
     | savingGame $ editorState state = scale 1 1 $ if valida (tempGame $ editorState state) then savedText else notSavedText
@@ -129,14 +124,7 @@ drawLevelEditor state
           imagesPlatformTheme = fromJust (lookup (platformTheme (options state)) (images state))
           jogo = tempGame $ editorState state
 
-drawLevelEditor' :: State -> Picture
-drawLevelEditor' state = Pictures [
-    drawMap jogo texPlataforma, 
-    drawSelBox state ]
-    where (jogo, unlocked) = (levels state) !! (currentLevel state)
-          imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-          texPlataforma = fromJust (lookup "plataforma" imagesTheme)
-
+-- | Função que desenha a caixa de seleção
 drawSelBox :: State -> Picture
 drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
     0 -> Color green
@@ -147,10 +135,12 @@ drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGa
           selectorTex = fromJust (lookup "selector" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
+-- | Função que desenha o local de spawn do jogador
 drawSpawnPoint :: EditorState -> Picture
 drawSpawnPoint estate = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame estate) pos) $ Color (dim magenta) $ circleSolid 10
     where (Mapa (pos,dir) _ _) = mapa $ tempGame estate
 
+-- | Função que desenha os limites do mapa
 drawMapLimits :: EditorState -> Picture
 drawMapLimits estate = Color green $ uncurry Translate (posMapToGlossNivel (cameraControl (tempGame estate)) ((fromIntegral tx/2), (fromIntegral ty/2))) $ (rectangleWire (d2f $ (fromIntegral tx)*escalaGloss) (d2f $ ((fromIntegral ty)*escalaGloss)))
     where sizeR :: (Int, Int)
@@ -238,24 +228,6 @@ addRemoveEnemy jog = jog {
     }
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
-
-{-
-Personagem {velocidade = (0,0), 
-                        tipo = case tipo enm of
-                            Fantasma -> MacacoMalvado
-                            MacacoMalvado -> Boss
-                            Boss -> Fantasma, 
-                        emEscada = False,
-                        vida = 1, 
-                        pontos = 0, 
-                        ressalta = True, 
-                        posicao = pos, 
-                        tamanho = if tipo enm == Fantasma || tipo enm == EyeEntidade then (0.5,0.7) else if tipo enm == MacacoMalvado then (1,1) else (3,3), 
-                        aplicaDano = if tipo enm == Boss || tipo enm == EyeBoss || tipo enm == EyeEntidade then (True, 4) else (False,0), 
-                        direcao = Oeste,
-                        temChave = False,
-                        mira= (0,0)}
--}
 
 -- | Função que altera a posição de spawn do jogador no mapa de um dado jogo, colocando-o na posição do jogador
 switchJogPos :: Jogo -> Jogo

@@ -32,19 +32,19 @@ window = FullScreen
 
 
 eventHandler :: Event -> State -> IO State
-eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = exitSuccess
+eventHandler (EventKey (SpecialKey KeyEsc) Down _ _) state = return state {exitGame = True}
 eventHandler (EventKey (Char 'm') Down _ _) state = return $ state {currentMenu = MainMenu,levels = replace (levels state) (currentLevel state,(initLevel state, unlocked))}
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 eventHandler (EventKey (Char 'u') Down _ _) state = do
-    writeFile "game.txt" (show (tempGame $ editorState state))
+    writeFile "data/game.txt" (show (tempGame $ editorState state))
     return $ state
 eventHandler (EventKey (Char 'l') Down _ _) state = do
-    writeFile "gameDebug.txt" (mapToFile (mapa (tempGame $ editorState state)))
-    writeFile "enemiesDebug.txt" (enemiesToFile (inimigos (tempGame $ editorState state)))
-    writeFile "colectablesDebug.txt" (colecionaveisToFile (colecionaveis (tempGame $ editorState state)))
+    writeFile "data/gameDebug.txt" (mapToFile (mapa (tempGame $ editorState state)))
+    writeFile "data/enemiesDebug.txt" (enemiesToFile (inimigos (tempGame $ editorState state)))
+    writeFile "data/colectablesDebug.txt" (colecionaveisToFile (colecionaveis (tempGame $ editorState state)))
     return $ state
 eventHandler (EventKey (Char 'y') Down _ _) state = do
-    gameFile <-readFile "game.txt"
+    gameFile <-readFile "data/game.txt"
     return $ state {
         editorState = (editorState state) {
             tempGame = read gameFile
@@ -60,8 +60,10 @@ eventHandler event state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
 
 timeHandler :: Float -> State -> IO State
-timeHandler dTime (State {exitGame = True}) = exitSuccess
 timeHandler dTime state
+    | exitGame state = do
+        writeFile "data/highscore.txt" (show (highscore state))
+        exitSuccess
     -- | vida (jogador jogo) == 0 && animTime state /= 0 = if animTime state > 0 then return state {animTime = (animTime state) - dTime}
         -- else return state {animTime = 0}
     | (currentLevel state) == length (levels state) - 1 && lostGame jogo == 1 = return $ state {
@@ -74,12 +76,17 @@ timeHandler dTime state
     }
     | lostGame jogo == 4 = return state {
             levels = replace (levels state) ((currentLevel state),((initLevel state)
-                {jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False}}, unlocked))
+                {
+                    jogador = (jogador jogo) {posicao = pinit, direcao = dir,aplicaDano = (False,0),temChave = False},
+                    colecionaveis = filterColecs (colecionaveis $ initLevel state) (colecionaveis jogo)  
+                }, unlocked))
         }
     | lostGame jogo == 1 = return state {
             initLevel = jogo1,
             currentLevel = (currentLevel state) + 1,
-            levels = replace restoredLevels (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1))
+            levels = replace restoredLevels (currentLevel state +1, (jogo1 {jogador = (jogador jogo1) {posicao = pinit1, direcao = dir1}}, unlckd1)),
+            currentScore = pontos (jogador jogo) + currentScore state,
+            highscore = max (highscore state) (pontos (jogador jogo) + currentScore state)
         }
     | currentMenu state == InGame = do
     generateRandomNumber <- randomRIO (1, 100 :: Int)
@@ -110,6 +117,8 @@ draw state = do
     putStrLn ("lostGame jog: " ++ show (lostGame $ jogo))
     putStrLn ("lostGame initState: " ++ show (lostGame $ initLevel state))
     putStrLn ("unlocked jog: " ++ show (unlocked))
+    putStrLn ("highscore: " ++ show (highscore state))
+    putStrLn ("currentscore: " ++ show (currentScore state))
     putStrLn ("inimigos: " ++ show (filter (\x -> tipo x == AtiradorFoguete) (inimigos jogo)))
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
@@ -308,6 +317,7 @@ loadImages state = do
     temasText <- loadBMP "assets/Backgrounds/temasText.bmp"
     savedText <- loadBMP "assets/Backgrounds/SavedText.bmp"
     notSavedText <- loadBMP "assets/Backgrounds/NotSavedText.bmp"
+    highscoreText <- loadBMP "assets/Backgrounds/HighscoreText.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -447,6 +457,7 @@ loadImages state = do
             ("temasText", temasText),
             ("savedText", savedText),
             ("notSavedText", notSavedText),
+            ("highscoreText", highscoreText),
             -- Level Editor
             ("selector", selector)
             ]),
@@ -508,7 +519,9 @@ loadImages state = do
 main :: IO ()
 main = do
     scrSize <- getScreenSize
+    highscore <- readFile "data/highscore.txt"
     initState <- loadImages initialState {
-        screenSize = scrSize
+        screenSize = scrSize,
+        highscore = read highscore
     }
     playIO window bgColor fr initState draw eventHandler timeHandler

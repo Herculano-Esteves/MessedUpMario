@@ -43,7 +43,9 @@ initialState = State {
         savingGame = False
     },
     cheats = False,
-    screenSize = (0,0)
+    screenSize = (0,0),
+    highscore = 0,
+    currentScore = 0
 }
 --PERSONAGENS START
 
