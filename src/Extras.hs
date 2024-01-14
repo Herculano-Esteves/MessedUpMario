@@ -148,9 +148,6 @@ eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplica
 --EyeEntity END
 
 --Portas Start
-
-
-
 portasFuncao :: Jogo -> Jogo
 portasFuncao jogo = if not (temChave (jogador jogo)) then jogo {mapa = mapa jogo} else jogo {mapa = m, jogador = (jogador jogo) {temChave = m == mapa jogo && temChave (jogador jogo)}}
                     where m = podeabrirporta (mapa jogo) (jogador jogo)
@@ -178,6 +175,4 @@ removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p
                                 | otherwise = head l : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
                             where   ((p1,p2),(p3,p4)) = genHitbox jog
                                     ((p5,p6),(p7,p8)) = gethitboxbloco dimensaobloco (x,y)
-
-
 --Portas End

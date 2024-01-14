@@ -37,7 +37,7 @@ inimigoParado =
       pontos = 0,
       aplicaDano = (False, 0),
       temChave = False,
-      mira = (0,0)
+      mira = (False,0,0)
     }
 
 jogadorParado =
@@ -53,7 +53,7 @@ jogadorParado =
       pontos = 0,
       aplicaDano = (False, 0),
       temChave = False,
-      mira = (0,0)
+      mira = (False,0,0)
     }
 
 jogo01 :: Jogo
@@ -109,7 +109,7 @@ jogadorEmFrenteEscada =
       pontos = 0,
       aplicaDano = (False, 0),
       temChave = False,
-      mira = (0,0)
+      mira = (False,0,0)
     }
 
 jogo02 :: Jogo
@@ -145,7 +145,7 @@ jogadorEmEscada =
       pontos = 0,
       aplicaDano = (False, 0),
       temChave = False,
-      mira = (0,0)
+      mira = (False,0,0)
     }
 
 teste06 :: Test
