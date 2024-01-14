@@ -15,7 +15,6 @@ import Data.Maybe (fromJust)
 import Utilities
 import Data.Fixed (mod', Pico)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
-import DrawMenu (drawButtonTextDebug, drawButton)
 
 
 -- | Devolve o tamanho da janela apropriado para um determinado mapa inicial e uma escala dos blocos

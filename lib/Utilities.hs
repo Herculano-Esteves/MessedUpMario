@@ -122,3 +122,12 @@ f2d = float2Double
 posMapToGloss :: State -> Posicao -> (Float,Float)
 posMapToGloss state (x,y) = (d2f x*d2f escalaGloss-fromIntegral (fst sizeWin)/2, fromIntegral (snd sizeWin)/2 - d2f y * d2f escalaGloss)
                             where sizeWin = screenSize state
+
+drawButton :: Images -> String -> (Int, Int) -> Bool -> Picture
+drawButton tex buttonType (currentIndex, index) pressed
+    | currentIndex == index && pressed = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexPressed
+    | currentIndex == index = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexHover
+    | otherwise = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTex
+    where bTex = fromJust $ lookup buttonType (fromJust $ lookup Default tex)
+          bTexHover = fromJust $ lookup (buttonType ++ "Hover") (fromJust $ lookup Default tex)
+          bTexPressed = fromJust $ lookup (buttonType ++ "Pressed") (fromJust $ lookup Default tex)

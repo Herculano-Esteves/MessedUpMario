@@ -6,6 +6,7 @@ import Graphics.Gloss.Interface.IO.Game
 import Mapas
 import Data.Maybe (fromJust)
 import Utilities
+import DrawLevel
 
 -- | Faz o tratamento do input quando o utilizador se encontra no menu
 eventHandlerInMenu :: Event -> State -> IO State
@@ -39,11 +40,13 @@ drawMenu :: State -> Picture
 drawMenu state 
     | currentMenu state == MainMenu = Pictures [
         --drawTitle,
+        drawEntityMenu state,
         drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
         drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
         drawButton (images state) "botaoEdit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
         drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
         drawBanner (images state)
+        
         ]
     | currentMenu state == OptionsMenu = Pictures [
         Translate 0 250 $ scale 2 2 $ temasText,
@@ -64,6 +67,17 @@ drawMenu state
         ] 
     where temasText = fromJust $ lookup "temasText" (fromJust $ lookup Default (images state))
           
+drawEntityMenu :: State -> Picture
+drawEntityMenu state = Pictures $ [Translate (-100) (-100) $ scale (-7.5) 7.5 $ playAnimAny (length bossanim) (time state) bossanim]
+        where   bossanim = [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6]
+                texBoss1 = fromJust (lookup "boss1" imagesTheme)
+                texBoss2 = fromJust (lookup "boss2" imagesTheme)
+                texBoss3 = fromJust (lookup "boss3" imagesTheme)
+                texBoss4 = fromJust (lookup "boss4" imagesTheme)
+                texBoss5 = fromJust (lookup "boss5" imagesTheme)
+                texBoss6 = fromJust (lookup "boss6" imagesTheme)
+                imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+
 
 -- ! Remove
 drawTitle :: Picture
@@ -122,15 +136,6 @@ drawButtonTextDebug isEnabled n textButton = Pictures [
     (if isEnabled == n then Color green else Color white) $ Translate 0 (-110 -40 * fromIntegral n) $ rectangleWire 70 30,
     Color white $ Translate (-30) ((-110) -10 - 40 * fromIntegral n) $ Scale 0.2 0.2 $ Text textButton
     ]
-
-drawButton :: Images -> String -> (Int, Int) -> Bool -> Picture
-drawButton tex buttonType (currentIndex, index) pressed
-    | currentIndex == index && pressed = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexPressed
-    | currentIndex == index = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTexHover
-    | otherwise = Translate 0 (-100 + (-60 * fromIntegral index)) $ bTex
-    where bTex = fromJust $ lookup buttonType (fromJust $ lookup Default tex)
-          bTexHover = fromJust $ lookup (buttonType ++ "Hover") (fromJust $ lookup Default tex)
-          bTexPressed = fromJust $ lookup (buttonType ++ "Pressed") (fromJust $ lookup Default tex)
 
 drawBanner :: Images -> Picture
 drawBanner tex = scale 1 1 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
