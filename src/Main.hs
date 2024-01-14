@@ -93,6 +93,9 @@ timeHandler dTime state
     return $ extrasFuncao generateRandomNumber (float2Double dTime) state {
         levels = replace (levels state) ((currentLevel state),(movimenta generateRandomNumber (float2Double dTime) jogo, unlocked)),
         time = (time state) + dTime}
+    | currentMenu state == MainMenu = return state {
+        time = (time state) + dTime
+    }
     | otherwise = return state
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
           (jogo1, unlckd1) = (levels state) !! (currentLevel state + 1)
