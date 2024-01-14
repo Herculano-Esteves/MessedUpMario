@@ -173,7 +173,8 @@ switchTheme :: Int -> Theme -> Theme
 switchTheme n current
     | n == 0 = case current of
         Default -> Quadradinho
-        Quadradinho -> Default
+        Quadradinho -> Caverna
+        Caverna -> Default
     | n == 1 = case current of
         Default -> Minecraft
         Minecraft -> Default

@@ -78,16 +78,46 @@ controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
 
 --Boss AI START
 bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> ataqueDoBoss tempo (jogador jogo) x ++ y) [] ( movimentaBoss tempo a) ++ c ++ d}
+bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> (ataque1Boss  x (jogador jogo)) ++ y) [] ( movimentaBoss (head(getcenterofhitbox 4 [(cameraControl jogo)])) tempo a) ++ b}
                             | otherwise = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) Boss
-                                    (c,d) = onlyOneTipo b CuspoDeFogo
 
---Sabendo que so pode existir um boss
-movimentaBoss :: Tempo -> [Personagem] -> [Personagem]
-movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo)}) bosses
+
+movimentaBoss :: Posicao -> Tempo -> [Personagem] -> [Personagem]
+movimentaBoss pos tempo bosses = map (\x -> x{aplicaDano = ((snd (aplicaDano boss) <= 30 && snd (aplicaDano boss) >= 25.5) || (snd (aplicaDano boss) <= 22 && snd (aplicaDano boss) >= 19) ,if snd (aplicaDano x)-tempo <= 15 then 30 else if snd (aplicaDano x) < 29.1 && snd (aplicaDano x) > 29 then 29 else
+                                        if snd (aplicaDano x) < 28.1 && snd (aplicaDano x) > 28 then 28 else
+                                        if snd (aplicaDano x) < 27.1 && snd (aplicaDano x) > 27 then 27 else
+                                        if snd (aplicaDano x) < 22.1 && snd (aplicaDano x) > 22 then 22 else
+                                        if snd (aplicaDano x) < 21.1 && snd (aplicaDano x) > 21 then 21 else
+                                        if snd (aplicaDano x) < 20.1 && snd (aplicaDano x) > 20 then 20 else
+                                        if snd (aplicaDano x) < 19.1 && snd (aplicaDano x) > 19 then 19 else
+                                         snd (aplicaDano x)-tempo),posicao = (1.5,b)}) bosses
                     where   boss = head bosses
                             tboss = snd (aplicaDano boss)-tempo
+                            (a,b) = pos
+
+
+ataque1Boss :: Personagem -> Personagem -> [Personagem]
+ataque1Boss boss jogador | tempo == 300 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                         | tempo == 290 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                         | tempo == 280 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                         | tempo == 270 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+                         | tempo == 220 = [bolacanhao{velocidade = (11,-7),posicao = posicao boss},boss]
+                         | tempo == 210 = [bolacanhao{velocidade = (11,-4),posicao = posicao boss},boss]
+                         | tempo == 200 = [bolacanhao{velocidade = (13,-2),posicao = posicao boss},boss]
+                         | tempo == 190 = [bolacanhao{velocidade = (15,0),posicao = posicao boss},boss]
+                         | otherwise = [boss]
+                        where   (condicao,anstestempo) = aplicaDano boss
+                                tempo = floor (anstestempo *10)
+                                (bx,by) = posicao boss
+                                (jx,jy) = posicao jogador
+                                (a,b) = (jx-bx,jy-by)
+                                (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
+                                (t,y,u) = mira boss
+
+
+
+
 
 ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
 ataqueDoBoss tempo jogador boss | not t = [boss]
@@ -103,7 +133,7 @@ ataqueDoBoss tempo jogador boss | not t = [boss]
                                   (t,y,u) = mira boss
 
 movimentaCuspoJogo :: Tempo -> Jogo -> Jogo
-movimentaCuspoJogo tempo jogo   | CuspoDeFogo `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaCuspo (mapa jogo) tempo c ++ d}
+movimentaCuspoJogo tempo jogo   | CuspoDeFogo `elem` map tipo (inimigos jogo) || BolaDeCanhao `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaCuspo (mapa jogo) tempo c ++ d}
                                 | otherwise = jogo
                             where   (c,d) = onlyOneTipo (inimigos jogo) CuspoDeFogo
 
@@ -143,7 +173,7 @@ eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) 
 
 
 eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 10 && snd (aplicaDano x) > 9,if snd (aplicaDano x)-tempo <= 0 then 10 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 8,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 8,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
 
 --EyeEntity END
 
@@ -180,7 +210,7 @@ removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p
 
 --Canhao Start
 canhaoMovimento :: Semente -> Tempo -> Jogo -> Jogo
-canhaoMovimento semente tempo jogo | Canhao `elem` map tipo (inimigos jogo) = jogo{inimigos = acaoCanhaoSpawnBola (acaoCanhao tempo (geraAleatorios semente (length a)) a) ++ acaoBolasDeCanhao (mapa jogo) tempo c ++ d}
+canhaoMovimento semente tempo jogo | Canhao `elem` map tipo (inimigos jogo) || BolaDeCanhao `elem` map tipo (inimigos jogo) = jogo{inimigos = acaoCanhaoSpawnBola (acaoCanhao tempo (geraAleatorios semente (length a)) a) ++ acaoBolasDeCanhao (mapa jogo) tempo c ++ d}
                                    | otherwise = jogo
                            where (a,b) = onlyOneTipo (inimigos jogo) Canhao
                                  (c,d) = onlyOneTipo b BolaDeCanhao
