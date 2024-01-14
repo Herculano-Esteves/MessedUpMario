@@ -32,16 +32,17 @@ reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
     }
     where (jogo, unlocked) = (levels state) !! (currentLevel state)
           valid = valida (tempGame $ editorState state)
-reactLevelEditor (EventKey (Char 's') Down _ _) state = return state {
-    editorState = (editorState state) {selectFunc = if ((selectFunc $ editorState state) == 3) then 0 else (selectFunc $ editorState state) + 1}}
+reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state 
+    | not $ savingGame (editorState state) = return state {
+        editorState = (editorState state) {tempGame = replaceBlock (tempGame (editorState state))}
+    }
+    | otherwise = return state {
+        currentMenu = MainMenu
+    }
 reactLevelEditor (EventKey (Char 'n') Down _ _) state = return $ addNewLevel state
 reactLevelEditor e state = return state {editorState = eventHandlerEditor e (screenSize state) (editorState state)}
           
 -- | Função que trata de todos os eventos do editor de níveis
-eventHandlerEditor :: Event -> (Int, Int) -> EditorState -> EditorState
-eventHandlerEditor (EventKey (SpecialKey KeyEnter) Down _ _) screen estate = estate {
-    tempGame = replaceBlock (tempGame estate)
-}
 eventHandlerEditor (EventKey (SpecialKey KeyUp) Down _ _) screen estate = estate {
         tempGame = cameraHitbox screen (1) $ (tempGame estate) {
             jogador = (jogador $ tempGame estate) {
@@ -87,14 +88,31 @@ eventHandlerEditor (EventKey (Char '1') Down _ _) screen estate = estate {
 eventHandlerEditor (EventKey (Char '2') Down _ _) screen estate = estate {
         tempGame = switchEndJogPos (tempGame estate)
     }
+eventHandlerEditor (EventKey (Char 'h') Down _ _) screen estate = estate {
+        showHelp = not (showHelp estate)
+    }
 eventHandlerEditor e screen s = s
 
 -- | Função global que desenha tudo o que é necessário no editor de níveis
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
-    | savingGame $ editorState state = scale 1 1 $ if valida (tempGame $ editorState state) then savedText else notSavedText
-    | otherwise = Pictures [drawEspinho jogo texEspinho, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
-                drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
+    | savingGame $ editorState state = Pictures [
+        scale 1 1 $ if valida (tempGame $ editorState state) then savedText else notSavedText,
+        Translate 0 (-150) $ scale 1 1 pressEnterTex
+    ]
+    | otherwise = Pictures [
+        drawEspinho jogo texEspinho,
+        drawLadder jogo texEscada,
+        drawPorta jogo texPorta,
+        drawMap jogo texPlataforma,
+        drawColecs state texMoeda texmartelo2 texChave jogo,
+        drawAlcapao jogo texAlcapao,
+        drawTunel jogo texTunel,
+        drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,
+        drawSpawnPoint (editorState state),
+        drawSelBox state,
+        drawMapLimits (editorState state),
+        drawHelp state]
     where texEscada = fromJust (lookup "escada" imagesPlatformTheme)
           texPlataforma = fromJust (lookup "plataforma" imagesPlatformTheme)
           texAlcapao = fromJust (lookup "alcapao" imagesPlatformTheme)
@@ -119,6 +137,7 @@ drawLevelEditor state
           texmartelo1 = fromJust (lookup "martelo1" imagesTheme)
           texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           savedText = fromJust (lookup "savedText" imagesTheme)
+          pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
           notSavedText = fromJust (lookup "notSavedText" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           imagesPlatformTheme = fromJust (lookup (platformTheme (options state)) (images state))
@@ -126,11 +145,7 @@ drawLevelEditor state
 
 -- | Função que desenha a caixa de seleção
 drawSelBox :: State -> Picture
-drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame $ editorState state) (x,y)) $ (case (selectFunc $ editorState state) of
-    0 -> Color green
-    1 -> Color red
-    2 -> Color blue
-    3 -> Color (dim cyan)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ selectorTex--rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
+drawSelBox state = uncurry Translate (posMapToGlossNivel (cameraControl $ tempGame $ editorState state) (x,y)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ selectorTex--rectangleWire (double2Float escalaGloss) (double2Float escalaGloss)
     where (x,y) = posicao $ jogador $ tempGame $ editorState state
           selectorTex = fromJust (lookup "selector" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
@@ -147,7 +162,15 @@ drawMapLimits estate = Color green $ uncurry Translate (posMapToGlossNivel (came
           sizeR = (round $ snd (snd (getMapaDimensoes 1 (mapa jog))), round $ fst $ (snd (getMapaDimensoes 1 (mapa jog))))
           (tx, ty) = sizeR
           jog = tempGame estate
-          
+
+drawHelp :: State -> Picture
+drawHelp state = Pictures [
+    if showHelp (editorState state) then scale 3 3 $ helpTex else Blank,
+    Translate (-725) (-500) $ scale 0.8 0.8 helpText]
+    where helpTex = fromJust (lookup "helpScreen" imagesTheme)
+          helpText = fromJust (lookup "helpText" imagesTheme)
+          imagesTheme = fromJust (lookup Default (images state))
+
 -- | Função que recebe um jogo e substitui um bloco na posição do jogador
 replaceBlock :: Jogo -> Jogo
 replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog

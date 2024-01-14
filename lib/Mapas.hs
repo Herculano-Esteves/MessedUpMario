@@ -38,9 +38,9 @@ initialState = State {
     editorState = EditorState {
         tempGame = jogo01,
         levelEditorPos = (0.5,0.5),
-        selectFunc = 0,
         removingEnemies = False,
-        savingGame = False
+        savingGame = False,
+        showHelp = False
     },
     cheats = False,
     screenSize = (0,0),

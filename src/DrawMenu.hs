@@ -45,11 +45,12 @@ drawMenu state
         Translate 0 (-25) $ drawButton (images state) "botaoEdit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
         Translate 0 (-150) $ drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
         drawBanner (images state)
-        ]
+    ]
     | currentMenu state == OptionsMenu = Pictures [
-        Translate 0 250 $ scale 2 2 $ temasText,
+        Translate 0 350 $ scale 2 2 $ temasText,
         drawMarioThemeSel state,
-        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state))
+        Translate 0 100 $ drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
+        drawCredits state
     ]
     | currentMenu state == GameOver = Pictures [
         -- Color red $ scale 0.5 0.5 $ text "Game over!"
@@ -204,10 +205,14 @@ switchTheme n current
 -- | Desenha o tema atual
 drawMarioThemeSel :: State -> Picture
 drawMarioThemeSel state = Pictures [
-    Translate 0 (100) $ scale 5 5 currentMario,
-    Translate 0 (-75) $ scale 2 2 currentPlatform,
+    Translate 0 (200) $ (if (marioTheme $ options state) /= Caverna then
+            scale 5 5
+        else
+            scale 3.5 3.5)
+        currentMario,
+    Translate 0 (25) $ scale 2 2 currentPlatform,
     -- drawArrow state
-    Translate (-100) (100 -175 * index) $ scale (-1) 1 $ arrowTex
+    Translate (-100) (200 -175 * index) $ scale (-1) 1 $ arrowTex
     ]
     where currentMario = fromJust $ lookup "marioandar1" (fromJust $ lookup (marioTheme $ options state) (images state))
           currentPlatform = fromJust $ lookup "plataforma" (fromJust $ lookup (platformTheme $ options state) (images state))
@@ -223,3 +228,7 @@ drawHighscore state = Pictures [
     scale 1 1 $ drawNum (highscore state) (25,-450) state
     ]
     where highscoreTex = fromJust $ lookup "highscoreText" (fromJust $ lookup Default (images state))
+
+drawCredits :: State -> Picture
+drawCredits state = Translate 0 (-300) $ scale 1 1 $ creditsText
+    where creditsText = fromJust $ lookup "creditsText" (fromJust $ lookup Default (images state))

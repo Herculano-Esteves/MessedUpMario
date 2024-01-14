@@ -35,9 +35,9 @@ data Options = Options {
 data EditorState = EditorState {
     tempGame        :: Jogo,
     levelEditorPos  :: Posicao,
-    selectFunc      :: Int,
     removingEnemies :: Bool,
-    savingGame      :: Bool
+    savingGame      :: Bool,
+    showHelp        :: Bool
 }
 
 data MenuState = MenuState {

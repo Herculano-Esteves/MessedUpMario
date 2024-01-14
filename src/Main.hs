@@ -335,6 +335,9 @@ loadImages state = do
     savedText <- loadBMP "assets/Backgrounds/SavedText.bmp"
     notSavedText <- loadBMP "assets/Backgrounds/NotSavedText.bmp"
     highscoreText <- loadBMP "assets/Backgrounds/HighscoreText.bmp"
+    helpScreen <- loadBMP "assets/Backgrounds/HelpScreen.bmp"
+    helpText <- loadBMP "assets/Backgrounds/HelpText.bmp"
+    creditsText <- loadBMP "assets/Backgrounds/CreditsText.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -475,6 +478,9 @@ loadImages state = do
             ("savedText", savedText),
             ("notSavedText", notSavedText),
             ("highscoreText", highscoreText),
+            ("helpScreen", helpScreen),
+            ("helpText", helpText),
+            ("creditsText", creditsText),
             -- Level Editor
             ("selector", selector)
             ]),
