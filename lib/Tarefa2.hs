@@ -90,7 +90,7 @@ validaColecs colecs (Mapa _ _ mat)
 
 -- | Verifica se as personagens (jogador e inimigos) se encontram em espaços vazios do mapa
 validaPosPers :: Personagem -> [Personagem] -> Mapa -> Bool
-validaPosPers player inms (Mapa (pos, dir) _ mat) = (floorPos pos `elem` getPosOfBlock Vazio mat) || (floorPos pos `elem` getPosOfBlock Escada mat) -- && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
+validaPosPers player inms (Mapa (pos, dir) _ mat) = (floorPos pos `elem` getPosOfBlock Vazio mat) || (floorPos pos `elem` getPosOfBlock Escada mat) && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
 
 floorPos :: Posicao -> Posicao
 floorPos (x,y) = (fromIntegral $ floor x, fromIntegral $ floor y)

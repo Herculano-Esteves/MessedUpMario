@@ -270,6 +270,9 @@ loadImages state = do
     botaoEdit <- loadBMP "assets/Buttons/BotaoEdit.bmp"
     botaoEditHover <- loadBMP "assets/Buttons/BotaoEditHover.bmp"
     botaoEditPressed <- loadBMP "assets/Buttons/BotaoEditPressed.bmp"
+    botaoRestart <- loadBMP "assets/Buttons/BotaoRestart.bmp"
+    botaoRestartHover <- loadBMP "assets/Buttons/BotaoRestartHover.bmp"
+    botaoRestartPressed <- loadBMP "assets/Buttons/BotaoRestartPressed.bmp"
     arrow <- loadBMP "assets/Buttons/arrow.bmp"
     -- Numbers
     um <- loadBMP "assets/Numbers/Um.bmp"
@@ -289,6 +292,8 @@ loadImages state = do
     end <- loadBMP "assets/Backgrounds/end.bmp"
     pressEnterText <- loadBMP "assets/Backgrounds/PressEnterText.bmp"
     temasText <- loadBMP "assets/Backgrounds/temasText.bmp"
+    savedText <- loadBMP "assets/Backgrounds/SavedText.bmp"
+    notSavedText <- loadBMP "assets/Backgrounds/NotSavedText.bmp"
     -- Level editor
     selector <- loadBMP "assets/NoAplication/selector.bmp"
     return  state {
@@ -319,6 +324,9 @@ loadImages state = do
             ("botaoEdit", botaoEdit),
             ("botaoEditHover", botaoEditHover),
             ("botaoEditPressed", botaoEditPressed),
+            ("botaoRestart", botaoRestart),
+            ("botaoRestartHover", botaoRestartHover),
+            ("botaoRestartPressed", botaoRestartPressed),
             ("arrow", arrow),
             ("menuBanner", menuBanner),
             ("portaMario",portamario),
@@ -423,6 +431,8 @@ loadImages state = do
             ("endScreen", end),
             ("pressEnterText", pressEnterText),
             ("temasText", temasText),
+            ("savedText", savedText),
+            ("notSavedText", notSavedText),
             -- Level Editor
             ("selector", selector)
             ]),

@@ -345,10 +345,10 @@ eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = atualiza (re
 eventHandlerInGame e jogo = jogo
 
 drawPause :: State -> Picture
-drawPause state = Pictures [
-        Translate 0 0 $ scale (4 * d2f escalaGloss/50) (4 * d2f escalaGloss/50) pauseTex,
+drawPause state = Translate 0 70 $ Pictures [
+        Translate 0 20 $ scale (4 * d2f escalaGloss/50) (4 * d2f escalaGloss/50) pauseTex,
         drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
-        drawButtonTextDebug (selectedButton (menuState state)) 1 "Restart",
+        drawButton (images state) "botaoRestart" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
         drawButton (images state) "botaoQuit" (selectedButton (menuState state), 2) (pressingButton (menuState state))
     ]
     where imagesTheme = fromJust (lookup Default (images state))

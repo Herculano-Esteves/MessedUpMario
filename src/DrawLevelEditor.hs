@@ -96,7 +96,7 @@ eventHandlerEditor e screen s = s
 
 drawLevelEditor :: State -> Picture
 drawLevelEditor state 
-    | savingGame $ editorState state = Color red $ scale 0.2 0.2 $ if valida (tempGame $ editorState state) then Text "Saved" else Text "Not saved! Invalid map"
+    | savingGame $ editorState state = scale 1 1 $ if valida (tempGame $ editorState state) then savedText else notSavedText
     | otherwise = Pictures [drawEspinho jogo texEspinho, drawLadder jogo texEscada, drawPorta jogo texPorta, drawMap jogo texPlataforma, drawColecs state texMoeda texmartelo2 texChave jogo, drawAlcapao jogo texAlcapao, drawTunel jogo texTunel,
                 drawEnemies state (texInimigo1,texInimigo2) texMacaco texBarril [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6] jogo,drawMorte jogo texMorte,drawSpawnPoint (editorState state), drawSelBox state, drawMapLimits (editorState state)]
     where texEscada = fromJust (lookup "escada" imagesPlatformTheme)
@@ -122,6 +122,8 @@ drawLevelEditor state
           martelos = [texmartelo1,texmartelo2]
           texmartelo1 = fromJust (lookup "martelo1" imagesTheme)
           texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
+          savedText = fromJust (lookup "savedText" imagesTheme)
+          notSavedText = fromJust (lookup "notSavedText" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
           imagesPlatformTheme = fromJust (lookup (platformTheme (options state)) (images state))
           jogo = tempGame $ editorState state
