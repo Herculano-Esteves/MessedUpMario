@@ -27,27 +27,31 @@ movimenta seed dtime jog    | lostGame jog == 5 = jog  --Pausa
 distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
+-- | Primeira decima de um numero
 firstDecimal :: Double -> Int
 firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
--- esquerda pertence, direita nao
 
+-- | Filtra uma lista de inimigos de acordo com o seu tipo em lista (pertence,nao pertence)
 onlyOneTipoLista :: [Personagem] -> [Entidade] -> ([Personagem],[Personagem])
 onlyOneTipoLista lista ent = foldl (\(a,b) y -> if tipo y `elem` ent then (y : a,b) else (a,y : b)) ([],[]) lista
 
+-- | Filtra uma lista de inimigos de acordo com o seu tipo (pertence,nao pertence)
 onlyOneTipo :: [Personagem] -> Entidade -> ([Personagem],[Personagem])
 onlyOneTipo lista ent = foldl (\(a,b) y -> if tipo y == ent then (y : a,b) else (a,y : b)) ([],[]) lista
 
 --Dano Jogador START
+-- | Funcao base para os inimigos perderem vida
 hitboxDanoJogadorFinal :: Jogo -> Jogo
 hitboxDanoJogadorFinal jogo | null (inimigos jogo) = jogo
                             | otherwise = jogo {inimigos = hitboxDanoJogador (jogador jogo) (inimigos jogo)}
 
+-- | Controlar os inimigos
 hitboxDanoJogador :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogador x y
     | fst (aplicaDano x) && snd (aplicaDano x) > 0 = hitboxDanoJogadoraux x y
     | otherwise = y
 
-
+-- | Funçao individual de inimigos
 hitboxDanoJogadoraux :: Personagem -> [Personagem] -> [Personagem]
 hitboxDanoJogadoraux _ [] = []
 hitboxDanoJogadoraux player (h:t)
@@ -66,6 +70,7 @@ hitboxDanoJogadoraux player (h:t)
 
 
 --Inimigo morto START
+-- | Controla os Inimigos no jogo se morrem ou nao e se levam dano ou nao
 inimigoMortoEnd :: Jogo -> Jogo
 inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
@@ -77,6 +82,7 @@ inimigoMorto enm    | null enm = enm
 
 
 -- GRAVIDADE START
+-- | Personagens afetados pela gravidade
 gravidadeQuedaEnd :: Double -> Jogo -> Jogo
 gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) sofreGrav) ++ naoSofre, jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
                             where   (sofreGrav,naoSofre) = onlyOneTipoLista (inimigos jogo) [EyeEntidade,Fantasma,Barril,MacacoMalvado,Canhao,AtiradorBase]
@@ -111,6 +117,7 @@ gravidadeQuedaonoff mapa perso = not (any (sobreposicao (genHitbox perso)) (getM
 -- GRAVIDADE END
 
 -- ! This -0.01 was needed for the player to go up the ladder
+-- | Remove Personagens dentro de plataformas, só as escolhidas
 seDentroSai :: Mapa -> Personagem -> Personagem
 seDentroSai mapa ent | any (sobreposicao ((p1,p4-0.01),(p3,p4-0.01))) (getMapColisions dimensaobloco [Plataforma,Alcapao,Tunel,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa) && not (isOnBlockWithStairBelow ent mapa) =
                     ent {posicao = (fst (posicao ent),fromIntegral (floor p4)-snd (tamanho ent)*0.5),velocidade = (fst (velocidade ent),0)}
@@ -130,12 +137,14 @@ isOnBlockWithStairBelow jog (Mapa e j blocos) = any (\(x,y) -> floorPos (posicao
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1) || floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos) && (snd (velocidade jog) == ladderSpeed || snd (velocidade jog) == -ladderSpeed || emEscada jog)
 
 -- JOGADOR LIFE START
+-- | Controla a vida do jogador e variaveis necessarias
 perdeVidaJogadorEnd :: Tempo -> Jogo -> Jogo
 perdeVidaJogadorEnd tempo jogo  | lostGame jogo == 2 && animacaoJogo jogo > 0 = jogo {animacaoJogo = animarMorte tempo (animacaoJogo jogo)}
                                 | (vida $ jogador jogo) == 0 = jogo {lostGame = 0}
                                 | lostGame jogo == 2 && animacaoJogo jogo <= 0 = jogo {lostGame = 4}
                                 -- | otherwise = jogoSamp {jogador = (jogador jogo) {posicao = posicao (jogador jogoSamp),aplicaDano = (False,0),temChave = False}}
                                 | otherwise = jogo {lostGame = 3}
+-- | 
 perdeVidaJogadorJogo :: Jogo -> Jogo
 perdeVidaJogadorJogo jogo   | cheatsjogo jogo = jogo
                             | otherwise = jogo {jogador = perdeVidaJogador (mapa jogo) (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (mapa jogo) (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (mapa jogo) (lostGame jogo) (jogador jogo) (inimigos jogo)}
@@ -156,7 +165,7 @@ perdeVidaJogador2 :: Mapa -> Int -> Personagem -> [Personagem] -> Int
 perdeVidaJogador2 mapa n jog inm
     | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) && all (==False) (foldl (\x y -> sobreposicao (genHitbox jog) y : x) [] (getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1.2) mapa)) = n
     | otherwise = 2
-
+-- | Controla a animaçao da morte
 animarMorte :: Tempo -> Float -> Float
 animarMorte tempo con   | con > 0 = con - double2Float tempo
                         | otherwise = 0
@@ -164,7 +173,7 @@ animarMorte tempo con   | con > 0 = con - double2Float tempo
 -- JOGADOR LIFE END
 
 -- JOGADOR E OBJETOS START
-
+-- | Controla a coleçao de objetos e seus efeitos
 coletarObjetos :: Tempo -> Jogo -> Jogo
 coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecionaveis jogo) (jogador jogo),jogador = (jogador jogo) {pontos = isMoedaApanhada (filterObjetos (colecionaveis jogo) Moeda) (jogador jogo) (pontos (jogador jogo)),
                                                                                                                                 aplicaDano = tempoDoAplicaDano (aplicaDanoFuncao (filterObjetos (colecionaveis jogo) Martelo) (jogador jogo) (aplicaDano (jogador jogo))) tempo,
@@ -172,40 +181,46 @@ coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecio
                                                                                                                                 vida = pegouCogumelo (filterObjetos (colecionaveis jogo) CogumeloVida) (jogador jogo) (vida (jogador jogo))}
                                                                                                                                 ,lostGame = pegouEstrela (lostGame jogo) (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}
 
--- Filtra objetos recebe lista total, o colecionavel que queremos
+-- | Filtra objetos recebe lista total, o colecionavel que queremos
 filterObjetos :: [(Colecionavel,Posicao)] -> Colecionavel -> [(Colecionavel,Posicao)]
 filterObjetos [] _ = []
 filterObjetos (h:t) obj | fst h == obj = h : filterObjetos t obj
                         | otherwise = filterObjetos t obj
 
-
+-- | Controla os efeitos de pegar na estrela
 pegouEstrela :: Int -> [(Colecionavel,Posicao)] -> Personagem -> Int
 pegouEstrela n lista jog  | estaTocarObjeto jog (snd (head lista)) = 1
                         | otherwise = n
 
+-- | Controla os efeitos de pegar na chave
 pegouChave :: [(Colecionavel,Posicao)] -> Personagem -> Bool -> Bool
 pegouChave [] _ v = v
 pegouChave (h:t) jog v  | v = True
                         | estaTocarObjeto jog (snd h) = True
                         | otherwise = pegouChave t jog v
 
+-- | Controla o tempo do aplica Dano
 tempoDoAplicaDano :: (Bool,Double) -> Tempo -> (Bool,Double)
 tempoDoAplicaDano (a,b) tempo   | b > 15 = (a,b)
                                 | b > 0 = (a,b-tempo)
                                 | b <= 0 = (False,0)
 
+-- | Controla o efeito de pegar no martelo
 aplicaDanoFuncao :: [(Colecionavel,Posicao)] -> Personagem -> (Bool,Double) -> (Bool,Double)
 aplicaDanoFuncao [] _ (v,i) = (v,i)
 aplicaDanoFuncao (h:t) player (v,i) | estaTocarObjeto player (snd h) = (True,10)
                                     | otherwise = aplicaDanoFuncao t player (v,i)
 
+-- | Controla o efeito de pegar numa moeda
 isMoedaApanhada :: [(Colecionavel,Posicao)] -> Personagem -> Int -> Int
 isMoedaApanhada obj player ponto = ponto + length (filter id (map (estaTocarObjeto player . snd) obj)) * 10
 
+-- | Retorna se o jogador está a tocar num objeto ou nao
 colecionarIndividualBool :: (Colecionavel,Posicao) -> Personagem -> Bool
 colecionarIndividualBool (c,p) player   | estaTocarObjeto player p = True
                                         | otherwise = False
 
+-- | Remove os objetos que o jogador está a tocar
 coletarObjetosremover :: [(Colecionavel,Posicao)] -> Personagem -> [(Colecionavel,Posicao)]
 coletarObjetosremover itens player = map (`colecionarIndividual` player) itens
 
@@ -217,6 +232,7 @@ estaTocarObjeto :: Personagem -> Posicao -> Bool
 estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0.5,snd pos+dimensaobloco*0.5),(fst pos+dimensaobloco*0.5,snd pos-dimensaobloco*0.5))
 
 --EXTRAS OBJETOS
+-- | Controla os efeitos de pegar num cogumelo de vida
 pegouCogumelo :: [(Colecionavel,Posicao)] -> Personagem -> Int-> Int
 pegouCogumelo [] jogador vida = vida
 pegouCogumelo lista jogador vida | estaTocarObjeto jogador (snd(head lista)) = vida + 1
@@ -225,6 +241,7 @@ pegouCogumelo lista jogador vida | estaTocarObjeto jogador (snd(head lista)) = v
 
 
 --JOGADOR E ALCAPAO START
+-- | Funçao principal dos alçapoes
 acionarAlcapao :: Jogo -> Jogo
 acionarAlcapao jogo = jogo {mapa = acionarAlcapaoaux (mapa jogo) (jogador jogo) Alcapao}
 
@@ -233,7 +250,7 @@ acionarAlcapaoaux :: Mapa -> Personagem -> Bloco -> Mapa
 acionarAlcapaoaux (Mapa a b c) jog bloco = Mapa a b (removerChao (Mapa a b c) jog bloco)
 
 
-
+-- | Remove o Alcapao nas condiçoes indicadas
 removerChao :: Mapa -> Personagem -> Bloco -> [[Bloco]]
 removerChao (Mapa a b c) jog bloco  | not (any (sobreposicao (genHitbox jog)) (getMapColisions dimensaobloco [bloco] (dimensaobloco*0.5,dimensaobloco*0.5) (Mapa a b c))) = c
                                     | otherwise = removerAlcapao (dimensaobloco*0.5) c jog bloco
@@ -242,7 +259,7 @@ removerAlcapao :: Double -> [[Bloco]] -> Personagem -> Bloco -> [[Bloco]]
 removerAlcapao _ [] _ _ = []
 removerAlcapao x l jog bloco | bloco `elem` head l = removerUmAlcapao x (dimensaobloco*0.5) (head l) jog bloco : removerAlcapao (x+dimensaobloco) (tail l) jog bloco
                              | otherwise = head l : removerAlcapao (x+dimensaobloco) (tail l) jog bloco
-
+-- | Remove o alcapao caso o jogador esteja parado em cima dele ou se já está a chegar ao proximo alçapao
 removerUmAlcapao :: Double -> Double -> [Bloco] -> Personagem -> Bloco -> [Bloco]
 removerUmAlcapao _ _ [] _ _ = []
 removerUmAlcapao y x l jog bloco  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0.07,p6),(px2,p6)) || sobreposicao ((p1,p2),(p3,p4))  ((p5,p6),(p7,p8)) && fst (velocidade jog) == 0) && head l == bloco = Vazio : removerUmAlcapao y (x+dimensaobloco) (tail l) jog bloco
@@ -255,6 +272,7 @@ removerUmAlcapao y x l jog bloco  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0
 
 
 --Logistica de movimento Start
+-- | Logistica - Não o deixa ultrapassar o teto
 naoPassaPeloTetoFinal :: Tempo -> Jogo -> Jogo
 naoPassaPeloTetoFinal tempo jogo = jogo {jogador = naoPassaPeloTeto tempo (mapa jogo) (jogador jogo),inimigos = naoPassaPeloTetoinimigo tempo (mapa jogo) (inimigos jogo)}
 
@@ -269,7 +287,7 @@ naoPassaPeloTeto tempo mapa jogador   | emEscada jogador = jogador
                                 | otherwise = jogador
                     where ((p1,p2),(p3,p4)) = genHitbox jogador
 
-
+-- | Logistica - Não o deixa ultrapassar a parede da direita
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
 podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2+0.2),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++
                                     getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa++
@@ -277,7 +295,7 @@ podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
-
+-- | Logistica - Não o deixa ultrapassar a parede da esquerda
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
 podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2+0.2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++
                                     getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa++
@@ -307,6 +325,7 @@ gethitboxrightside x (a,b) = ((a+x*0.5,b-x*0.5),(a+x*0.5,b+x*0.5))
 
 
 -- Ladder logic started
+-- | Controla as escadas
 checkEscadas :: Jogo -> Jogo
 checkEscadas jogo = jogo {
     inimigos = (checkEscadaList (mapa jogo) b) ++ a,
@@ -341,18 +360,13 @@ ladderConditions jog = jog {
 
 --INICIO DE AI
 
-
+-- | Movimenta os inimigos que andam
 movimentoInimigos :: Semente -> Jogo -> Jogo
 movimentoInimigos sem jogo = jogo {inimigos = movimentoInimigoscontrolo (geraAleatorios sem (length (inimigos jogo))) (mapa jogo) (inimigos jogo) jogo}
 
--- movimentoInimigoscontrolo ::[Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
--- movimentoInimigoscontrolo _ _ [] _ = []
--- movimentoInimigoscontrolo [] _ _ _ = []
--- movimentoInimigoscontrolo (h:t) mapa (a:b) jogo = if tipo a == Fantasma then inimigoMove h mapa a : movimentoInimigoscontrolo t mapa b jogo else a : movimentoInimigoscontrolo t mapa b jogo
-
 movimentoInimigoscontrolo :: [Int] -> Mapa -> [Personagem] -> Jogo -> [Personagem]
 movimentoInimigoscontrolo seeds mapa enms jogo = zipWith (\h a -> if tipo a == Fantasma || tipo a == EyeEntidade then inimigoMove h mapa a else a) seeds enms
-
+-- | Controla os inimigos individualmente
 inimigoMove :: Int -> Mapa -> Personagem -> Personagem
 inimigoMove start mapa enm  | read (take 3 (show start)) <= 304 && read (take 3 (show start)) >= 301 && (emEscada enm || canGoDown' enm mapa) = inimigosubirdescerescada start mapa enm -- colar depois no True (mod (read(take 2 (show start))) 3 == 0 && p)
                             | inimigosubirdescerescadaBool mapa enm = enm
@@ -374,8 +388,7 @@ inimigoAndar start mapa enm     | posicao enm == (-20,-20) = enm
 
 -- | Função que faz com que o inimigo suba ou desça a escada
 inimigosubirdescerescada :: Int -> Mapa -> Personagem -> Personagem
-inimigosubirdescerescada start mapa enm --if any (sobreposicao ((p1+0.3,p4),(p3-0.3,p4))) (getMapColisions dimensaobloco [Vazio] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)
-                                            --then enm {velocidade = (if fst (velocidade enm) == 0 then 1.5 else fst (velocidade enm),0), posicao = (fst (posicao enm),fromInteger (floor (snd (posicao enm)))+0.5)}
+inimigosubirdescerescada start mapa enm 
     | canGoDown' enm mapa && snd (velocidade enm) >= 0 || snd (velocidade enm) == ladderSpeed = enm {
                                                 posicao = (fromIntegral (floor (fst (posicao enm))) + 0.5, snd (posicao enm)),
                                                 velocidade = (0,ladderSpeed)}
@@ -403,14 +416,13 @@ canGoDown' jog (Mapa _ _ blocos)= any (\(x,y) -> floorPos (posicao jog) == (x,y-
 
 
 --Macaco Malvado Start
--- Só pode existir um macacomalvado por mapa
+-- | Funçao que controla o macaco malvado sabendo que só pode existir um por mapa
 movimentoMacacoMalvado :: Tempo -> Jogo -> Jogo
 movimentoMacacoMalvado tempo jogo   | MacacoMalvado `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaBarris (mapa jogo) tempo (animaMacacoMalvado (mapa jogo) tempo (jogador jogo) a) c ++ d}
                                     | otherwise = jogo
                                     where   (a,b) = onlyOneTipo (inimigos jogo) MacacoMalvado
                                             (c,d) = onlyOneTipo b Barril
 
---sabendo que só pode existir um macaco malvado no mapa
 animaMacacoMalvado :: Mapa -> Tempo -> Personagem -> [Personagem] -> Personagem
 animaMacacoMalvado mapa tempo jogador macaco = enm{posicao = 
      if fst(posicao jogador) > fst(posicao enm)+0.2 && podeAndarParaEsquerdaBool mapa enm  then (fst(posicao enm)+(tempo*1.5),snd(posicao enm))
@@ -418,7 +430,7 @@ animaMacacoMalvado mapa tempo jogador macaco = enm{posicao =
                                             ,direcao = if fst(posicao jogador) < fst(posicao enm)-0.3 then Este else if fst(posicao jogador) > fst(posicao enm)+0.3 then Oeste else Norte
                                             ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,10) else (snd (aplicaDano enm) == 10, snd (aplicaDano enm)-tempo)}
                                         where enm = head macaco
-
+-- | Movimenta os barris no Mapa
 movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
 movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 10 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
                                         | null lista = [macaco]

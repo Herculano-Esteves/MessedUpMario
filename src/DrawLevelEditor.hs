@@ -13,13 +13,6 @@ import Tarefa2 (floorPos, valida)
 import Extras
 
 reactLevelEditor :: Event -> State -> IO State
-{-reactLevelEditor (EventKey (SpecialKey KeyEnter) Down _ _) state = return state {
-        levels = case (selectFunc $ editorState state) of
-                    0 -> replace (levels state) ((currentLevel state),(replaceBlock jogo, unlocked))
-                    1 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-                    2 -> replace (levels state) ((currentLevel state),(switchEnemy (levelEditorPos $ editorState state) jogo, unlocked))
-    }
-    where (jogo, unlocked) = (levels state) !! (currentLevel state)-}
 reactLevelEditor (EventKey (Char 'o') Down _ _) state = return state {
         levels = if valid then
                 replace (levels state) ((currentLevel state),( tempGame $ editorState state, unlocked))

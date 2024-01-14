@@ -22,7 +22,7 @@ import DrawMenu (drawButtonTextDebug, drawButton)
 -- sizeWin :: (Int, Int)
 -- sizeWin = (round $ snd (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))), round $ fst (snd (getMapaDimensoes escalaGloss (Mapa ((0,0),Norte) (0,0) (mapaTradutor mapaDoBoss)))))
 
--- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss
+-- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss em relaçao á camera do jogo
 posMapToGlossNivel :: Hitbox -> Posicao -> (Float,Float)
 posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
                                 where   (a,b) =(d2f x*d2f escalaGloss - d2f (escalaGloss*fst jogador),- d2f y * d2f escalaGloss+ d2f (escalaGloss*snd jogador))
@@ -33,15 +33,14 @@ posMapToGlossNivel hit (x,y) = (a-4.5*d2f escalaGloss,b+2.5*d2f escalaGloss)
 
 
 
-
+-- | Desenha o nivel desejado
 drawLevel :: State -> Picture
 drawLevel state = Pictures [
         drawEspinho jogo texEspinho,
         drawHitbox (cheats state) jogo (jogador jogo) (jogador jogo),
-       
-        drawBackground jogo texPlataforma,drawLadder jogo texEscada,
         drawPorta jogo texPorta,
         drawMap jogo texPlataforma,
+        drawLadder jogo texEscada,
         drawColecs state texMoeda texmartelo2 texChave jogo,
         drawAlcapao jogo texAlcapao,
         drawTunel jogo texTunel,
@@ -85,13 +84,12 @@ drawLevel state = Pictures [
           imagesPlatformTheme = fromJust (lookup (platformTheme (options state)) (images state))
           (jogo, unlocked) = levels state !! currentLevel state
           posPontuacao = posMapToGloss state (1.4,0.5)
-
+-- | Desenha a hitbox da camera
 drawCameracontrol :: Bool ->Picture -> Jogo -> Picture
 drawCameracontrol controlo pic jogo | controlo = color green $ rectangleWire (75*7) (75 * 5)
                                 | otherwise = Pictures []
 
--- ? Set a scale for drawng according to the size of the wind
--- TODO: Check if the code "$ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $" is actually working properly
+-- | Desenha o jogador no mapa e anima-o
 drawPlayer :: State -> Personagem -> Picture
 drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst (levels state !! currentLevel state))) (posicao jog)) $ Translate 0 7 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
     scale (if direcao jog == Este then 2 else -2) 2 $ if animacaoJogo jogo > 0 || lostGame jogo == 4 || lostGame jogo == 0 then texMorreuMario else
@@ -129,7 +127,7 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
           escala = realToFrac (snd (aplicaDano jog))
           (jogo, unlocked) = levels state !! currentLevel state
 
--- (if (fst(velocidade jog) == 4 || fst(velocidade jog) == (-4)) && snd(velocidade jog) >= 0 && snd(velocidade jog) <= 1 then picandar else
+-- | Desenha todos os inimigos com ajuda de funçoes auxiliares
 drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo (if direcao x == Norte then texmacaco4 else (playAnimAny (length macacoAndar) (time state) macacoAndar)) x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
@@ -163,7 +161,7 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
                                                                     escala = realToFrac (snd (aplicaDano jog))
                                                                     controlo = cheats state
 
-
+-- | Funçao mais poderosa e versatil para criar texturas com mais que duas imagens (funçao mais recente onde menos inimigos a usam)
 drawMoreComplex :: State -> Jogo -> Bool -> Personagem -> Picture
 drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, desenhahit]
                                             | tipo inim == EyeEntidade = Pictures [starttranslate $ Scale (0.25) (0.25) texOlhobranco, starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) $ Scale (1/3) (1/3) texOlhoazul, desenhahit]
@@ -199,7 +197,7 @@ drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [s
                                                 (jx,jy) = posicao (jogador jogo)
                                                 (a,b) = (jx-bx,jy-by)
                                                 (disx,disy) = (-(bx-mx),-(my-by))
-
+-- | Funçao que desenha inimigos menos poderosa mas facil de usar em inimigos simples
 drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture
 drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
                                 if tipo inim == Barril then Rotate (fromInteger (floor (snd (posicao inim)))*90) $ Scale (if fst (velocidade inim) > 0 then 0.7 else -0.7) 0.7 tex else
@@ -210,7 +208,7 @@ drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGl
                                 Scale (if fst (velocidade inim) > 0 then 1 else -1) 1 tex
                                 , drawHitbox controlo jogo jogador inim]
                                 where (vx,vy) = velocidade inim
-
+-- | Desenha a hitbox da Personagem desejada
 drawHitbox :: Bool -> Jogo -> Personagem -> Personagem -> Picture
 drawHitbox controlo jogo jogador inm    | controlo = (Color green $ uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao inm)) $ rectangleWire tx ty)
                                         | otherwise = Pictures []
@@ -218,7 +216,7 @@ drawHitbox controlo jogo jogador inm    | controlo = (Color green $ uncurry Tran
           ty = snd (snd $ aux (genHitbox inm)) - snd (fst $ aux (genHitbox inm))
           aux :: Hitbox -> ((Float,Float),(Float,Float))
           aux (p1,p2) = (posMapToGlossNivel (cameraControl jogo) p1, posMapToGlossNivel (cameraControl jogo) p2)
-
+-- | Desenha os colecionaveis desejados
 drawColecs :: State -> Picture -> Picture -> Picture -> Jogo -> Picture
 drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if colec == Moeda then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (Scale 2 2 (playAnimAny (length moedaanim) (time state) moedaanim)) else
                                                      if colec == Martelo then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale 2 2 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo else
@@ -247,24 +245,15 @@ drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if c
                                                             cogumelovida1 = fromJust (lookup "cogumelovida1" imagesTheme)
 
                                                             imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
-
+-- | Desenha o martelo
 drawHammer :: Jogo -> Picture -> Personagem -> Picture
 drawHammer jogo tex jog = Translate (pox + (if direcao jog == Este then d2f ((tamx/1.5)*escalaGloss) else -d2f ((tamx/1.5)*escalaGloss))) (poy + 0.15*d2f escalaGloss) $ Scale (if dir == Este then 1 else -1) 1 $ (if dir == Norte || dir == Sul then scale 0 0 else scale 2 2) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) tex
                         where   (pox,poy) = posMapToGlossNivel (cameraControl jogo) (posicao jog)
                                 (tamx,tamy) = tamanho jog
                                 dir = direcao jog
--- TODO: Maybe we should make the get center of hitbox not receive a scale to avoid having to set it to 1
-drawMap :: Jogo -> Picture -> Picture
-drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) -- ++
-    --map (\pos -> Color white $ uncurry Translate (posMapToGloss pos) $ Color green $ rectangleSolid 50 50) (getcenterofhitbox escalaGloss (getMapColisions escalaGloss [] (escalaGloss*0.5,escalaGloss*0.5) (mapa jogo)))
-{-
-drawBackground :: Jogo -> Picture -> Picture
-drawBackground jogo img = Pictures $ foldl (\guarda (a,b)-> map (\(xx,yy) -> uncurry Translate (posMapToGlossNivel (jogador jogo) (xx+a,yy+b)) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma,Vazio,Alcapao,Tunel,Porta,Escada] (1*0.5,1*0.5) (mapa jogo))) ++ guarda) [] [(x,y),(x,0),(-x,0),(x,-y),(0,y),(0,-y),(-x,y),(-x,-y)]
-                            where (x,y) = snd (getMapaDimensoes escalaGloss (mapa jogo))
--}
-drawBackground :: Jogo -> Picture -> Picture
-drawBackground jogo tex = pictures []
 
+
+-- | Desenha o Hud do jogo
 drawHud :: Jogo -> State -> Picture
 drawHud jogo state = Pictures $ (genPics posmaphearts (vida $ jogador jogo) ++ [
         Translate posx posy $ scale 2.5 2.5 texMarioface,
@@ -291,48 +280,53 @@ drawHud jogo state = Pictures $ (genPics posmaphearts (vida $ jogador jogo) ++ [
 
 
 
-
+-- | Animaçao da morte do jogador
 drawMorte :: Jogo -> Picture -> Picture
 drawMorte jogo img = uncurry Translate (posMapToGlossNivel (cameraControl jogo) (posicao (jogador jogo))) $ if animacaoJogo jogo > 0 || lostGame jogo == 4 || lostGame jogo == 0 then scale (20*escala) (20*escala) img else scale 0 0 img
                     where escala = realToFrac (animacaoJogo jogo)*2+0.4
 
+-- | Desenha o mapa plataformas
+drawMap :: Jogo -> Picture -> Picture
+drawMap jogo img = Pictures $ map (\pos -> Color white $ uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Plataforma] (1*0.5,1*0.5) (mapa jogo))) 
+
+-- | Desenha as escadas do mapa
 drawLadder :: Jogo -> Picture -> Picture
 drawLadder jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Escada] (1*0.5,1*0.5) (mapa jogo)))
 
+-- | Desenha os Tuneis
 drawTunel :: Jogo -> Picture -> Picture
 drawTunel jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Tunel] (1*0.5,1*0.5) (mapa jogo)))
 
+-- | Desenha as Portas
 drawPorta :: Jogo -> Picture -> Picture
 drawPorta jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Porta] (1*0.5,1*0.5) (mapa jogo)))
 
+-- | Desenha os Espinhos
 drawEspinho :: Jogo -> Picture -> Picture
 drawEspinho jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Espinho] (1*0.5,1*0.5) (mapa jogo)))
 
+ -- | Desenha os alçapoes
+drawAlcapao :: Jogo -> Picture -> Picture
+drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
 
 
+
+-- | Anima só com duas imagens
 playAnim :: Float -> [Picture] -> Picture
 playAnim time texs
     | (time `mod'` (1/n)) < 1/(n*2) = head texs
     | otherwise = texs !! 1
     where n = 6 -- Animation speed
 
---Any lenght Anim (usar por defenicao a length da lista como controlo do tempo)
+-- | Anima qualquer lista de imagens com controlo de tempo
 playAnimAny :: Int -> Float -> [Picture] -> Picture
 playAnimAny x time texs = texs !! frame
   where
     n = fromIntegral x -- Número de frames
     frame = floor (time * n) `mod` length texs
 
+-- | Inetracao do jogador
 eventHandlerInGame :: Event -> Jogo -> Jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyRight) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyRight) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyLeft) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarEsquerda) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyLeft) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyUp) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Subir) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyUp) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyDown) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Descer) jogo
--- eventHandlerInGame (EventKey (SpecialKey KeyDown) Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
--- eventHandlInGameer (EventKey (SpecialKey KeySpace) Up _ _) jogo = return $ atualiza [Nothing, Nothing, Nothing] (Nothing) jogo
 eventHandlerInGame (EventKey (Char 'd') Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarDireita) jogo
 eventHandlerInGame (EventKey (Char 'd') Up _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Parar) jogo
 eventHandlerInGame (EventKey (Char 'a') Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just AndarEsquerda) jogo
@@ -344,6 +338,7 @@ eventHandlerInGame (EventKey (Char 's') Up _ _) jogo = atualiza (replicate (leng
 eventHandlerInGame (EventKey (SpecialKey KeySpace) Down _ _) jogo = atualiza (replicate (length (inimigos jogo)) Nothing) (Just Saltar) jogo
 eventHandlerInGame e jogo = jogo
 
+-- | Desenha a Pausa
 drawPause :: State -> Picture
 drawPause state = Translate 0 70 $ Pictures [
         Translate 0 20 $ scale (4 * d2f escalaGloss/50) (4 * d2f escalaGloss/50) pauseTex,
@@ -353,7 +348,4 @@ drawPause state = Translate 0 70 $ Pictures [
     ]
     where imagesTheme = fromJust (lookup Default (images state))
           pauseTex = fromJust (lookup "pauseScreen" imagesTheme)
-
-drawAlcapao :: Jogo -> Picture -> Picture
-drawAlcapao jogo img = Pictures $ map (\pos -> uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) img) (getcenterofhitbox 1 (getMapColisions 1 [Alcapao] (1*0.5,1*0.5) (mapa jogo)))
 
