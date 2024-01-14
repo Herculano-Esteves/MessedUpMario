@@ -45,7 +45,7 @@ drawMenu state
         drawBanner (images state)
         ]
     | currentMenu state == OptionsMenu = Pictures [
-        drawButtonTextDebug (selectedButton (menuState state)) 0 "Change theme",
+        Translate 0 250 $ scale 2 2 $ temasText,
         drawMarioThemeSel state
     ]
     | currentMenu state == GameOver = Pictures [
@@ -59,11 +59,9 @@ drawMenu state
         scale 2.5 2.5 $ drawNum ((selectedButton $ menuState state) + 1) (0,25) state,
         drawArrow state,
         drawLock state
-        ] -- ++
-        -- map (\((level2, unlocked1), n) -> Pictures $
-            -- [drawButtonTextDebug (selectedButton $ menuState state) n ("Jogo " ++ show n),
-            -- drawLock unlocked1 n ]
-            -- ) (zip (levels state) [0..]) --[(level1, n) | level1 <- levels state, n <- [0..length (levels state)-1]]
+        ] 
+    where temasText = fromJust $ lookup "temasText" (fromJust $ lookup Default (images state))
+          
 
 -- ! Remove
 drawTitle :: Picture
@@ -84,7 +82,8 @@ buttonPress state
         currentMenu = LevelEditor,
         editorState = (editorState state) {tempGame = jogo' {jogador = jog}, savingGame = False}}
     | selectedButton (menuState state) == 3 && currentMenu state == MainMenu = state { exitGame = True}
-    | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {marioTheme = switchTheme (marioTheme $ options state)} }
+    | selectedButton (menuState state) == 0 && currentMenu state == OptionsMenu = state { options = (options state) {marioTheme = switchTheme 0 (marioTheme $ options state)} }
+    | selectedButton (menuState state) == 1 && currentMenu state == OptionsMenu = state { options = (options state) {platformTheme = switchTheme 1 (platformTheme $ options state)} }
     | currentMenu state == LevelSelection && unlocked = state { 
             currentMenu = InGame, 
             currentLevel = selectedButton (menuState state), 
@@ -167,17 +166,21 @@ drawEndScreen state = Pictures [
     where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))
           pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
 
-switchTheme :: Theme -> Theme
-switchTheme current = case current of
-    Default -> Quadradinho
-    Quadradinho -> Default
+switchTheme :: Int -> Theme -> Theme
+switchTheme n current
+    | n == 0 = case current of
+        Default -> Quadradinho
+        Quadradinho -> Default
+    | n == 1 = case current of
+        Default -> Minecraft
+        Minecraft -> Default
 
 drawMarioThemeSel :: State -> Picture
 drawMarioThemeSel state = Pictures [
     scale 5 5 currentMario,
-    Translate 0 (-100) $ scale 5 5 currentMario,
+    Translate 0 (-200) $ scale 2 2 currentPlatform,
     -- drawArrow state
-    Translate (-100) (-100 * (fromIntegral $ selectedButton $ menuState state)) $ scale (-1) 1 $ arrowTex
+    Translate (-100) (-200 * (fromIntegral $ selectedButton $ menuState state)) $ scale (-1) 1 $ arrowTex
     ]
     where currentMario = fromJust $ lookup "marioandar1" (fromJust $ lookup (marioTheme $ options state) (images state))
           currentPlatform = fromJust $ lookup "plataforma" (fromJust $ lookup (platformTheme $ options state) (images state))

@@ -58,15 +58,15 @@ drawLevel state = Pictures [
         else
             blank
     ]
-    where texEscada = fromJust (lookup "escada" imagesTheme)
-          texPlataforma = fromJust (lookup "plataforma" imagesTheme)
-          texAlcapao = fromJust (lookup "alcapao" imagesTheme)
+    where texEscada = fromJust (lookup "escada" imagesPlatformTheme)
+          texPlataforma = fromJust (lookup "plataforma" imagesPlatformTheme)
+          texAlcapao = fromJust (lookup "alcapao" imagesPlatformTheme)
           texTunel = fromJust (lookup "tunel" imagesTheme)
           texInimigo1 = fromJust (lookup "inimigo1" imagesTheme)
           texInimigo2 = fromJust (lookup "inimigo2" imagesTheme)
           texMoeda = fromJust (lookup "moeda" imagesTheme)
-          texChave = fromJust (lookup "chavemario" imagesTheme)
-          texPorta = fromJust (lookup "portaMario" imagesTheme)
+          texChave = fromJust (lookup "chavemario" imagesPlatformTheme)
+          texPorta = fromJust (lookup "portaMario" imagesPlatformTheme)
           texMacaco = fromJust (lookup "macacoMalvado" imagesTheme)
           texBarril = fromJust (lookup "barril" imagesTheme)
           texMorte = fromJust (lookup "morreu" imagesTheme)
@@ -82,6 +82,7 @@ drawLevel state = Pictures [
           texmartelo1 = fromJust (lookup "martelo1" imagesTheme)
           texmartelo2 = fromJust (lookup "martelo2" imagesTheme)
           imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
+          imagesPlatformTheme = fromJust (lookup (platformTheme (options state)) (images state))
           (jogo, unlocked) = levels state !! currentLevel state
           posPontuacao = posMapToGloss state (1.4,0.5)
 

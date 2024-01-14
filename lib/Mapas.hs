@@ -25,7 +25,8 @@ initialState = State {
     time = 0,
     options = Options {
         currentTheme = Default,
-        marioTheme = Default
+        marioTheme = Default,
+        platformTheme = Default
         },
     menuState = MenuState {
         selectedButton = 0,
