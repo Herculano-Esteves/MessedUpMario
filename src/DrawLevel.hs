@@ -167,13 +167,38 @@ drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x 
 drawMoreComplex :: State -> Jogo -> Bool -> Personagem -> Picture
 drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [starttranslate texOlhobranco,starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) texOlhoazul, desenhahit]
                                             | tipo inim == EyeEntidade = Pictures [starttranslate $ Scale (0.25) (0.25) texOlhobranco, starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) $ Scale (1/3) (1/3) texOlhoazul, desenhahit]
-                                            | otherwise = rectangleSolid 10 10
+                                            | tipo inim == Canhao = Pictures [starttranslate $ Rotate (-atan2 (d2f mx) (d2f my) * 180 / pi) $ Scale (3) (3) canhaocano,starttranslate $ Scale (3) (3) canhaobase,  desenhahit]
+                                            | tipo inim == BolaDeCanhao = Pictures [starttranslate $ scale 3 3 canhaobola, desenhahit]
+                                            | tipo inim == AtiradorBase = Pictures [starttranslate $ scale (if direcao inim == Este then -3.2 else 3.2) 3.2 $ atiradorbase1, desenhahit]
+                                            | tipo inim == AtiradorFoguete = Pictures [starttranslate $ scale (if fst (velocidade inim) > 0 then -2.1 else 2.1) 2.1 $ playAnimAny (length atiradorfogueteanim -1) (time state) atiradorfogueteanim, desenhahit]
+                                            | tipo inim == CaoEnemy = Pictures [starttranslate $ Translate (d2f disx/14*1* d2f  escalaGloss) (d2f disy/14*1* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel1,starttranslate $ Translate (d2f disx/14*2* d2f  escalaGloss) (d2f disy/14*2* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel2,starttranslate $ Translate (d2f disx/14*3* d2f  escalaGloss) (d2f disy/14*3* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel1,
+                                                                        starttranslate $ Translate (d2f disx/14*4* d2f  escalaGloss) (d2f disy/14*4* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel2,starttranslate $ Translate (d2f disx/14*5* d2f  escalaGloss) (d2f disy/14*5* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel1,starttranslate $ caoenemyanel2,
+                                                                        starttranslate $ Translate (d2f disx/14*6* d2f  escalaGloss) (d2f disy/14*6* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel1,starttranslate $ Translate (d2f disx/14*7* d2f  escalaGloss) (d2f disy/14*7* d2f  escalaGloss) $ scale 1.8 1.8 caoenemyanel2,starttranslate $ scale 2.6 2.6 $ Rotate (-atan2 (d2f a) (d2f b) * 180 / pi) $ Rotate (-90)  $ playAnimAny (length caoanimacao + 2) (time state) caoanimacao, desenhahit]
+                                            | otherwise = color red $ rectangleSolid 30 30
                                         where   texOlhobranco = fromJust (lookup "olhobranco" imagesTheme)
                                                 texOlhoazul = fromJust (lookup "olhoazul" imagesTheme)
+                                                canhaocano = fromJust (lookup "canhaocano" imagesTheme)
+                                                canhaobase = fromJust (lookup "canhaobase" imagesTheme)
+                                                canhaobola = fromJust (lookup "canhaobola" imagesTheme)
+                                                atiradorfogueteanim = [atiradorfoguete1,atiradorfoguete2,atiradorfoguete3,atiradorfoguete4]
+                                                atiradorfoguete1 = fromJust (lookup "atiradorfoguete1" imagesTheme)
+                                                atiradorfoguete2 = fromJust (lookup "atiradorfoguete2" imagesTheme)
+                                                atiradorfoguete3 = fromJust (lookup "atiradorfoguete3" imagesTheme)
+                                                atiradorfoguete4 = fromJust (lookup "atiradorfoguete4" imagesTheme)
+                                                atiradorbase1 = fromJust (lookup "atiradorbase1" imagesTheme)
+                                                caoanimacao = [caoenemy1,caoenemy2]
+                                                caoenemy1 = fromJust (lookup "caoenemy1" imagesTheme)
+                                                caoenemy2 = fromJust (lookup "caoenemy2" imagesTheme)
+                                                caoenemyanel1 = fromJust (lookup "caoenemyanel1" imagesTheme)
+                                                caoenemyanel2 = fromJust (lookup "caoenemyanel2" imagesTheme)
                                                 imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                 starttranslate x = Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) x
                                                 desenhahit = drawHitbox controlo jogo (jogador jogo) inim
                                                 (_,mx,my) = mira inim
+                                                (bx,by) = posicao inim
+                                                (jx,jy) = posicao (jogador jogo)
+                                                (a,b) = (jx-bx,jy-by)
+                                                (disx,disy) = (-(bx-mx),-(my-by))
 
 drawEnemy :: Bool -> Jogo -> Picture -> Personagem -> Personagem -> Picture
 drawEnemy controlo jogo tex inim jogador = Pictures [Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $
@@ -199,6 +224,7 @@ drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if c
                                                      if colec == Martelo then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale 2 2 $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo else
                                                      if colec == Chave then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) chave else
                                                      if colec == Estrela then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) (playAnimAny (length estrelaAnim -3) (time state) estrelaAnim) else
+                                                     if colec == CogumeloVida then uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) $ scale 2 2 cogumelovida1 else
                                                      uncurry Translate (posMapToGlossNivel (cameraControl jogo) pos) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) martelo)
                                                      (colecionaveis jogo)
                                                      where  estrelaAnim = [estrela1,estrela2,estrela3,estrela4,estrela5,estrela6,estrela7,estrela8,estrela9,estrela10,estrela11,estrela12]
@@ -218,6 +244,7 @@ drawColecs state moeda martelo chave jogo = Pictures $ map (\(colec,pos) -> if c
                                                             moeda1 = fromJust (lookup "moeda1" imagesTheme)
                                                             moeda2 = fromJust (lookup "moeda2" imagesTheme)
                                                             moeda3 = fromJust (lookup "moeda3" imagesTheme)
+                                                            cogumelovida1 = fromJust (lookup "cogumelovida1" imagesTheme)
 
                                                             imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 

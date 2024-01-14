@@ -110,7 +110,7 @@ draw state = do
     putStrLn ("lostGame jog: " ++ show (lostGame $ jogo))
     putStrLn ("lostGame initState: " ++ show (lostGame $ initLevel state))
     putStrLn ("unlocked jog: " ++ show (unlocked))
-
+    putStrLn ("inimigos: " ++ show (filter (\x -> tipo x == AtiradorFoguete) (inimigos jogo)))
     --putStrLn (show (mapa jogo))
     if (currentMenu state == InGame) then return (drawLevel state)
     else if (currentMenu state == LevelEditor) then return (drawLevelEditor state)
@@ -208,6 +208,21 @@ loadImages state = do
     macacomalvado2 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado2.bmp"
     macacomalvado3 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado3.bmp"
     macacomalvado4 <- loadBMP "assets/Bosses/MacacoMalvado/MacacoMalvado4.bmp"
+    --CANHAO
+    canhaocano <- loadBMP "assets/Inimigos/CanhaoCano.bmp"
+    canhaobase <- loadBMP "assets/Inimigos/CanhaoBase.bmp"
+    canhaobola <- loadBMP "assets/Inimigos/CanhaoBola.bmp"
+    --ATIRADOR
+    atiradorbase1 <- loadBMP "assets/Inimigos/AtiradorBase.bmp"
+    atiradorfoguete1 <- loadBMP "assets/Inimigos/AtiradorFoguete1.bmp"
+    atiradorfoguete2 <- loadBMP "assets/Inimigos/AtiradorFoguete2.bmp"
+    atiradorfoguete3 <- loadBMP "assets/Inimigos/AtiradorFoguete3.bmp"
+    atiradorfoguete4 <- loadBMP "assets/Inimigos/AtiradorFoguete4.bmp"
+    --CAOENEMY
+    caoenemy1 <- loadBMP "assets/Inimigos/CaoEnemy1.bmp"
+    caoenemy2 <- loadBMP "assets/Inimigos/CaoEnemy2.bmp"
+    caoenemyanel1 <- loadBMP "assets/Inimigos/CaoEnemyAnel1.bmp"
+    caoenemyanel2 <- loadBMP "assets/Inimigos/CaoEnemyAnel2.bmp"
     -- Estrela mario
     estrela1 <- loadBMP "assets/Estrela/Estrela1.bmp"
     estrela2 <- loadBMP "assets/Estrela/Estrela2.bmp"
@@ -221,6 +236,8 @@ loadImages state = do
     estrela10 <- loadBMP "assets/Estrela/Estrela10.bmp"
     estrela11 <- loadBMP "assets/Estrela/Estrela11.bmp"
     estrela12 <- loadBMP "assets/Estrela/Estrela12.bmp"
+    --COGUMELOS
+    cogumelovida1 <- loadBMP "assets/Colec/CogumeloVida.bmp"
 
 
     -- Start of Minecraft theme
@@ -353,11 +370,26 @@ loadImages state = do
             --Boss EYE
             ("olhobranco",olhobranco),
             ("olhoazul",olhoazul),
+            --CANHAO
+            ("canhaobase",canhaobase),
+            ("canhaocano",canhaocano),
+            ("canhaobola",canhaobola),
+            --ATIRADOR
+            ("atiradorbase1",atiradorbase1),
+            ("atiradorfoguete1",atiradorfoguete1),
+            ("atiradorfoguete2",atiradorfoguete2),
+            ("atiradorfoguete3",atiradorfoguete3),
+            ("atiradorfoguete4",atiradorfoguete4),
             --MacacoMalvado
             ("macacomalvado1",macacomalvado1),
             ("macacomalvado2",macacomalvado2),
             ("macacomalvado3",macacomalvado3),
             ("macacomalvado4",macacomalvado4),
+            --CAOENEMY
+            ("caoenemy1",caoenemy1),
+            ("caoenemy2",caoenemy2),
+            ("caoenemyanel1",caoenemyanel1),
+            ("caoenemyanel2",caoenemyanel2),
             -- Estrela Mario
             ("estrela1",estrela1),
             ("estrela2",estrela2),
@@ -371,6 +403,8 @@ loadImages state = do
             ("estrela10",estrela10),
             ("estrela11",estrela11),
             ("estrela12",estrela12),
+            --Cogumelos
+            ("cogumelovida1",cogumelovida1),
             -- numeros
             ("um", um),
             ("dois", dois),

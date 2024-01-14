@@ -185,7 +185,7 @@ addNewLevel state = state {
             colecionaveis = [
                 (Estrela, (0.5,2.5))
             ],
-            mapa = genEmptyMap (30,30),
+            mapa = genEmptyMap (25,16),
             lostGame = 3,
             cameraControl = ((0,0),(0,0)),
             animacaoJogo = 0,
@@ -212,11 +212,14 @@ addRemoveEnemy jog = jog {
                         Fantasma -> macacomalvado {posicao = pos}
                         MacacoMalvado -> eyeentidade {posicao = pos}
                         EyeEntidade -> eyeboss {posicao = pos}
-                        EyeBoss -> fantasma {posicao = pos}
+                        EyeBoss -> canhao {posicao = pos}
+                        Canhao -> caoinimigo {posicao = pos}
+                        CaoEnemy -> atiradorbase {posicao = pos}
+                        AtiradorBase -> fantasma {posicao = pos}
                      else enm) $
-                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= EyeBoss) (inimigos jog)
+                filter (\enm -> (floorPos pos) /= (floorPos $ posicao enm) || tipo enm /= AtiradorBase) (inimigos jog)
             else
-                Personagem {velocidade = (0,0), 
+                Personagem {velocidade = (0,0),
                         tipo = Fantasma, 
                         emEscada = False,
                         vida = 1, 
@@ -274,10 +277,11 @@ addRemoveColecs jog = jog {
                 (case col of
                 Moeda -> Martelo
                 Martelo -> Chave
-                Chave -> Moeda
+                Chave -> CogumeloVida
+                CogumeloVida -> Moeda
                 , pos)
                 else (col,pos)) $
-            filter (\(col,pos) -> floorPos pos /= floorPos (posicao $ jogador jog) || col /= Chave) (colecionaveis jog)
+            filter (\(col,pos) -> floorPos pos /= floorPos (posicao $ jogador jog) || col /= CogumeloVida) (colecionaveis jog)
         else
             (Moeda, posicao $ jogador jog) : colecionaveis jog
 }

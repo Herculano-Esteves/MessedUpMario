@@ -71,14 +71,15 @@ inimigoMortoEnd jogo = jogo {inimigos = inimigoMorto (inimigos jogo)}
 
 inimigoMorto :: [Personagem] -> [Personagem]
 inimigoMorto enm    | null enm = enm
-                    | otherwise = foldl (\x h-> if vida h == 0 then h {posicao = (-20,-20)} : x else h : x ) [] enm
+                    | otherwise = foldl (\x h-> if vida h == 0 then h {posicao = (-20,-20)} : x else h : x ) [] a ++ b
+                    where (a,b) = onlyOneTipoLista enm [Fantasma,CuspoDeFogo,BolaDeCanhao,AtiradorFoguete,Barril,EyeEntidade]
 --Inimigo morto END
 
 
 -- GRAVIDADE START
 gravidadeQuedaEnd :: Double -> Jogo -> Jogo
 gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) sofreGrav) ++ naoSofre, jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
-                            where   (sofreGrav,naoSofre) = onlyOneTipoLista (inimigos jogo) [EyeEntidade,Fantasma,Barril,MacacoMalvado]
+                            where   (sofreGrav,naoSofre) = onlyOneTipoLista (inimigos jogo) [EyeEntidade,Fantasma,Barril,MacacoMalvado,Canhao,AtiradorBase]
 
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
@@ -119,8 +120,9 @@ seDentroSai mapa ent | any (sobreposicao ((p1,p4-0.01),(p3,p4-0.01))) (getMapCol
 removerPersoChao :: Jogo -> Jogo
 removerPersoChao jogo = jogo {
     jogador = seDentroSai (mapa jogo) (jogador jogo),
-    inimigos = map (\inm -> (if (tipo inm /= Barril) && (tipo inm /= CuspoDeFogo) then seDentroSai (mapa jogo) inm else inm)) (inimigos jogo)
+    inimigos = (map (seDentroSai (mapa jogo)) b) ++ a
 }
+            where (a,b) = onlyOneTipoLista (inimigos jogo) [CuspoDeFogo,BolaDeCanhao,Barril,AtiradorFoguete,CaoEnemy]
 --where onFstLadder = any (\)
 
 isOnBlockWithStairBelow :: Personagem -> Mapa -> Bool
@@ -166,7 +168,11 @@ animarMorte tempo con   | con > 0 = con - double2Float tempo
 coletarObjetos :: Tempo -> Jogo -> Jogo
 coletarObjetos tempo jogo = jogo {colecionaveis = coletarObjetosremover (colecionaveis jogo) (jogador jogo),jogador = (jogador jogo) {pontos = isMoedaApanhada (filterObjetos (colecionaveis jogo) Moeda) (jogador jogo) (pontos (jogador jogo)),
                                                                                                                                 aplicaDano = tempoDoAplicaDano (aplicaDanoFuncao (filterObjetos (colecionaveis jogo) Martelo) (jogador jogo) (aplicaDano (jogador jogo))) tempo,
-                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo))},lostGame = pegouEstrela (lostGame jogo) (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}
+                                                                                                                                temChave = pegouChave (filterObjetos (colecionaveis jogo) Chave) (jogador jogo) (temChave (jogador jogo)),
+                                                                                                                                vida = pegouCogumelo (filterObjetos (colecionaveis jogo) CogumeloVida) (jogador jogo) (vida (jogador jogo))}
+                                                                                                                                ,lostGame = pegouEstrela (lostGame jogo) (filterObjetos (colecionaveis jogo) Estrela) (jogador jogo)}
+
+-- Filtra objetos recebe lista total, o colecionavel que queremos
 filterObjetos :: [(Colecionavel,Posicao)] -> Colecionavel -> [(Colecionavel,Posicao)]
 filterObjetos [] _ = []
 filterObjetos (h:t) obj | fst h == obj = h : filterObjetos t obj
@@ -209,6 +215,12 @@ colecionarIndividual (c,p) player   | estaTocarObjeto player p = (c,(-20,-20))
 
 estaTocarObjeto :: Personagem -> Posicao -> Bool
 estaTocarObjeto jog pos = sobreposicao (genHitbox jog) ((fst pos-dimensaobloco*0.5,snd pos+dimensaobloco*0.5),(fst pos+dimensaobloco*0.5,snd pos-dimensaobloco*0.5))
+
+--EXTRAS OBJETOS
+pegouCogumelo :: [(Colecionavel,Posicao)] -> Personagem -> Int-> Int
+pegouCogumelo [] jogador vida = vida
+pegouCogumelo lista jogador vida | estaTocarObjeto jogador (snd(head lista)) = vida + 1
+                                 | otherwise = pegouCogumelo (tail lista) jogador vida
 -- JOGADOR E OBJETOS END
 
 
@@ -297,9 +309,10 @@ gethitboxrightside x (a,b) = ((a+x*0.5,b-x*0.5),(a+x*0.5,b+x*0.5))
 -- Ladder logic started
 checkEscadas :: Jogo -> Jogo
 checkEscadas jogo = jogo {
-    inimigos = checkEscadaList (mapa jogo) (inimigos jogo),
+    inimigos = (checkEscadaList (mapa jogo) b) ++ a,
     jogador = checkEscadaAux (mapa jogo) (jogador jogo)
 }
+        where (a,b) = onlyOneTipoLista (inimigos jogo) [BolaDeCanhao,CuspoDeFogo,AtiradorFoguete]
 
 checkEscadaList :: Mapa -> [Personagem] -> [Personagem]
 checkEscadaList mapa = map (checkEscadaAux mapa)
@@ -403,11 +416,11 @@ animaMacacoMalvado mapa tempo jogador macaco = enm{posicao =
      if fst(posicao jogador) > fst(posicao enm)+0.2 && podeAndarParaEsquerdaBool mapa enm  then (fst(posicao enm)+(tempo*1.5),snd(posicao enm))
      else if fst(posicao jogador)+0.2 < fst(posicao enm) && podeAndarParaDireitaBool mapa enm then (fst(posicao enm)-(tempo*1.5),snd(posicao enm)) else posicao enm
                                             ,direcao = if fst(posicao jogador) < fst(posicao enm)-0.3 then Este else if fst(posicao jogador) > fst(posicao enm)+0.3 then Oeste else Norte
-                                            ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,15) else (snd (aplicaDano enm) == 15, snd (aplicaDano enm)-tempo)}
+                                            ,aplicaDano = if snd (aplicaDano enm) <= 0 then (True,10) else (snd (aplicaDano enm) == 10, snd (aplicaDano enm)-tempo)}
                                         where enm = head macaco
 
 movimentaBarris :: Mapa -> Tempo -> Personagem -> [Personagem] -> [Personagem]
-movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 15 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
+movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 10 = macaco : [barrilpersonagem{posicao = posicao macaco,velocidade = (0,1)}]
                                         | null lista = [macaco]
                                         | otherwise = macaco : foldl (\x y -> if sobreposicao ((a,b),(c,d)) (genHitbox y) then movimentaBarrisaux ((a,b),(c,d)) tempo y macaco ++ x else x) [] lista
                                         where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
@@ -416,7 +429,7 @@ movimentaBarris mapa tempo macaco lista | snd (aplicaDano macaco) == 15 = macaco
 movimentaBarrisaux :: Hitbox ->  Tempo -> Personagem -> Personagem -> [Personagem]
 movimentaBarrisaux map tempo barril macaco  | not (sobreposicao map (genHitbox barril)) = []
                                         | vida barril <= 0 || (fst (posicao barril) > 0 && fst (posicao barril) < 0) = [barril {posicao = (-5,-5),velocidade = (0,0),vida = 1}]
-                                        | snd (aplicaDano macaco) == 15 = [barril {posicao = posicao macaco,velocidade = (0,1)}]
+                                        | snd (aplicaDano macaco) == 10 = [barril {posicao = posicao macaco,velocidade = (0,1)}]
                                         | otherwise = [barril {posicao = (fst (posicao barril), snd (posicao barril) + snd (velocidade barril)*tempo)}]
 --Macaco Malvado End
 

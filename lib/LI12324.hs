@@ -69,6 +69,11 @@ data Entidade
   | CuspoDeFogo
   | EyeBoss
   | EyeEntidade
+  | Canhao
+  | BolaDeCanhao
+  | AtiradorBase
+  | AtiradorFoguete
+  | CaoEnemy
   deriving (Ord, Eq, Read, Show)
 
 -- | Tipos de items passiveis de ser colecionaveis por um 'Personagem'.
@@ -77,6 +82,7 @@ data Colecionavel
   | Martelo
   | Chave
   | Estrela
+  | CogumeloVida
   deriving (Ord, Eq, Read, Show)
 
 -- | Personagem do 'Jogo'.

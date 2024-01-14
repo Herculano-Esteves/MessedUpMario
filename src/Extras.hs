@@ -17,7 +17,7 @@ extrasFuncao random tempo state = state{levels = replace (levels state) (current
 movimentaExtras :: State -> Tempo -> Semente -> (Int,Int) -> Jogo -> Jogo
 movimentaExtras state dtime random screen jogo  | lostGame jogo == 5 = jogo
                                                 | lostGame jogo == 2 = perdeVidaJogadorEnd dtime jogo
-                                                | otherwise = portasFuncao $ movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
+                                                | otherwise = caoMovimenta random dtime $ atiradorMovimento random dtime $ canhaoMovimento random dtime $ portasFuncao $ movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
 
 --Cheats START
 cheatModeAtualiza :: Bool -> Jogo -> Jogo
@@ -69,7 +69,7 @@ controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
                                     | a < limESQx = controlarCameraHitbox (control-1) mapa (sizex,sizey) ((x,y),(z,w)) ((limESQx,b),(limESQx+8,d))
                                     | b < limESQy = controlarCameraHitbox (control-1) mapa (sizex,sizey) ((x,y),(z,w)) ((a,limESQy),(c,limESQy+6))
                                     | otherwise = ((a,b),(c,d))
-                                    where ((limESQx,limESQy),(limDIRx,limDIRy)) = ((dimx+((fromIntegral sizex/2)/escalaGloss)-4,(dimy+((fromIntegral sizey/2)/escalaGloss))-3),(dimw-((fromIntegral sizex/2)/escalaGloss)+4,dimz-((fromIntegral sizey/2)/escalaGloss)+3))
+                                    where ((limESQx,limESQy),(limDIRx,limDIRy)) = ((dimx+fromIntegral sizex/2/escalaGloss-4,dimy+(fromIntegral sizey/2)/escalaGloss-3),(dimw-fromIntegral sizex/2/escalaGloss+4,dimz-fromIntegral sizey/2/escalaGloss+3))
                                           ((dimx,dimy),(dimz,dimw))= getMapaDimensoes 1 mapa
 
 
@@ -85,7 +85,7 @@ bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimi
 
 --Sabendo que so pode existir um boss
 movimentaBoss :: Tempo -> [Personagem] -> [Personagem]
-movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo)}) bosses
+movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 8 && snd (aplicaDano boss) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo)}) bosses
                     where   boss = head bosses
                             tboss = snd (aplicaDano boss)-tempo
 
@@ -128,7 +128,7 @@ eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo
 
 
 eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (True,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (True,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
 
 
 
@@ -143,7 +143,7 @@ eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) 
 
 
 eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 12,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if snd (aplicaDano x)-tempo <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 12,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
 
 --EyeEntity END
 
@@ -176,3 +176,101 @@ removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p
                             where   ((p1,p2),(p3,p4)) = genHitbox jog
                                     ((p5,p6),(p7,p8)) = gethitboxbloco dimensaobloco (x,y)
 --Portas End
+
+
+--Canhao Start
+canhaoMovimento :: Semente -> Tempo -> Jogo -> Jogo
+canhaoMovimento semente tempo jogo | Canhao `elem` map tipo (inimigos jogo) = jogo{inimigos = acaoCanhaoSpawnBola (acaoCanhao tempo (geraAleatorios semente (length a)) a) ++ acaoBolasDeCanhao (mapa jogo) tempo c ++ d}
+                                   | otherwise = jogo
+                           where (a,b) = onlyOneTipo (inimigos jogo) Canhao
+                                 (c,d) = onlyOneTipo b BolaDeCanhao
+
+acaoCanhaoSpawnBola :: [Personagem] -> [Personagem]
+acaoCanhaoSpawnBola = foldl (\x y -> if fst (aplicaDano y) then bolacanhao{velocidade = doise (mira y),posicao = posicao y} : y : x else y : x) []
+                        where doise :: (Bool,Double,Double) -> Velocidade
+                              doise (a,b,c) = (b,c)
+
+acaoCanhao :: Tempo -> [Int] -> [Personagem] -> [Personagem]
+acaoCanhao _ _ [] = []
+acaoCanhao _ [] _ = []
+acaoCanhao tempo aleatorios canhoes = acaoCanhaoaux tempo (read (take 1 (show (abs (head aleatorios))))) (head canhoes) : acaoCanhao tempo (tail aleatorios) (tail canhoes)
+
+acaoCanhaoaux :: Tempo -> Int -> Personagem -> Personagem
+acaoCanhaoaux tempo aleatorio canhao = x{aplicaDano = (b == 3,if b-tempo <= 0 then 3+fromIntegral aleatorio/2 else if b > 2.5 && b < 3 then 3 else if b == 3 then 2.5 else b-tempo),mira = if b-tempo <= 0 then (True,bolax,bolay) else mira x}
+                                where x = canhao
+                                      (bolax,bolay) = (control,-10)
+                                      (a,b) = aplicaDano x
+                                      control = fromIntegral aleatorio-5
+
+acaoBolasDeCanhao :: Mapa -> Tempo -> [Personagem] -> [Personagem]
+acaoBolasDeCanhao mapa tempo lista = foldl (\x y -> if sobreposicao (genHitbox y) ((a,b),(d,c)) then y : x else x) [] (map (movimentoSemColisoes True tempo) lista)
+                                        where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
+
+
+-- Movimenta sem colisoes e o bool é se a gravidade o afeta ou nao (True sim,False nao)
+movimentoSemColisoes :: Bool -> Tempo -> Personagem -> Personagem
+movimentoSemColisoes controlo tempo ent | controlo = ent{posicao = (a+vx*tempo,b+vy*tempo),velocidade = (vx,vy+snd gravidade*tempo)}
+                                        | otherwise = ent{posicao = (a+vx*tempo,b+vy*tempo),velocidade = (vx,vy)}
+                                where (a,b) = posicao ent
+                                      (vx,vy) = velocidade ent
+--Canhao End
+
+--ATIRADOR START
+atiradorMovimento :: Semente -> Tempo -> Jogo -> Jogo
+atiradorMovimento semente tempo jogo | AtiradorBase `elem` map tipo (inimigos jogo) = jogo{inimigos = acaoAtiradorspawnFoguete (acaoAtirador tempo (geraAleatorios semente (length a)) a (jogador jogo)) ++ acaoAtiradorFoguetes (mapa jogo) tempo c ++ d}
+                                     | otherwise = jogo
+                           where (a,b) = onlyOneTipo (inimigos jogo) AtiradorBase
+                                 (c,d) = onlyOneTipo b AtiradorFoguete
+
+acaoAtiradorspawnFoguete  :: [Personagem] -> [Personagem]
+acaoAtiradorspawnFoguete = foldl (\x y -> if fst (aplicaDano y) then atiradorfogueteent{velocidade = (if direcao y == Oeste then -5 else 5,0),posicao = (fst (posicao y),snd (posicao y)-0.5)} : y : x else y : x) []
+
+
+acaoAtirador :: Tempo -> [Int] -> [Personagem] -> Personagem -> [Personagem]
+acaoAtirador _ _ [] _ = []
+acaoAtirador _ [] _ _ = []
+acaoAtirador tempo aleatorios atiradores jogador = acaoAtiradoraux tempo (read (take 1 (show (abs (head aleatorios))))) (head atiradores) jogador : acaoAtirador tempo (tail aleatorios) (tail atiradores) jogador
+
+acaoAtiradoraux :: Tempo -> Int -> Personagem -> Personagem -> Personagem
+acaoAtiradoraux tempo aleatorio x jogador = x{aplicaDano = (b == 4,if b-tempo <= 0 then 4+fromIntegral aleatorio/2 else if b > 3.5 && b < 4 then 4 else if b == 4 then 3.5 else b-tempo),direcao = if fst (posicao jogador) > fst (posicao x) then Este else Oeste}
+                                where (a,b) = aplicaDano x
+                                      control = fromIntegral aleatorio-5
+
+acaoAtiradorFoguetes :: Mapa -> Tempo -> [Personagem] -> [Personagem]
+acaoAtiradorFoguetes mapa tempo lista = foldl (\x y -> if sobreposicao (genHitbox y) ((a,b),(d,c)) && not (any (sobreposicao (genHitbox y)) (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)) then y : x else x) [] (map (movimentoSemColisoes False tempo) lista)
+                                        where ((a,b),(c,d)) = getMapaDimensoes 1 mapa
+
+--ATIRADOR END
+
+--CAOENEMY START
+
+caoMovimenta :: Semente -> Tempo -> Jogo -> Jogo
+caoMovimenta random tempo jogo | CaoEnemy `elem` map tipo (inimigos jogo) = jogo {inimigos = todosOsCaes (geraAleatorios random (length a)) (jogador jogo) tempo a ++ b}
+                        | otherwise = jogo
+                        where (a,b) = onlyOneTipo (inimigos jogo) CaoEnemy
+
+todosOsCaes :: [Int] -> Personagem -> Tempo -> [Personagem] -> [Personagem]
+todosOsCaes [] _ _ _ = []
+todosOsCaes _ _ _ [] = []
+todosOsCaes randoms jogador tempo lista = movimentoSemColisoes True tempo (caoAtaqueControlo tempo jogador $ caoIndividualDados (read (take 1 (show (abs (head randoms))))) tempo (head lista)) : todosOsCaes (tail randoms) jogador tempo (tail lista)
+
+caoIndividualDados :: Int -> Tempo -> Personagem -> Personagem
+caoIndividualDados control tempo cao = cao{aplicaDano = (b>2,if b-tempo < 0 then 6+(fromIntegral control/2) else b-tempo),mira = if not c then (True,fst (posicao cao),snd (posicao cao)) else mira cao}
+                                where (a,b) = aplicaDano cao
+                                      (c,d,e) = mira cao
+
+caoAtaqueControlo :: Tempo -> Personagem -> Personagem -> Personagem
+caoAtaqueControlo tempo jogador cao     | dano1 && distancia (mx,my) (bx,by) < 3 = cao{velocidade = (c,d)}
+                                        | dano1 = cao{velocidade = (0,0)}
+                                        | not dano1 && distancia (mx,my) (bx,by) > 1 = cao {velocidade = (cx,dy)}
+                                        | otherwise = cao {velocidade = (0,0)}
+                        where   (dano1,dano2) = aplicaDano cao
+                                (bx,by) = posicao cao
+                                (jx,jy) = posicao jogador
+                                (a,b) = (jx-bx,jy-by)
+                                (x,y) = (mx-bx,my-by)
+                                (cx,dy) = (x/sqrt (x^2 + y^2)*5,y/sqrt (x^2 + y^2)*5)
+                                (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
+                                (_,mx,my) = mira cao
+
+--CAOENEMY END
