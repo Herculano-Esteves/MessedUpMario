@@ -17,7 +17,7 @@ extrasFuncao random tempo state = state{levels = replace (levels state) (current
 movimentaExtras :: State -> Tempo -> Semente -> (Int,Int) -> Jogo -> Jogo
 movimentaExtras state dtime random screen jogo  | lostGame jogo == 5 = jogo
                                                 | lostGame jogo == 2 = perdeVidaJogadorEnd dtime jogo
-                                                | otherwise = movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
+                                                | otherwise = portasFuncao $ movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
 
 --Cheats START
 cheatModeAtualiza :: Bool -> Jogo -> Jogo
@@ -90,7 +90,7 @@ movimentaBoss tempo bosses = map (\x -> x{aplicaDano = (snd (aplicaDano boss) < 
                             tboss = snd (aplicaDano boss)-tempo
 
 ataqueDoBoss :: Tempo -> Personagem -> Personagem -> [Personagem]
-ataqueDoBoss tempo jogador boss | mira boss == (-100,-100) = [boss]
+ataqueDoBoss tempo jogador boss | not t = [boss]
                                 | tboss == 8-10*tempo = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
                                 | tboss == 8-42*tempo && tipo boss /= EyeEntidade = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
 
@@ -100,6 +100,7 @@ ataqueDoBoss tempo jogador boss | mira boss == (-100,-100) = [boss]
                                   (jx,jy) = posicao jogador
                                   (a,b) = (jx-bx,jy-by)
                                   (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
+                                  (t,y,u) = mira boss
 
 movimentaCuspoJogo :: Tempo -> Jogo -> Jogo
 movimentaCuspoJogo tempo jogo   | CuspoDeFogo `elem` map tipo (inimigos jogo) = jogo {inimigos = movimentaCuspo (mapa jogo) tempo c ++ d}
@@ -127,9 +128,9 @@ eyebossMovimento tempo jogo     | EyeBoss `elem` map tipo (inimigos jogo) = jogo
 
 
 eyemovimentaBoss :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (fst(posicao jogador)-fst(posicao x),snd(posicao jogador)-snd(posicao x))}) bosses
-                   
-                            
+eyemovimentaBoss tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (True,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+
+
 
 --EYEBOSS END
 
@@ -142,6 +143,41 @@ eyeentityMovimento tempo jogo     | EyeEntidade `elem` map tipo (inimigos jogo) 
 
 
 eyemovimentaEntity :: Tempo -> [Personagem] -> Personagem -> [Personagem]
-eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = if distancia (posicao x) (posicao jogador) > 12 then (-100,-100) else (fst(posicao jogador)-fst(posicao x),snd(posicao jogador)-snd(posicao x))}) bosses
-                   
+eyemovimentaEntity tempo bosses jogador = map (\x -> x{aplicaDano = (snd (aplicaDano x) < 8 && snd (aplicaDano x) > 7,if (snd (aplicaDano x)-tempo) <= 0 then 8 else snd (aplicaDano x)-tempo),mira = (distancia (posicao x) (posicao jogador) <= 12,fst (posicao jogador)-fst (posicao x),snd (posicao jogador)-snd (posicao x))}) bosses
+
 --EyeEntity END
+
+--Portas Start
+
+
+
+portasFuncao :: Jogo -> Jogo
+portasFuncao jogo = if not (temChave (jogador jogo)) then jogo {mapa = mapa jogo} else jogo {mapa = m, jogador = (jogador jogo) {temChave = m == mapa jogo && temChave (jogador jogo)}}
+                    where m = podeabrirporta (mapa jogo) (jogador jogo)
+
+podeabrirporta :: Mapa -> Personagem -> Mapa
+podeabrirporta mapa player = acionarBlocoGeral mapa player Porta
+
+acionarBlocoGeral :: Mapa -> Personagem -> Bloco -> Mapa
+acionarBlocoGeral (Mapa a b c) jog bloco = Mapa a b (removerBloco (Mapa a b c) jog bloco)
+
+
+removerBloco :: Mapa -> Personagem -> Bloco -> [[Bloco]]
+removerBloco (Mapa a b c) jog bloco | not (any (sobreposicao ((p1-0.1,p2),(p3+0.1,p4))) (getMapColisions dimensaobloco [bloco] (dimensaobloco*0.5,dimensaobloco*0.5) (Mapa a b c))) = c
+                                    | otherwise = removerBloco2 (dimensaobloco*0.5) c jog bloco
+                                    where ((p1,p2),(p3,p4)) = genHitbox jog
+
+removerBloco2 :: Double -> [[Bloco]] -> Personagem -> Bloco -> [[Bloco]]
+removerBloco2 _ [] _ _ = []
+removerBloco2 x l jog bloco | bloco `elem` head l = removerUmBloco x (dimensaobloco*0.5) (head l) jog bloco : removerBloco2 (x+dimensaobloco) (tail l) jog bloco
+                            | otherwise = head l : removerBloco2 (x+dimensaobloco) (tail l) jog bloco
+
+removerUmBloco :: Double -> Double -> [Bloco] -> Personagem -> Bloco -> [Bloco]
+removerUmBloco _ _ [] _ _ = []
+removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p7,p8)) && head l == bloco = Vazio : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
+                                | otherwise = head l : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
+                            where   ((p1,p2),(p3,p4)) = genHitbox jog
+                                    ((p5,p6),(p7,p8)) = gethitboxbloco dimensaobloco (x,y)
+
+
+--Portas End

@@ -20,7 +20,7 @@ import Text.Read (Lexeme(String))
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
 movimenta seed dtime jog    | lostGame jog == 5 = jog
                             | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
-                            | otherwise = setStarPos $ naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ portasFuncao $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
+                            | otherwise = setStarPos $ naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
 
@@ -30,6 +30,10 @@ distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 firstDecimal :: Double -> Int
 firstDecimal num = floor ((num * 10) - fromIntegral (floor num) * 10)
 -- esquerda pertence, direita nao
+
+onlyOneTipoLista :: [Personagem] -> [Entidade] -> ([Personagem],[Personagem])
+onlyOneTipoLista lista ent = foldl (\(a,b) y -> if tipo y `elem` ent then (y : a,b) else (a,y : b)) ([],[]) lista
+
 onlyOneTipo :: [Personagem] -> Entidade -> ([Personagem],[Personagem])
 onlyOneTipo lista ent = foldl (\(a,b) y -> if tipo y == ent then (y : a,b) else (a,y : b)) ([],[]) lista
 
@@ -73,12 +77,9 @@ inimigoMorto enm    | null enm = enm
 
 -- GRAVIDADE START
 gravidadeQuedaEnd :: Double -> Jogo -> Jogo
-gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) inimigosgravidade) ++ i, jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
-                            where   inimigosgravidade = a++c++e++h
-                                    (a,b) = onlyOneTipo (inimigos jogo) EyeEntidade
-                                    (c,d) = onlyOneTipo b Fantasma
-                                    (e,f) = onlyOneTipo d Barril
-                                    (h,i) = onlyOneTipo f MacacoMalvado
+gravidadeQuedaEnd dtime jogo = jogo {inimigos = (gravidadeQueda dtime (mapa jogo) sofreGrav) ++ naoSofre, jogador = changeVelocidade dtime (mapa jogo) (jogador jogo)}
+                            where   (sofreGrav,naoSofre) = onlyOneTipoLista (inimigos jogo) [EyeEntidade,Fantasma,Barril,MacacoMalvado]
+
 
 -- | Muda a gravidade em todas as personagens que precisam de gravidade
 gravidadeQueda :: Double -> Mapa -> [Personagem] -> [Personagem]
@@ -135,22 +136,23 @@ perdeVidaJogadorEnd tempo jogo  | lostGame jogo == 2 && animacaoJogo jogo > 0 = 
                                 | otherwise = jogo {lostGame = 3}
 perdeVidaJogadorJogo :: Jogo -> Jogo
 perdeVidaJogadorJogo jogo   | cheatsjogo jogo = jogo
-                            | otherwise = jogo {jogador = perdeVidaJogador (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (lostGame jogo) (jogador jogo) (inimigos jogo)}
+                            | otherwise = jogo {jogador = perdeVidaJogador (mapa jogo) (jogador jogo) (inimigos jogo),animacaoJogo = perdeVidaJogador1 (mapa jogo) (jogador jogo) (inimigos jogo),lostGame = perdeVidaJogador2 (mapa jogo) (lostGame jogo) (jogador jogo) (inimigos jogo)}
 
 -- | Função que verifica se o jogador colide com algum inimigo
-perdeVidaJogador :: Personagem -> [Personagem] -> Personagem
-perdeVidaJogador jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = jog
+perdeVidaJogador :: Mapa -> Personagem -> [Personagem] -> Personagem
+perdeVidaJogador mapa jog inm
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) && all (==False) (foldl (\x y -> sobreposicao (genHitbox jog) y : x) [] (getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1.2) mapa)) = jog
     | otherwise = jog {vida = vida jog - 1}
 
-perdeVidaJogador1 :: Personagem -> [Personagem] -> Float
-perdeVidaJogador1 jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = 0
+
+perdeVidaJogador1 :: Mapa -> Personagem -> [Personagem] -> Float
+perdeVidaJogador1 mapa jog inm
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) && all (==False) (foldl (\x y -> sobreposicao (genHitbox jog) y : x) [] (getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1.2) mapa)) = 0
     | otherwise = 3
 
-perdeVidaJogador2 :: Int -> Personagem -> [Personagem] -> Int
-perdeVidaJogador2 n jog inm
-    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) = n
+perdeVidaJogador2 :: Mapa -> Int -> Personagem -> [Personagem] -> Int
+perdeVidaJogador2 mapa n jog inm
+    | all not (foldl (\x y -> colisoesPersonagens jog y : x ) [] inm) && all (==False) (foldl (\x y -> sobreposicao (genHitbox jog) y : x) [] (getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1.2) mapa)) = n
     | otherwise = 2
 
 animarMorte :: Tempo -> Float -> Float
@@ -242,7 +244,12 @@ removerUmAlcapao y x l jog bloco  | (sobreposicao ((px+0.07,p4),(px,p4)) ((px2+0
 
 --Logistica de movimento Start
 naoPassaPeloTetoFinal :: Tempo -> Jogo -> Jogo
-naoPassaPeloTetoFinal tempo jogo = jogo {jogador = naoPassaPeloTeto tempo (mapa jogo) (jogador jogo)}
+naoPassaPeloTetoFinal tempo jogo = jogo {jogador = naoPassaPeloTeto tempo (mapa jogo) (jogador jogo),inimigos = naoPassaPeloTetoinimigo tempo (mapa jogo) (inimigos jogo)}
+
+naoPassaPeloTetoinimigo :: Tempo -> Mapa -> [Personagem] -> [Personagem]
+naoPassaPeloTetoinimigo tempo mapa inm = (map (naoPassaPeloTeto tempo mapa) a) ++ b
+                                    where   (a,b) = onlyOneTipoLista inm [EyeEntidade,Fantasma]
+
 
 naoPassaPeloTeto :: Tempo -> Mapa -> Personagem -> Personagem
 naoPassaPeloTeto tempo mapa jogador   | emEscada jogador = jogador
@@ -252,13 +259,17 @@ naoPassaPeloTeto tempo mapa jogador   | emEscada jogador = jogador
 
 
 podeAndarParaEsquerdaBool :: Mapa -> Personagem -> Bool
-podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2+0.2),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaEsquerdaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p3+0.1,p2+0.2),(p3,p4-0.2)) y : x) [] (getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa++
+                                    getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa++
+                                    getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1) mapa)) && not (sobreposicao ((p8+1,p6),(p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
 
 podeAndarParaDireitaBool :: Mapa -> Personagem -> Bool
-podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2+0.2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++(getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa))) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
+podeAndarParaDireitaBool mapa ent = all not (foldl (\x y -> sobreposicao ((p1-0.1,p2+0.2),(p1,p4-0.2)) y : x) [] ((getMapColisions dimensaobloco [Plataforma,Tunel,Alcapao,Porta] (dimensaobloco*0.5,dimensaobloco*0.5) mapa)++
+                                    getMapColisions dimensaobloco [Porta] (dimensaobloco*0.5,dimensaobloco*1.5) mapa++
+                                    getMapColisions dimensaobloco [Espinho] (dimensaobloco*0.5,dimensaobloco*1) mapa)) && not (sobreposicao ((0,0),(-p8,p7)) ((p1,p2),(p3,p4)))
     where ((p1,p2),(p3,p4)) = genHitbox ent
           ((p5,p6),(p7,p8)) = getMapaDimensoes dimensaobloco mapa
 
@@ -376,40 +387,7 @@ canGoDown' jog (Mapa _ _ blocos)= any (\(x,y) -> floorPos (posicao jog) == (x,y-
     any (\(x,y) -> floorPos (posicao jog) == (x,y-1)) (getPosOfBlock Escada blocos) &&
     any (\(x,y) -> floorPos (posicao jog) == (x,y)) (getPosOfBlock Plataforma blocos)
 
---Portas Start
 
-
-
-portasFuncao :: Jogo -> Jogo
-portasFuncao jogo = if not (temChave (jogador jogo)) then jogo {mapa = mapa jogo} else jogo {mapa = m, jogador = (jogador jogo) {temChave = m == mapa jogo && temChave (jogador jogo)}}
-                    where m = podeabrirporta (mapa jogo) (jogador jogo)
-
-podeabrirporta :: Mapa -> Personagem -> Mapa
-podeabrirporta mapa player = acionarBlocoGeral mapa player Porta
-
-acionarBlocoGeral :: Mapa -> Personagem -> Bloco -> Mapa
-acionarBlocoGeral (Mapa a b c) jog bloco = Mapa a b (removerBloco (Mapa a b c) jog bloco)
-
-
-removerBloco :: Mapa -> Personagem -> Bloco -> [[Bloco]]
-removerBloco (Mapa a b c) jog bloco | not (any (sobreposicao ((p1-0.1,p2),(p3+0.1,p4))) (getMapColisions dimensaobloco [bloco] (dimensaobloco*0.5,dimensaobloco*0.5) (Mapa a b c))) = c
-                                    | otherwise = removerBloco2 (dimensaobloco*0.5) c jog bloco
-                                    where ((p1,p2),(p3,p4)) = genHitbox jog
-
-removerBloco2 :: Double -> [[Bloco]] -> Personagem -> Bloco -> [[Bloco]]
-removerBloco2 _ [] _ _ = []
-removerBloco2 x l jog bloco | bloco `elem` head l = removerUmBloco x (dimensaobloco*0.5) (head l) jog bloco : removerBloco2 (x+dimensaobloco) (tail l) jog bloco
-                            | otherwise = head l : removerBloco2 (x+dimensaobloco) (tail l) jog bloco
-
-removerUmBloco :: Double -> Double -> [Bloco] -> Personagem -> Bloco -> [Bloco]
-removerUmBloco _ _ [] _ _ = []
-removerUmBloco y x l jog bloco  | sobreposicao ((p1-1,p2),(p3+1,p4)) ((p5,p6),(p7,p8)) && head l == bloco = Vazio : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
-                                | otherwise = head l : removerUmBloco y (x+dimensaobloco) (tail l) jog bloco
-                            where   ((p1,p2),(p3,p4)) = genHitbox jog
-                                    ((p5,p6),(p7,p8)) = gethitboxbloco dimensaobloco (x,y)
-
-
---Portas End
 
 --Macaco Malvado Start
 -- Só pode existir um macacomalvado por mapa

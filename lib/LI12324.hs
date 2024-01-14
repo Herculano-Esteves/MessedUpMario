@@ -93,7 +93,7 @@ data Personagem =
     , pontos     :: Int
     , aplicaDano :: (Bool, Double)-- ^ se está armado e por quanto tempo ainda
     , temChave   :: Bool  -- se pode abrir uma porta ou nao
-    , mira       :: (Double, Double) -- onde está a apontar
+    , mira       :: (Bool,Double, Double) -- onde está a apontar
     }
   deriving (Eq, Read, Show)
 

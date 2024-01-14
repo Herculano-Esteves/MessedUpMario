@@ -8,7 +8,7 @@ import Data.Maybe (fromJust)
 import Graphics.Gloss.Interface.IO.Game
 import LI12324 (Bloco(Plataforma))
 import GHC.Float (double2Float)
-import Mapas (jogoSamp, jog, macacomalvado, eyeentidade, eyeboss, fantasma)
+import Mapas
 import Tarefa2 (floorPos, valida)
 import Extras
 
@@ -165,7 +165,8 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
             Alcapao -> Escada
             Escada -> Porta
             Porta -> Tunel
-            Tunel -> Vazio
+            Tunel -> Espinho
+            Espinho -> Vazio
             Vazio -> Plataforma
           (x,y) = posicao $ jogador jog
 
@@ -226,7 +227,7 @@ addRemoveEnemy jog = jog {
                         aplicaDano = (False, 0), 
                         direcao = Oeste,
                         temChave = False,
-                        mira= (0,0)} : inimigos jog
+                        mira= (False,0,0)} : inimigos jog
     }
     where enmLs = zip [1..] (inimigos jog)
           pos = posicao $ jogador jog
