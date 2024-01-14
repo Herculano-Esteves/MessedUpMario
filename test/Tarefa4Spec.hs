@@ -80,21 +80,21 @@ teste02 = TestLabel "T02" $ test [testeA, testeB]
   where
     testeA = "A: Quando a acção é AndarDireita, o vetor velocidade do jogador é positivo na componente do X" ~: True ~=? (fst . velocidade . jogador $ resultadoAndarDireita) > 0
     testeB = "B: Quando a acção é AndarDireita, a orientação do jogador é Este" ~: Este ~=? (direcao . jogador $ resultadoAndarDireita)
-    resultadoAndarDireita = atualiza [Nothing] (Just AndarDireita) jogo01
+    resultadoAndarDireita = movimenta 100 (1/60) $ atualiza [Nothing] (Just AndarDireita) jogo01
 
 teste03 :: Test
 teste03 = TestLabel "T03" $ test [testeA, testeB]
   where
     testeA = "A: Quando a acção é AndarEsquerda, o vetor velocidade do jogador é negativo na componente do X" ~: True ~=? (fst . velocidade . jogador $ resultadoAndarDireita) < 0
     testeB = "B: Quando a acção é AndarEsquerda, a orientação do jogador é Oeste" ~: Oeste ~=? (direcao . jogador $ resultadoAndarDireita)
-    resultadoAndarDireita = atualiza [Nothing] (Just AndarEsquerda) jogo01
+    resultadoAndarDireita = movimenta 100 (1/60) $ atualiza [Nothing] (Just AndarEsquerda) jogo01{jogador= (jogador jogo01){posicao = (5.5,3.5)}}
 
 teste04 :: Test
 teste04 = TestLabel "T04" $ test [testeA, testeB]
   where
     testeA = "A: Quando a acção é Saltar, o vetor velocidade do jogador é negativo na componente do Y" ~: True ~=? (snd . velocidade . jogador $ resultadoSaltar) < 0
     testeB = "B: Quando a acção é Saltar, a orientação do jogador não muda" ~: (direcao . jogador $ jogo01) ~=? (direcao . jogador $ resultadoSaltar)
-    resultadoSaltar = atualiza [Nothing] (Just Saltar) jogo01
+    resultadoSaltar = movimenta 100 (1/60) $ atualiza [Nothing] (Just Saltar) jogo01{jogador= (jogador jogo01){posicao = (5.5,4.5),tamanho = (1,1)}}
 
 jogadorEmFrenteEscada =
   Personagem
@@ -130,7 +130,8 @@ teste05 = TestLabel "T05" $ test [testeA, testeB]
   where
     testeA = "A: Quando a acção é Subir, o vetor velocidade do jogador é negativo na componente do Y" ~: True ~=? (snd . velocidade . jogador $ resultadoSubir) < 0
     testeB = "B: Quando a acção é Saltar, o jogador passa a estar em escada" ~: True ~=? (emEscada . jogador $ resultadoSubir)
-    resultadoSubir = movimenta 100 (1/60) $ atualiza [Nothing] (Just Subir) $ movimenta 100 (1/60) jogo01
+    resultadoSubir = movimenta 100 (1/2) $ atualiza [Nothing,Nothing] (Just Subir) jogo01{jogador= (jogador jogo01){posicao = (5.5,3.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
+    resultadosubirescada = movimenta 100 (1/60) $ atualiza [Nothing,Nothing] (Just Subir) jogo01{jogador= (jogador jogo01){posicao = (5.5,3.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
 
 jogadorEmEscada =
   Personagem

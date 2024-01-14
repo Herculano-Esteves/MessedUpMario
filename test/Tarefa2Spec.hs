@@ -43,7 +43,7 @@ jogadorParado =
   Personagem
     { velocidade = (0.0, 0.0),
       tipo = Jogador,
-      posicao = (8.5, 7.5),
+      posicao = (8.5, 8.5),
       direcao = Oeste,
       tamanho = (0.8, 0.8),
       emEscada = False,
@@ -59,7 +59,7 @@ jogo01 :: Jogo
 jogo01 =
   Jogo
     { mapa = mapa01,
-      inimigos = [inimigoModelo, inimigoModelo {posicao = (3.5, 7.6)}],
+      inimigos = [inimigoModelo, inimigoModelo{posicao = (11.5, 5.5)}],
       colecionaveis = [],
       jogador = jogadorParado,
       lostGame = 3,
@@ -100,7 +100,7 @@ teste03 = TestLabel "T03" $ test [testeA, testeB]
     testeB = "B: Jogador não pode ressaltar" ~: False ~=? valida jogo01 {jogador = jogadorParado {ressalta = True}}
 
 teste04 :: Test
-teste04 = "T04: Se na posição inicial um inimigo colidir com a posição inicial do jogador, o jogo é inválido" ~: False ~=? valida jogo01 {inimigos = [inimigoModelo {posicao = (8.0, 6.0)}, inimigoModelo]}
+teste04 = "T04: Se na posição inicial um inimigo colidir com a posição inicial do jogador, o jogo é inválido" ~: False ~=? valida jogo01 {inimigos = [inimigoModelo {posicao = (8.0, 8.0)}, inimigoModelo]}
 
 teste05 :: Test
 teste05 = "T05: Para o jogo ser válido precisa de ter pelo menos dois inimigos" ~: False ~=? valida jogo01 {inimigos = [inimigoModelo]}

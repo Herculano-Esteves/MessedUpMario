@@ -24,7 +24,7 @@ import Utilities
 valida :: Jogo -> Bool
 valida jogo = validaChao (mapa jogo) &&
     validaRessalta (jogador jogo) (inimigos jogo) &&
-    validaPosJogInim (mapa jogo) (inimigos jogo) &&
+    validaPosJogInim (jogador jogo) (inimigos jogo) &&
     validaNumIniAndVidaFan (inimigos jogo) &&
     validaEscadas (mapa jogo) &&
     validaAlcapoes (mapa jogo) &&
@@ -39,12 +39,12 @@ validaRessalta :: Personagem -> [Personagem] -> Bool
 validaRessalta jogador inimigosList = not (ressalta jogador) && all ressalta inimigosList
 
 -- | Verifica a posiçao inicial se sobrepoem ou nao com os inimigos
-validaPosJogInim :: Mapa -> [Personagem] -> Bool
-validaPosJogInim (Mapa (posJogador,_) _ _) inimigosList = all (\i -> posicao i /= posJogador) inimigosList
+validaPosJogInim :: Personagem -> [Personagem] -> Bool
+validaPosJogInim jogador inimigosList = not (any  (\i -> sobreposicao (genHitbox i) (genHitbox jogador) ) inimigosList)
 
 -- | Verfica se existem pelo menos 2 inimigos e se cada fantasma tem apenas 1 vida
 validaNumIniAndVidaFan :: [Personagem] -> Bool
-validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma) inis)
+validaNumIniAndVidaFan inis = (length inis >= 2) && (all (\f -> vida f == 1) $ filter (\p -> tipo p == Fantasma || tipo p == EyeEntidade) inis)
 
 -- | Verfica se as escadas são continuas e terminam e começam com plataforma
 validaEscadas :: Mapa -> Bool
@@ -86,11 +86,11 @@ validaPosPersColecs jogo = validaPosPers (jogador jogo) (inimigos jogo) (mapa jo
 validaColecs :: [(Colecionavel,Posicao)] -> Mapa -> Bool
 validaColecs colecs (Mapa _ _ mat)
     | null colecs = True
-    | otherwise = all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Vazio mat) colecs
+    | otherwise = all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Vazio mat) colecs || all (\(c,(x,y)) -> (fromIntegral $ floor x, fromIntegral $ floor y) `elem` getPosOfBlock Escada mat) colecs
 
 -- | Verifica se as personagens (jogador e inimigos) se encontram em espaços vazios do mapa
 validaPosPers :: Personagem -> [Personagem] -> Mapa -> Bool
-validaPosPers player inms (Mapa (pos, dir) _ mat) = floorPos pos `elem` getPosOfBlock Vazio mat -- && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
+validaPosPers player inms (Mapa (pos, dir) _ mat) = (floorPos pos `elem` getPosOfBlock Vazio mat) || (floorPos pos `elem` getPosOfBlock Escada mat) -- && all (\inm -> if tipo inm /= Barril then floorPos (posicao inm) `elem` getPosOfBlock Vazio mat else True) inms
 
 floorPos :: Posicao -> Posicao
 floorPos (x,y) = (fromIntegral $ floor x, fromIntegral $ floor y)

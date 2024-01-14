@@ -30,9 +30,9 @@ c1 = (Martelo, (5,1))
 
 j1 = Jogo gameMap1 [en1,en2] [c1] pl1 3 ((0,0),(0,0)) 0 False
 
-teste1A = "T1A: Inimigo 1 perde vida." ~: True ~=? (vida . head . inimigos $ movimenta 100 1.0 j1) < 10
+teste1A = "T1A: Inimigo 1 perde vida." ~: True ~=? (vida . head . inimigos $ movimenta 100 1.0 j1{inimigos = [en1,en1]}) < 10
 teste1B = "T1B: Jogador perde vida." ~: True ~=? (vida . jogador $ movimenta 100 1.0 j1) < 10
-teste1C = "T1C: Inimigo 2 não perde vida." ~: True ~=? (vida . last . inimigos $ movimenta 100 1.0 j1) == 10
+teste1C = "T1C: Inimigo 2 não perde vida." ~: True ~=? (vida . last . inimigos $ movimenta 100 1.0 j1{inimigos = [en2,en2]}) == 10
 
 pl2 = Personagem (0.0,0.0) Jogador (5.2,1) Oeste (0.8,0.8) False False 10 0 (False, 0.0) False (False,0,0)
 
@@ -47,7 +47,7 @@ pl3 = Personagem (0.0,0.0) Jogador (3.5,4) Oeste (0.8,0.8) True False 10 0 (Fals
 
 j5 = Jogo gameMap1 [] [] pl3 3 ((0,0),(0,0)) 0 False
 
-teste3 = "T3: Jogador não cai quando esta na escada." ~: j5 ~=? movimenta 100 1.0 j5
+teste3 = "T3: Jogador não cai quando esta na escada." ~: jogador j5 ~=? jogador (movimenta 100 1.0 j5)
 
 pl4 = Personagem (-1.0,0.0) Jogador (0.5,10.5) Oeste (1,1) False False 10 0 (False, 0.0) False (False,0,0)
 
