@@ -14,8 +14,8 @@ initialState :: State
 initialState = State {
     levels = [
         (jogo01, True),
-        (jogo2,True),
-        (jogo04,True)--,
+        (jogo2,False),
+        (jogo04,False)--,
         --(jogoTurorial,False)
         ],
     initLevel = jogo01,
