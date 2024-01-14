@@ -15,7 +15,6 @@ import Data.Maybe (fromJust)
 import Utilities
 import Data.Fixed (mod', Pico)
 import Graphics.Gloss.Interface.Environment (getScreenSize)
-import DrawMenu (drawButtonTextDebug, drawButton)
 
 
 -- | Faz a conversão do refrencial usado na lógica interna do jogo para o referencial usado pelo gloss em relaçao á camera do jogo
