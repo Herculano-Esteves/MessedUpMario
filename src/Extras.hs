@@ -17,7 +17,7 @@ extrasFuncao random tempo state = state{levels = replace (levels state) (current
 movimentaExtras :: State -> Tempo -> Semente -> (Int,Int) -> Jogo -> Jogo
 movimentaExtras state dtime random screen jogo  | lostGame jogo == 5 = jogo
                                                 | lostGame jogo == 2 = perdeVidaJogadorEnd dtime jogo
-                                                | otherwise = caoMovimenta random dtime $ atiradorMovimento random dtime $ canhaoMovimento random dtime $ portasFuncao $ movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento dtime jogo
+                                                | otherwise = caoMovimenta random dtime $ atiradorMovimento random dtime $ canhaoMovimento random dtime $ portasFuncao $ movimentaCuspoJogo dtime $ eyeentityMovimento dtime $ eyebossMovimento dtime $ cheatModeAtualiza (cheats state) $ cameraHitbox screen dtime $ bossMovimento random dtime jogo
 
 --Cheats START
 -- | Controla se os cheats estao ativos ou nao (nao colide com os inimigos)
@@ -75,14 +75,16 @@ controlarCameraHitbox control mapa (sizex,sizey) ((x,y),(z,w)) ((a,b),(c,d))
 
 --Boss AI START
 -- | Controla o boss permitindo mais que um por mapa (nao aconselhavel)
-bossMovimento :: Tempo -> Jogo -> Jogo
-bossMovimento tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> (ataque1Boss  x (jogador jogo)) ++ y) [] ( movimentaBoss (head(getcenterofhitbox 4 [(cameraControl jogo)])) tempo a) ++ b}
+bossMovimento :: Semente -> Tempo -> Jogo -> Jogo
+bossMovimento semente tempo jogo    | Boss `elem` map tipo (inimigos jogo) = jogo {inimigos = foldl (\y x -> (ataque1Boss semente  x (jogador jogo)) ++ y) [] ( movimentaBoss (head(getcenterofhitbox 4 [(cameraControl jogo)])) tempo a) ++ b}
                             | otherwise = jogo
                             where   (a,b) = onlyOneTipo (inimigos jogo) Boss
 
 -- | Controla as condiçoes de cada boss
 movimentaBoss :: Posicao -> Tempo -> [Personagem] -> [Personagem]
-movimentaBoss pos tempo bosses = map (\x -> x{aplicaDano = ((snd (aplicaDano boss) <= 30 && snd (aplicaDano boss) >= 25.5) || (snd (aplicaDano boss) <= 22 && snd (aplicaDano boss) >= 19) ,if snd (aplicaDano x)-tempo <= 15 then 30 else if snd (aplicaDano x) < 29.1 && snd (aplicaDano x) > 29 then 29 else
+movimentaBoss pos tempo bosses = map (\x -> x{aplicaDano = ((snd (aplicaDano boss) <= 30 && snd (aplicaDano boss) >= 25.5) || (snd (aplicaDano boss) <= 22 && snd (aplicaDano boss) >= 19) ,if snd (aplicaDano x)-tempo <= 17 then 35 else
+                                        if snd (aplicaDano x) < 30.1 && snd (aplicaDano x) > 30 then 30 else
+                                        if snd (aplicaDano x) < 29.1 && snd (aplicaDano x) > 29 then 29 else
                                         if snd (aplicaDano x) < 28.1 && snd (aplicaDano x) > 28 then 28 else
                                         if snd (aplicaDano x) < 27.1 && snd (aplicaDano x) > 27 then 27 else
                                         if snd (aplicaDano x) < 22.1 && snd (aplicaDano x) > 22 then 22 else
@@ -95,11 +97,11 @@ movimentaBoss pos tempo bosses = map (\x -> x{aplicaDano = ((snd (aplicaDano bos
                             (a,b) = pos
 
 -- | Controla os aataques do boss
-ataque1Boss :: Personagem -> Personagem -> [Personagem]
-ataque1Boss boss jogador | tempo == 300 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                         | tempo == 290 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                         | tempo == 280 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
-                         | tempo == 270 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d)},boss]
+ataque1Boss :: Int -> Personagem -> Personagem -> [Personagem]
+ataque1Boss n boss jogador | tempo == 300 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d+cont)},boss]
+                         | tempo == 290 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d+cont)},boss]
+                         | tempo == 280 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d+cont)},boss]
+                         | tempo == 270 = [cuspopersonagem{posicao = (bx,by),velocidade = (c,d+cont)},boss]
                          | tempo == 220 = [bolacanhao{velocidade = (11,-7),posicao = posicao boss},boss]
                          | tempo == 210 = [bolacanhao{velocidade = (11,-4),posicao = posicao boss},boss]
                          | tempo == 200 = [bolacanhao{velocidade = (13,-2),posicao = posicao boss},boss]
@@ -112,6 +114,7 @@ ataque1Boss boss jogador | tempo == 300 = [cuspopersonagem{posicao = (bx,by),vel
                                 (a,b) = (jx-bx,jy-by)
                                 (c,d) = (a/sqrt (a^2 + b^2)*5,b/sqrt (a^2 + b^2)*5)
                                 (t,y,u) = mira boss
+                                cont = fromIntegral ((div n 20) -3)
 
 
 
