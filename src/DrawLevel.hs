@@ -189,8 +189,8 @@ drawMoreComplex state jogo controlo inim    | tipo inim == EyeBoss = Pictures [s
                                                 caoanimacao = [caoenemy1,caoenemy2]
                                                 caoenemy1 = fromJust (lookup "caoenemy1" imagesTheme)
                                                 caoenemy2 = fromJust (lookup "caoenemy2" imagesTheme)
-                                                caoenemyanel1 = fromJust (lookup "caoenemyanel1" imagesTheme)
-                                                caoenemyanel2 = fromJust (lookup "caoenemyanel2" imagesTheme)
+                                                caoenemyanel1 = if (currentMenu state /= LevelEditor) then fromJust (lookup "caoenemyanel1" imagesTheme) else blank
+                                                caoenemyanel2 = if (currentMenu state /= LevelEditor) then fromJust (lookup "caoenemyanel2" imagesTheme) else blank
                                                 imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
                                                 starttranslate x = Translate (fst $ posMapToGlossNivel (cameraControl jogo) (posicao inim)) (0.3+snd (posMapToGlossNivel (cameraControl jogo) (posicao inim))) $ scale (d2f escalaGloss/50) (d2f escalaGloss/50) x
                                                 desenhahit = drawHitbox controlo jogo (jogador jogo) inim
