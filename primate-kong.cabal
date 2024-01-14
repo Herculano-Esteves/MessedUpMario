@@ -112,5 +112,18 @@ test-suite primate-kong-test
     -- The entrypoint to the test suite.
     main-is:          Spec.hs
 
+    other-modules:
+        LI12324
+        Tarefa1
+        Tarefa2
+        Tarefa3
+        Tarefa4
+        Mapas
+        Utilities
+        Tarefa1Spec
+        Tarefa2Spec
+        Tarefa3Spec
+        Tarefa4Spec
+
     -- Test dependencies.
     build-depends:    base ^>=4.16.4.0, random ^>=1.2.1.1, HUnit, gloss ^>=1.13.2.2

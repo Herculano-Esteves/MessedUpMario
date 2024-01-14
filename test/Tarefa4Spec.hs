@@ -61,7 +61,7 @@ jogo01 =
   Jogo
     { mapa = mapa01,
       inimigos = [inimigoParado],
-      colecionaveis = [],
+      colecionaveis = [(Estrela, (8.5,6.5))],
       jogador = jogadorParado,
       lostGame = 3,
       cameraControl = ((0,0),(0,0)),
@@ -128,10 +128,10 @@ jogo02 =
 teste05 :: Test
 teste05 = TestLabel "T05" $ test [testeA, testeB]
   where
-    testeA = "A: Quando a acção é Subir, o vetor velocidade do jogador é negativo na componente do Y" ~: True ~=? (snd . velocidade . jogador $ resultadoSubir) < 0
+    testeA = "A: Quando a acção é Subir, o vetor velocidade do jogador é negativo na componente do Y" ~: True ~=? (snd . velocidade . jogador $ resultadosubirescada) < 0
     testeB = "B: Quando a acção é Saltar, o jogador passa a estar em escada" ~: True ~=? (emEscada . jogador $ resultadoSubir)
-    resultadoSubir = movimenta 100 (1/2) $ atualiza [Nothing,Nothing] (Just Subir) jogo01{jogador= (jogador jogo01){posicao = (5.5,3.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
-    resultadosubirescada = movimenta 100 (1/60) $ atualiza [Nothing,Nothing] (Just Subir) jogo01{jogador= (jogador jogo01){posicao = (5.5,3.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
+    resultadoSubir = movimenta 100 (1/2) $ atualiza [Nothing,Nothing] (Just Subir) $ movimenta 100 (1/2) jogo01{jogador= (jogador jogo01){posicao = (6.5,4.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
+    resultadosubirescada = movimenta 100 (1/60) $ atualiza [Nothing, Nothing] (Just Subir) $ movimenta 100 (1/60) jogo01{jogador= (jogador jogo01){posicao = (6.5,4.5),tamanho = (1,1)},inimigos = [inimigoParado{posicao = (1,1)},inimigoParado{posicao = (1,1)}]}
 
 jogadorEmEscada =
   Personagem
