@@ -69,14 +69,26 @@ drawMenu state
     where temasText = fromJust $ lookup "temasText" (fromJust $ lookup Default (images state))
           
 drawEntityMenu :: State -> Picture
-drawEntityMenu state = Pictures $ [Translate (-100) (-100) $ scale (-7.5) 7.5 $ playAnimAny (length bossanim) (time state) bossanim]
-        where   bossanim = [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6]
+drawEntityMenu state = Pictures $ [Translate (-1000) (20) $ scale (-15) 15 $ playAnimAny (9) (time state) allanimation]
+        where   allanimation =  bossanim ++ bossanim ++ bossanim ++ bossanim ++ bossanim ++ bossanim ++ ataqueboss
+                bossanim = [texBoss1,texBoss2,texBoss3,texBoss4,texBoss5,texBoss6]
                 texBoss1 = fromJust (lookup "boss1" imagesTheme)
                 texBoss2 = fromJust (lookup "boss2" imagesTheme)
                 texBoss3 = fromJust (lookup "boss3" imagesTheme)
                 texBoss4 = fromJust (lookup "boss4" imagesTheme)
                 texBoss5 = fromJust (lookup "boss5" imagesTheme)
                 texBoss6 = fromJust (lookup "boss6" imagesTheme)
+                ataqueboss = [texataque1,texataque2,texataque3,texataque4,texataque5,texataque6,texataque7,texataque8,texataque9,texataque10]
+                texataque1 = fromJust (lookup "ataqueboss1" imagesTheme)
+                texataque3 = fromJust (lookup "ataqueboss3" imagesTheme)
+                texataque4 = fromJust (lookup "ataqueboss4" imagesTheme)
+                texataque5 = fromJust (lookup "ataqueboss5" imagesTheme)
+                texataque2 = fromJust (lookup "ataqueboss2" imagesTheme)
+                texataque6 = fromJust (lookup "ataqueboss6" imagesTheme)
+                texataque7 = fromJust (lookup "ataqueboss7" imagesTheme)
+                texataque8 = fromJust (lookup "ataqueboss8" imagesTheme)
+                texataque9 = fromJust (lookup "ataqueboss9" imagesTheme)
+                texataque10 = fromJust (lookup "ataqueboss10" imagesTheme)
                 imagesTheme = fromJust (lookup (currentTheme (options state)) (images state))
 
 
