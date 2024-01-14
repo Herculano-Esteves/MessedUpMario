@@ -25,28 +25,26 @@ eventHandlerInMenu (EventKey (SpecialKey KeyEnter) Up _ _) state = return $ if p
         (buttonPress state) {menuState = (menuState (buttonPress state)) {pressingButton = False}}
     else
         state
---eventHandlerInMenu (EventKey (Char '1') Down _ _) state = return state {currentLevel = 1}
---eventHandlerInMenu (EventKey (Char '0') Down _ _) state = return state {currentLevel = 0}
 eventHandlerInMenu e state = return state
 
+-- | Função que retorna o limite de setas que podem ser selecionadas num determinado menu
 menuArrowsLimit :: State -> Int
 menuArrowsLimit state
     | currentMenu state == LevelSelection = length (levels state) - 1
     | currentMenu state == InGame = 2
     | currentMenu state == OptionsMenu = 2
     | otherwise = 3
+
 -- | Função que deseha todos os elementos  visuais do menu
 drawMenu :: State -> Picture
 drawMenu state 
     | currentMenu state == MainMenu = Pictures [
-        --drawTitle,
         drawEntityMenu state,
-        drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
-        drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
-        drawButton (images state) "botaoEdit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
-        drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
+        Translate 0 (225) $ drawButton (images state) "botaostart" (selectedButton (menuState state), 0) (pressingButton (menuState state)),
+        Translate 0 100 $ drawButton (images state) "botaoSettings" (selectedButton (menuState state), 1) (pressingButton (menuState state)),
+        Translate 0 (-25) $ drawButton (images state) "botaoEdit" (selectedButton (menuState state), 2) (pressingButton (menuState state)),
+        Translate 0 (-150) $ drawButton (images state) "botaoQuit" (selectedButton (menuState state), 3) (pressingButton (menuState state)),
         drawBanner (images state)
-        
         ]
     | currentMenu state == OptionsMenu = Pictures [
         Translate 0 250 $ scale 2 2 $ temasText,
@@ -150,6 +148,7 @@ drawButtonTextDebug isEnabled n textButton = Pictures [
     Color white $ Translate (-30) ((-110) -10 - 40 * fromIntegral n) $ Scale 0.2 0.2 $ Text textButton
     ]
 
+-- | Desenha o background do menu principal
 drawBanner :: Images -> Picture
 drawBanner tex = scale 1 1 $ fromJust $ lookup "menuBanner" (fromJust $ lookup Default tex)
 
@@ -165,12 +164,14 @@ drawArrow state = Pictures [
             blank
     ]
 
+-- | Desenha um cadeado aberto ou fechado, dependendo se o nível está desbloqueado ou não
 drawLock :: State -> Picture
 drawLock state = Translate 20 (-100) $ (if unlocked then lockOpen else lockClosed)
     where lockOpen = fromJust $ lookup "lockOpen" (fromJust $ lookup Default (images state))
           lockClosed = fromJust $ lookup "lockClosed" (fromJust $ lookup Default (images state))
           unlocked = snd $ (levels state) !! (selectedButton $ menuState state)
 
+-- | Desenha o ecrã de game over
 drawGameover :: State -> Picture
 drawGameover state = Pictures [
         scale 7.5 7.5 $ tex,
@@ -179,6 +180,7 @@ drawGameover state = Pictures [
     where tex = fromJust $ lookup "gameOver" (fromJust $ lookup Default (images state))
           pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
 
+-- | Desenha o ecrã de fim de jogo
 drawEndScreen :: State -> Picture
 drawEndScreen state = Pictures [
         scale 10 10 $ tex,
@@ -187,6 +189,7 @@ drawEndScreen state = Pictures [
     where tex = fromJust $ lookup "endScreen" (fromJust $ lookup Default (images state))
           pressEnterTex = fromJust $ lookup "pressEnterText" (fromJust $ lookup Default (images state))
 
+-- | Altera o tema atual
 switchTheme :: Int -> Theme -> Theme
 switchTheme n current
     | n == 0 = case current of
@@ -198,6 +201,7 @@ switchTheme n current
         Default -> Minecraft
         Minecraft -> Default
 
+-- | Desenha o tema atual
 drawMarioThemeSel :: State -> Picture
 drawMarioThemeSel state = Pictures [
     Translate 0 (100) $ scale 5 5 currentMario,
@@ -212,6 +216,7 @@ drawMarioThemeSel state = Pictures [
             | (selectedButton $ menuState state) > 1 = 1
             | otherwise = (fromIntegral $ selectedButton $ menuState state)
 
+-- | Desenha o highscore
 drawHighscore :: State -> Picture
 drawHighscore state = Pictures [
     Translate 0 (-450) $ scale 2.5 2.5 $ highscoreTex,
