@@ -189,6 +189,20 @@ loadImages state = do
     cavernamariomartelo1 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo1.bmp"
     cavernamariomartelo2 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo2.bmp"
     cavernamariomartelo3 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo3.bmp"
+    --Gold ANIMAÇOES
+    goldmariocorrer1 <- loadBMP "assets/MarioAnimations/GoldTexturas/Andar2.bmp"
+    goldmariocorrer2 <- loadBMP "assets/MarioAnimations/GoldTexturas/Andar1.bmp"
+    goldmariocorrer3 <- loadBMP "assets/MarioAnimations/GoldTexturas/Andar3.bmp"
+    goldmarioolhos <- loadBMP "assets/MarioAnimations/GoldTexturas/Olhos.bmp"
+    goldescada1 <- loadBMP "assets/MarioAnimations/GoldTexturas/Escadas1.bmp"
+    goldescada2 <- loadBMP "assets/MarioAnimations/GoldTexturas/Escadas2.bmp"
+    goldmorreumario <- loadBMP "assets/MarioAnimations/GoldTexturas/MorteMario.bmp"
+    goldmariocair <- loadBMP "assets/MarioAnimations/GoldTexturas/MarioCair1.bmp"
+    goldmariosaltar1 <- loadBMP "assets/MarioAnimations/GoldTexturas/MarioSaltar1.bmp"
+    goldmariosaltar2 <- loadBMP "assets/MarioAnimations/GoldTexturas/MarioSaltar2.bmp"
+    goldmariomartelo1 <- loadBMP "assets/MarioAnimations/GoldTexturas/AndarMartelo1.bmp"
+    goldmariomartelo2 <- loadBMP "assets/MarioAnimations/GoldTexturas/AndarMartelo2.bmp"
+    goldmariomartelo3 <- loadBMP "assets/MarioAnimations/GoldTexturas/AndarMartelo3.bmp"
     --Hud
     hearts <- loadBMP "assets/hud/Heart.bmp"
     marioface <- loadBMP "assets/hud/MarioFace.bmp"
@@ -500,6 +514,22 @@ loadImages state = do
             ("mariomartelo2", cavernamariomartelo2),
             ("mariomartelo3", cavernamariomartelo3),
             ("mariocair", cavernamariocair)
+            ]),
+            (Gold,
+            [
+            ("marioandar1",goldmariocorrer2),
+            ("marioandar2",goldmariocorrer1),
+            ("marioandar3",goldmariocorrer3),
+            ("marioolhos",goldmarioolhos),
+            ("escada1",goldescada1),
+            ("escada2",goldescada2),
+            ("morreumario",goldmorreumario),
+            ("mariosaltar1", goldmariosaltar1),
+            ("mariosaltar2", goldmariosaltar2),
+            ("mariomartelo1", goldmariomartelo1),
+            ("mariomartelo2", goldmariomartelo2),
+            ("mariomartelo3", goldmariomartelo3),
+            ("mariocair", goldmariocair)
             ])
             ]
         }

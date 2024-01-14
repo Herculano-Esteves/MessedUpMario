@@ -18,12 +18,12 @@ import Mapas
 import Text.Read (Lexeme(String))
 
 movimenta :: Semente -> Tempo -> Jogo -> Jogo
-movimenta seed dtime jog    | lostGame jog == 5 = jog
-                            | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog
+movimenta seed dtime jog    | lostGame jog == 5 = jog  --Pausa
+                            | lostGame jog == 2 = perdeVidaJogadorEnd dtime jog --Perdeu uma vida
                             | otherwise = setStarPos $ naoPassaPeloTetoFinal dtime $ ladderConditions $ perdeVidaJogadorJogo $ movimentoMacacoMalvado dtime $ checkEscadas (acionarAlcapao (removerPersoChao ( coletarObjetos dtime  (hitboxDanoJogadorFinal (inimigoMortoEnd (movimentoInimigos seed (gravidadeQuedaEnd dtime jog)))))))
                             where (a,b) = aplicaDano (jogador jog)
 
-
+-- | distancia entre dois pontos
 distancia :: Posicao -> Posicao -> Double
 distancia (x,y) (a,b) = sqrt (abs ((x-a)^2+(y-b)^2))
 
