@@ -175,6 +175,20 @@ loadImages state = do
     quadradomariomartelo1 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo1.bmp"
     quadradomariomartelo2 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo2.bmp"
     quadradomariomartelo3 <- loadBMP "assets/MarioAnimations/QuadradinhoTexturas/AndarMartelo3.bmp"
+    --CAVERNA ANIMAÇOES
+    cavernamariocorrer1 <- loadBMP "assets/MarioAnimations/CavernasTexturas/Andar1.bmp"
+    cavernamariocorrer2 <- loadBMP "assets/MarioAnimations/CavernasTexturas/Andar2.bmp"
+    cavernamariocorrer3 <- loadBMP "assets/MarioAnimations/CavernasTexturas/Andar3.bmp"
+    cavernamarioolhos <- loadBMP "assets/MarioAnimations/CavernasTexturas/Olhos.bmp"
+    cavernaescada1 <- loadBMP "assets/MarioAnimations/CavernasTexturas/Escadas1.bmp"
+    cavernaescada2 <- loadBMP "assets/MarioAnimations/CavernasTexturas/Escadas2.bmp"
+    cavernamorreumario <- loadBMP "assets/MarioAnimations/CavernasTexturas/MorteMario.bmp"
+    cavernamariocair <- loadBMP "assets/MarioAnimations/CavernasTexturas/MarioCair1.bmp"
+    cavernamariosaltar1 <- loadBMP "assets/MarioAnimations/CavernasTexturas/MarioSaltar1.bmp"
+    cavernamariosaltar2 <- loadBMP "assets/MarioAnimations/CavernasTexturas/MarioSaltar2.bmp"
+    cavernamariomartelo1 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo1.bmp"
+    cavernamariomartelo2 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo2.bmp"
+    cavernamariomartelo3 <- loadBMP "assets/MarioAnimations/CavernasTexturas/AndarMartelo3.bmp"
     --Hud
     hearts <- loadBMP "assets/hud/Heart.bmp"
     marioface <- loadBMP "assets/hud/MarioFace.bmp"
@@ -470,6 +484,22 @@ loadImages state = do
             ("mariomartelo2", quadradomariomartelo2),
             ("mariomartelo3", quadradomariomartelo3),
             ("mariocair", quadradomariocair)
+            ]),
+            (Caverna,
+            [
+            ("marioandar1",cavernamariocorrer2),
+            ("marioandar2",cavernamariocorrer1),
+            ("marioandar3",cavernamariocorrer3),
+            ("marioolhos",cavernamarioolhos),
+            ("escada1",cavernaescada1),
+            ("escada2",cavernaescada2),
+            ("morreumario",cavernamorreumario),
+            ("mariosaltar1", cavernamariosaltar1),
+            ("mariosaltar2", cavernamariosaltar2),
+            ("mariomartelo1", cavernamariomartelo1),
+            ("mariomartelo2", cavernamariomartelo2),
+            ("mariomartelo3", cavernamariomartelo3),
+            ("mariocair", cavernamariocair)
             ])
             ]
         }

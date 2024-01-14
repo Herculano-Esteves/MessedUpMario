@@ -133,7 +133,7 @@ drawPlayer state jog = uncurry Translate (posMapToGlossNivel (cameraControl (fst
 drawEnemies :: State ->  (Picture,Picture) -> Picture -> Picture -> [Picture] -> Jogo -> Picture
 drawEnemies state inimigo texMacaco texBarril texBoss jogo = Pictures $ map (\x ->if tipo x == Fantasma then drawEnemy controlo jogo (playAnimAny 3 (time state) [fst inimigo, snd inimigo]) x (jogador jogo) else
                                                             if tipo x == MacacoMalvado then drawEnemy controlo jogo (if direcao x == Norte then texmacaco4 else (playAnimAny (length macacoAndar) (time state) macacoAndar)) x (jogador jogo) else if tipo x == Barril then drawEnemy controlo jogo texBarril x (jogador jogo) else
-                                                            if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then playAnimAny (length ataqueboss) (time state) ataqueboss else playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
+                                                            if tipo x == Boss then drawEnemy controlo jogo (if fst (aplicaDano x) then Scale 5.5 5.5 $ playAnimAny (length ataqueboss) (time state) ataqueboss else Scale 5.5 5.5 $ playAnimAny (length texBoss) (time state) texBoss) x (jogador jogo) else
                                                             if tipo x == CuspoDeFogo then drawEnemy controlo jogo (playAnimAny (length cuspobosstex) (time state) cuspobosstex) x (jogador jogo) else
                                                             drawMoreComplex state jogo controlo x)
                                                             (inimigos jogo)

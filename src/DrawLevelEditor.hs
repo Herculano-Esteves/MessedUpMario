@@ -164,7 +164,7 @@ replaceBlock jog = replaceMapGame (x,y) (newBlock currentBlock) jog
     where currentBlock = blocos !! floor y !! floor x
           (Mapa _ _ blocos) = mapa jog
           newBlock c = case c of
-            Plataforma -> Vazio
+            Plataforma -> Alcapao
             Alcapao -> Escada
             Escada -> Porta
             Porta -> Tunel
@@ -188,7 +188,7 @@ addNewLevel state = state {
             colecionaveis = [
                 (Estrela, (0.5,2.5))
             ],
-            mapa = genEmptyMap (24,20),
+            mapa = genEmptyMap (22,25),
             lostGame = 3,
             cameraControl = ((0,0),(0,0)),
             animacaoJogo = 0,
