@@ -1,5 +1,19 @@
 # Laboratórios de Informática I
 
+## Configuração Local (Sem "Bloat")
+
+Este projeto foi configurado para utilizar um armazenamento de bibliotecas local, para evitar instalar pacotes globais no computador.
+
+Para manter o armazenamento dentro desta pasta, certifique-se de que tem um ficheiro `cabal.project` na raiz do projeto com o seguinte conteúdo:
+
+```cabal
+packages: .
+store-dir: ./.cabal-store
+allow-newer: base
+```
+
+Isso garante que todas as bibliotecas (incluindo `gloss` e `OpenGLRaw`) fiquem na pasta `.cabal-store` dentro deste projeto.
+
 ## Executável
 
 Pode compilar e executar o programa através dos comandos `build` e `run` do `cabal`.

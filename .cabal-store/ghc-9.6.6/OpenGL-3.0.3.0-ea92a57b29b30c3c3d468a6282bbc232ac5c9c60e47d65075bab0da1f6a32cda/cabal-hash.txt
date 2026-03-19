@@ -1,0 +1,10 @@
+pkgid: OpenGL-3.0.3.0
+component: ComponentLib
+src: 5a05ffc752dfc7dd16818d7b3c7c59a27639e246cdfa1963fa02e3ce247a2e19
+pkg-config-deps: 
+deps: GLURaw-2.0.0.5-fe0b5b5d52f4097a0aa26c69807aa034bc403f1ac785d97abd6f2c699fdaa4e3, ObjectName-1.1.0.2-570172fa60c25a36541013e57f6ac071ebba6e63130aba9916e228a98fcf05e9, OpenGLRaw-3.3.4.1-d27af583b19b29d30a598e86c435202232823f7c4b9a015b26004752d32bf501, StateVar-1.2.2-4c0b4e68a271285e8fd5cadf97caf747ffaf4aa117a69ebf23d7fab5e7c8fa93, base-4.18.2.1, bytestring-0.11.5.3, containers-0.6.7, text-2.0.2, transformers-0.6.1.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0

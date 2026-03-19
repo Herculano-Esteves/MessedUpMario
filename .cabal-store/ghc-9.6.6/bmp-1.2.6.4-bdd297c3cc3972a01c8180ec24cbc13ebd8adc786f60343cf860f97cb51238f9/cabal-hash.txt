@@ -1,0 +1,10 @@
+pkgid: bmp-1.2.6.4
+component: ComponentLib
+src: 162e7930d95ea252efda2f8cf30b403b1a26ace34399363f12e4b0968109d345
+pkg-config-deps: 
+deps: base-4.18.2.1, binary-0.8.9.1, bytestring-0.11.5.3
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0

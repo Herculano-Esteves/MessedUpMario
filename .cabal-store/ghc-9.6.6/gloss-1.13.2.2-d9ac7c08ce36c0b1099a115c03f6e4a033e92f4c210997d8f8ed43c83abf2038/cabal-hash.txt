@@ -1,0 +1,11 @@
+pkgid: gloss-1.13.2.2
+component: ComponentLib
+src: b66d9de2fafae77c5c51d1eed1028a620045beab1a928bf4d2df7029155fca27
+pkg-config-deps: 
+deps: GLUT-2.7.0.16-213346a76341e7df4a2c50f1b16d4a671bf11e7587865780bd98789db8fa642f, OpenGL-3.0.3.0-ea92a57b29b30c3c3d468a6282bbc232ac5c9c60e47d65075bab0da1f6a32cda, base-4.18.2.1, bmp-1.2.6.4-bdd297c3cc3972a01c8180ec24cbc13ebd8adc786f60343cf860f97cb51238f9, bytestring-0.11.5.3, containers-0.6.7, ghc-prim-0.10.0, gloss-rendering-1.13.2.1-2fe552df7c143cd98a0006e304fce9f4fd6614627fe9127cb46fa6c1327f5db9
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+flags: -glfw +glut
+shared-lib: True
+stripped-exe: False
+debug-info: 0

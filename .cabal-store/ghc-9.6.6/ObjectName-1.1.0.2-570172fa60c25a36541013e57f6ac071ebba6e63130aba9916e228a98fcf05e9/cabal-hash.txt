@@ -1,0 +1,10 @@
+pkgid: ObjectName-1.1.0.2
+component: ComponentLib
+src: ffa5da1907bfa60de12b9975c25063ed24002699bc6e3774919f2a7d1273b375
+pkg-config-deps: 
+deps: base-4.18.2.1, transformers-0.6.1.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0

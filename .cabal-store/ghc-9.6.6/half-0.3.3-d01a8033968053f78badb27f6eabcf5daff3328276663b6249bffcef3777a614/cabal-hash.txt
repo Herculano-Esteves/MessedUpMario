@@ -1,0 +1,10 @@
+pkgid: half-0.3.3
+component: ComponentLib
+src: f476049628d6ff79722fb073c01e85f2a11b2ef3835fdc3fc21a61f05d17ab02
+pkg-config-deps: 
+deps: base-4.18.2.1, binary-0.8.9.1, deepseq-1.4.8.1, template-haskell-2.20.0.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0

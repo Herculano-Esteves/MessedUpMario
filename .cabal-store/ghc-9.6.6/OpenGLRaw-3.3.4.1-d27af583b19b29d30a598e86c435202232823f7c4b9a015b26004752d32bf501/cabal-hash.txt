@@ -1,0 +1,11 @@
+pkgid: OpenGLRaw-3.3.4.1
+component: ComponentLib
+src: 121abdea149ac74514efb2c1c1c319466757242d1b72a8bdf99d49535f06d31e
+pkg-config-deps: 
+deps: base-4.18.2.1, bytestring-0.11.5.3, containers-0.6.7, fixed-0.3-403b04baceee78d604898651a9acafa163bc13ca4fe645e69c08988c33cd4abe, half-0.3.3-d01a8033968053f78badb27f6eabcf5daff3328276663b6249bffcef3777a614, text-2.0.2, transformers-0.6.1.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+flags: -osandroid +usegles2 +useglxgetprocaddress +usenativewindowslibraries
+shared-lib: True
+stripped-exe: False
+debug-info: 0

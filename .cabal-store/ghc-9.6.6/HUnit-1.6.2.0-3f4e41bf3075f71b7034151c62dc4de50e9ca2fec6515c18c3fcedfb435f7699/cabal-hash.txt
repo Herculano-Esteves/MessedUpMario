@@ -1,0 +1,10 @@
+pkgid: HUnit-1.6.2.0
+component: ComponentLib
+src: b0b7538871ffc058486fc00740886d2f3172f8fa6869936bfe83a5e10bd744ab
+pkg-config-deps: 
+deps: base-4.18.2.1, call-stack-0.4.0-99792bd611a18a862d22ed6d7b134b45ce8446448427bc5ab59605edcdaeff11, deepseq-1.4.8.1
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0

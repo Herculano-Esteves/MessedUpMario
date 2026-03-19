@@ -1,0 +1,11 @@
+pkgid: GLUT-2.7.0.16
+component: ComponentLib
+src: b6fae948d0778ee49e1199b20a007d1c4e9e7c008096fcfe6d2f7ec98974b36d
+pkg-config-deps: 
+deps: OpenGL-3.0.3.0-ea92a57b29b30c3c3d468a6282bbc232ac5c9c60e47d65075bab0da1f6a32cda, StateVar-1.2.2-4c0b4e68a271285e8fd5cadf97caf747ffaf4aa117a69ebf23d7fab5e7c8fa93, array-0.5.6.0, base-4.18.2.1, containers-0.6.7, transformers-0.6.1.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+flags: -buildexamples +usenativewindowslibraries
+shared-lib: True
+stripped-exe: False
+debug-info: 0

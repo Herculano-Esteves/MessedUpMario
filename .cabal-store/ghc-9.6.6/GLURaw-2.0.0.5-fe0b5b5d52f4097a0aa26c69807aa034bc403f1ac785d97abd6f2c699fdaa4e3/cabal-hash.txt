@@ -1,0 +1,11 @@
+pkgid: GLURaw-2.0.0.5
+component: ComponentLib
+src: d1c6097f7db8592617dc6ee79c514cf6605d1f5ee314ba0a5736cd73d4b679ac
+pkg-config-deps: 
+deps: OpenGLRaw-3.3.4.1-d27af583b19b29d30a598e86c435202232823f7c4b9a015b26004752d32bf501, base-4.18.2.1, transformers-0.6.1.0
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+flags: +usenativewindowslibraries
+shared-lib: True
+stripped-exe: False
+debug-info: 0

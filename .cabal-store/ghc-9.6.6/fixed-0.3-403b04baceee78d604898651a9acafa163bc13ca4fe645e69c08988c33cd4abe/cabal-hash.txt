@@ -1,0 +1,10 @@
+pkgid: fixed-0.3
+component: ComponentLib
+src: 9218ebd3af3f07335db8dcd148b3ce40acf984734c244cce5959f57402d48282
+pkg-config-deps: 
+deps: base-4.18.2.1
+compilerid: ghc-9.6.6
+platform: x86_64-linux
+shared-lib: True
+stripped-exe: False
+debug-info: 0
